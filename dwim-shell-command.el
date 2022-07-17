@@ -337,7 +337,7 @@ internal behavior).
     (progress-reporter-update progress-reporter)
     ;; Momentarily set buffer to same window, so it's next in recent stack.
     ;; Makes finding the shell command buffer a lot easier.
-    (let ((current) (current-buffer))
+    (let ((current (current-buffer)))
       (pop-to-buffer-same-window proc-buffer)
       (pop-to-buffer-same-window current))
     (if (equal (process-status proc) 'exit)
@@ -395,7 +395,7 @@ Set TEMP-DIR to a unique temp directory to this template."
   (setq template (replace-regexp-in-string "\\(\<\<td\>\>\\)" temp-dir template nil nil 1))
 
   (when post-process-template
-    (setq template (funcall post-process-template template file)))
+    (setq template (funcall post-process-template template files)))
   template)
 
 (defun dwim-shell-command--expand-file-template (template file &optional post-process-template temp-dir)
@@ -501,7 +501,7 @@ ON-COMPLETION SILENT-SUCCESS are all needed to finalize processing."
     (setq dwim-shell-command--commands
           (map-delete dwim-shell-command--commands (process-name process)))))
 
-(defun dwim-shell-command--sentinel (process state)
+(defun dwim-shell-command--sentinel (process _)
   "Handles PROCESS sentinel and STATE."
   (let ((exec (map-elt dwim-shell-command--commands (process-name process))))
     (dwim-shell-command--finalize (dwim-shell-command--command-calling-buffer exec)
