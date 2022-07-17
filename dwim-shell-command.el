@@ -32,7 +32,11 @@
 (require 'comint)
 (require 'dired)
 (require 'dired-aux)
+(require 'map)
 (require 'seq)
+(require 'shell)
+(require 'subr-x)
+(require 'view)
 
 (defvar dwim-shell-command--commands nil "All commands in progress.")
 
