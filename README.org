@@ -2,7 +2,6 @@
 
 Run M-x =dwim-shell-command= to execute [[https://en.wikipedia.org/wiki/DWIM][DWIM]] shell commands (asynchronously and using noweb templates).
 
-#+ATTR_ORG: :width 100
 [[file:images/template.png]]
 
 
