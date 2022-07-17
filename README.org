@@ -9,11 +9,11 @@ Run M-x =dwim-shell-command= to execute [[https://en.wikipedia.org/wiki/DWIM][DW
 
 =dwim-shell-command= attempts to guess which file(s) you may want the command to operate on.
 
-1. If visiting a =dired= buffer, draw the marked file(s).
+If visiting a =dired= buffer, draw the marked file(s).
 
 [[file:images/diredmark.gif]]
 
-2. If visiting any other buffer with an associated file, use that.
+If visiting any other buffer with an associated file, use that.
 
 [[file:images/blur.png]]
 
@@ -29,14 +29,14 @@ Operate on drawn files using either the following:
 
 For example:
 
-With drawn files ='("path/to/image1.png" "path/to/image2.png")=
+With drawn files =path/to/image1.png= and =path/to/image2.png=
 
-   =convert '<<f>>' '<<fne>>.jpg'= expands to
+  =convert <<f>> <<fne>>.jpg= expands to
 
-     =convert 'path/to/image1.png' 'path/to/image1.jpg'=
-     =convert 'path/to/image2.png' 'path/to/image2.jpg'=
+  =convert path/to/image1.png path/to/image1.jpg=
+  =convert path/to/image2.png path/to/image2.jpg=
 
-   while =ls -lh <<*>>= expands to
+  while =ls -lh <<*>>= expands to
 
      =ls -lh path/to/image1.png path/to/image2.png=
 
@@ -50,30 +50,28 @@ While the process is busy, show a spinner in the minibuffer. No focus changes.
 
 After process is finished:
 
-1. If there were any files created in the =default-directory=, jump to a =dired= buffer and move point to the new file (via [[https://www.gnu.org/software/emacs/manual/html_node/emacs/Dired-Enter.html][dired-jump]]).
+If there were any files created in the =default-directory=, jump to a =dired= buffer and move point to the new file (via [[https://www.gnu.org/software/emacs/manual/html_node/emacs/Dired-Enter.html][dired-jump]]).
 
 [[file:images/showme.png]]
 
 
-2. If no new files were created, automatically switch focus to the process buffer and display its output.
+If no new files were created, automatically switch focus to the process buffer and display its output.
 
 [[file:images/apple.gif]]
 
 Note: You can prevent this automatic focus by prepending your command with whitespace.
 
-   |
-   V
-  " convert '<<f>>' '<<fne>>.jpg'"
+  " convert <<f>> <<fne>>.jpg"
 
-3. If the shell command caused any errors, offer to focus the process buffer and display its output.
+If the shell command caused any errors, offer to focus the process buffer and display its output.
 
 [[file:images/couldnt.png]]
 
 *** Easily create utilities
 
-Command-line utilities like [[https://ffmpeg.org/][ffmpeg]] can be easily integrated into Emacs flows (without the need to remember any flags or parameters) by wrapping command invocations into functions and invoking via =M-x= (or your favorite binding).
+Command-line utilities like [[https://ffmpeg.org/][ffmpeg]] can be easily integrated into Emacs flows (without the need to remember any flags or parameters) by wrapping command invocations into functions and invoking via =M-x= (or your favorite binding). Same DWIM behavior from =dwim-shell-command= is inherited.
 
-All gifs in this README were created via M-x =dwim-shell-command-convert-to-gif=, powered by =dwim-shell-command-on-marked-files=, included in =dwim-shell-command.el=:
+All gifs in this README were created via M-x =dwim-shell-command-convert-to-gif=, powered by =dwim-shell-command-on-marked-files=:
 
 #+begin_src emacs-lisp :lexical no
   (defun dwim-shell-command-convert-to-gif ()
