@@ -1,7 +1,5 @@
 * dwim-shell-command
 
-Emacs shell commands with /do what I mean/ ([[https://en.wikipedia.org/wiki/DWIM][DWIM]]) behaviour.
-
 Run M-x =dwim-shell-command= to execute /do what I mean/ ([[https://en.wikipedia.org/wiki/DWIM][DWIM]]) shell commands asynchronously using noweb templates.
 
 * Which files
