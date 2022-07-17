@@ -18,11 +18,11 @@ Run M-x =dwim-shell-command= to execute [[https://en.wikipedia.org/wiki/DWIM][DW
 
 Operate on drawn files using either the following:
 
-  <<f>> (file path)
-  <<fne>> (file path without extension)
-  <<e>> (extension)
-  <<td>> (generate a temporary directory)
-  <<*>> (all files joined)
+  - =<<f>>= (file path)
+  - =<<fne>>= (file path without extension)
+  - =<<e>>= (extension)
+  - =<<td>>= (generate a temporary directory)
+  - =<<*>>= (all files joined)
 
 [[file:images/template.png]]
 
