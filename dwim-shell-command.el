@@ -38,6 +38,10 @@
 (require 'subr-x)
 (require 'view)
 
+(defcustom dwim-shell-command-show-placeholders-in-prompt t
+  "If t, show template placeholders in prompt."
+  :type 'boolean)
+
 (defvar dwim-shell-command--commands nil "All commands in progress.")
 
 (cl-defstruct
@@ -120,7 +124,9 @@ Quick exit
   pressing `q'."
   (interactive)
   (dwim-shell-command-on-marked-files
-   "DWIM shell command" (read-shell-command "DWIM shell command: ")))
+   "DWIM shell command" (read-shell-command (if dwim-shell-command-show-placeholders-in-prompt
+                                                "DWIM shell command (<<f>> <<fne>> <<e>> <<td>> <<*>>): "
+                                              "DWIM shell command: "))))
 
 (cl-defun dwim-shell-command-on-marked-files (buffer-name script &key utils extensions shell-util shell-args shell-pipe post-process-template on-completion)
   "Create DWIM utilities executing templated SCRIPT on given files.
