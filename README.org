@@ -3,8 +3,6 @@
 Run M-x =dwim-shell-command= to execute [[https://en.wikipedia.org/wiki/DWIM][DWIM]] shell commands (asynchronously and using noweb templates).
 
 [[file:images/template.png]]
-
-
 * Which files
 
 =dwim-shell-command= attempts to guess which file(s) you may want the command to operate on.
