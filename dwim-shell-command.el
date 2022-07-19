@@ -43,6 +43,11 @@
   :type 'boolean
   :group 'dwim-shell-command)
 
+(defcustom dwim-shell-command-prompt-on-error t
+  "If t, prompt user to focus buffer on process error."
+  :type 'boolean
+  :group 'dwim-shell-command)
+
 (defvar dwim-shell-command--commands nil "All commands in progress.")
 
 (cl-defstruct
@@ -504,7 +509,9 @@ ON-COMPLETION SILENT-SUCCESS are all needed to finalize processing."
               (unless silent-success
                 (switch-to-buffer (process-buffer process))))))
       (if (and (buffer-name (process-buffer process))
-               (y-or-n-p (format "Couldn't run %s, see output? " (buffer-name (process-buffer process)))))
+               (or (not dwim-shell-command-prompt-on-error)
+                   (y-or-n-p (format "Couldn't run %s, see output? "
+                                     (buffer-name (process-buffer process))))))
           (switch-to-buffer (process-buffer process))
         (kill-buffer (process-buffer process))))
     (setq dwim-shell-command--commands
