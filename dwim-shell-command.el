@@ -40,7 +40,8 @@
 
 (defcustom dwim-shell-command-show-placeholders-in-prompt t
   "If t, show template placeholders in prompt."
-  :type 'boolean)
+  :type 'boolean
+  :group 'dwim-shell-command)
 
 (defvar dwim-shell-command--commands nil "All commands in progress.")
 
