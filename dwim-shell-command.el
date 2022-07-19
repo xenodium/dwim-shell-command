@@ -125,9 +125,10 @@ Quick exit
   pressing `q'."
   (interactive)
   (dwim-shell-command-on-marked-files
-   "DWIM shell command" (read-shell-command (if dwim-shell-command-show-placeholders-in-prompt
-                                                "DWIM shell command (<<f>> <<fne>> <<e>> <<td>> <<*>>): "
-                                              "DWIM shell command: "))))
+   "DWIM shell command"
+   (read-shell-command (if dwim-shell-command-show-placeholders-in-prompt
+                           "DWIM shell command (<<f>> <<fne>> <<e>> <<td>> <<*>>): "
+                         "DWIM shell command: "))))
 
 (cl-defun dwim-shell-command-on-marked-files (buffer-name script &key utils extensions shell-util shell-args shell-pipe post-process-template on-completion)
   "Create DWIM utilities executing templated SCRIPT on given files.
@@ -352,13 +353,12 @@ internal behavior).
       (pop-to-buffer-same-window proc-buffer)
       (pop-to-buffer-same-window current))
     (if (equal (process-status proc) 'exit)
-        (progn
-          (dwim-shell-command--finalize (current-buffer)
-                                        files-before
-                                        proc
-                                        progress-reporter
-                                        on-completion
-                                        silent-success))
+        (dwim-shell-command--finalize (current-buffer)
+                                      files-before
+                                      proc
+                                      progress-reporter
+                                      on-completion
+                                      silent-success)
       (setq dwim-shell-command--commands
             (push (cons (process-name proc)
                         (make-dwim-shell-command--command :script script
@@ -486,25 +486,23 @@ ON-COMPLETION SILENT-SUCCESS are all needed to finalize processing."
       (progress-reporter-done progress-reporter))
     (if (= (process-exit-status process) 0)
         (if on-completion
-            (progn
-              (funcall on-completion (process-buffer process)))
-          (progn
-            (with-current-buffer calling-buffer
-              (when (and (equal major-mode 'dired-mode)
-                         revert-buffer-function)
-                (funcall revert-buffer-function nil t))
-              (setq oldest-new-file
-                    (dwim-shell-command--last-modified-between
-                     files-before
-                     (dwim-shell-command--default-directory-files)))
-              (when oldest-new-file
-                (dired-jump nil oldest-new-file)))
-            (unless (equal (process-buffer process)
-                           (window-buffer (selected-window)))
-              (if oldest-new-file
-                  (kill-buffer (process-buffer process))
-                (unless silent-success
-                  (switch-to-buffer (process-buffer process)))))))
+            (funcall on-completion (process-buffer process))
+          (with-current-buffer calling-buffer
+            (when (and (equal major-mode 'dired-mode)
+                       revert-buffer-function)
+              (funcall revert-buffer-function nil t))
+            (setq oldest-new-file
+                  (dwim-shell-command--last-modified-between
+                   files-before
+                   (dwim-shell-command--default-directory-files)))
+            (when oldest-new-file
+              (dired-jump nil oldest-new-file)))
+          (unless (equal (process-buffer process)
+                         (window-buffer (selected-window)))
+            (if oldest-new-file
+                (kill-buffer (process-buffer process))
+              (unless silent-success
+                (switch-to-buffer (process-buffer process))))))
       (if (and (buffer-name (process-buffer process))
                (y-or-n-p (format "Couldn't run %s, see output? " (buffer-name (process-buffer process)))))
           (switch-to-buffer (process-buffer process))
