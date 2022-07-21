@@ -31,12 +31,16 @@ With drawn files =path/to/image1.png= and =path/to/image2.png=
 
   =convert <<f>> <<fne>>.jpg= expands to
 
-  =convert path/to/image1.png path/to/image1.jpg=
-  =convert path/to/image2.png path/to/image2.jpg=
+  #+begin_src sh
+    convert path/to/image1.png path/to/image1.jpg
+    convert path/to/image2.png path/to/image2.jpg
+  #+end_src
 
   while =ls -lh <<*>>= expands to
 
-     =ls -lh path/to/image1.png path/to/image2.png=
+  #+begin_src sh
+    ls -lh path/to/image1.png path/to/image2.png
+  #+end_src
 
 * Focus
 
@@ -125,3 +129,16 @@ Use your preferred way to install /dwim-shell-command/. Until available on [[htt
 Now you're ready to run
 
 M-x =dwim-shell-command=
+
+** use-package
+
+You can load with use-package and remap to `shell-command`'s existing binding using something like:
+
+#+begin_src emacs-lisp :lexical no
+  (use-package dwim-shell-command
+    :bind (([remap shell-command] . dwim-shell-command)
+           :map dired-mode-map
+           ([remap dired-do-async-shell-command] . dwim-shell-command)
+           ([remap dired-do-shell-command] . dwim-shell-command)
+           ([remap dired-smart-shell-command] . dwim-shell-command)))
+#+end_src
