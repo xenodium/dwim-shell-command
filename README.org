@@ -1,13 +1,35 @@
 * dwim-shell-command
 
-Run M-x =dwim-shell-command= to execute [[https://en.wikipedia.org/wiki/DWIM][DWIM]] shell commands (asynchronously and using noweb templates).
+** Run M-x =dwim-shell-command= to execute [[https://en.wikipedia.org/wiki/DWIM][DWIM]] shell commands
+
+- Asynchronously.
+- Using noweb templates.
+- Automatically injecting files (from [[https://www.gnu.org/software/emacs/manual/html_node/emacs/Dired.html][dired]] or other buffers).
+- Managing buffer focus with heuristics.
+- Showing progress bar.
+- Quick buffer exit.
 
 [[file:images/template.png]]
+
+** Bring command-line utilities to your Emacs workflows
+
+Use =dwim-shell-command-on-marked-files= to easily integrate command-line utilities into frequent Emacs workflows (ie. operate on current buffer or [[https://www.gnu.org/software/emacs/manual/html_node/emacs/Dired.html][dired]] files).
+
+#+begin_src emacs-lisp :lexical no
+  (defun dwim-shell-command-convert-to-gif ()
+    "Convert all marked videos to optimized gif(s)."
+    (interactive)
+    (dwim-shell-command-on-marked-files
+     "Convert to gif"
+     "ffmpeg -loglevel quiet -stats -y -i <<f>> -pix_fmt rgb24 -r 15 <<fne>>.gif"
+     :utils "ffmpeg"))
+#+end_src
+
 * Which files
 
 =dwim-shell-command= attempts to guess which file(s) you may want the command to operate on.
 
-If visiting a =dired= buffer, draw the marked file(s).
+If visiting a [[https://www.gnu.org/software/emacs/manual/html_node/emacs/Dired.html][dired]] buffer, draw the marked file(s).
 
 [[file:images/diredmark.gif]]
 
@@ -52,7 +74,7 @@ While the process is busy, show a spinner in the minibuffer. No focus changes.
 
 After process is finished:
 
-If there were any files created in the =default-directory=, jump to a =dired= buffer and move point to the new file (via [[https://www.gnu.org/software/emacs/manual/html_node/emacs/Dired-Enter.html][dired-jump]]).
+If there were any files created in the =default-directory=, jump to a [[https://www.gnu.org/software/emacs/manual/html_node/emacs/Dired.html][dired]] buffer and move point to the new file (via [[https://www.gnu.org/software/emacs/manual/html_node/emacs/Dired-Enter.html][dired-jump]]).
 
 [[file:images/showme.png]]
 
