@@ -350,7 +350,12 @@ internal behavior).
                                                       (if shell-pipe
                                                           (list (format "echo '%s' | %s" script shell-pipe))
                                                         (list script)))))
-    (setq progress-reporter (make-progress-reporter (process-name proc)))
+    (setq progress-reporter (make-progress-reporter
+                             ;; Append space so "done" is spaced when
+                             ;; progress reporter is finished:
+                             ;;
+                             ;; *DWIM shell command* done
+                             (concat (process-name proc) " ")))
     (progress-reporter-update progress-reporter)
     ;; Momentarily set buffer to same window, so it's next in recent stack.
     ;; Makes finding the shell command buffer a lot easier.
