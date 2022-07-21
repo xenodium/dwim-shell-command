@@ -515,9 +515,12 @@ ON-COMPLETION SILENT-SUCCESS are all needed to finalize processing."
                 (switch-to-buffer (process-buffer process))))))
       (if (and (buffer-name (process-buffer process))
                (or (not dwim-shell-command-prompt-on-error)
-                   (y-or-n-p (format "Couldn't run %s, see output? "
+                   (y-or-n-p (format "Error in %s, see output? "
                                      (buffer-name (process-buffer process))))))
-          (switch-to-buffer (process-buffer process))
+          (progn
+            (switch-to-buffer (process-buffer process))
+            (unless dwim-shell-command-prompt-on-error
+              (message "Error in %s" (buffer-name (process-buffer process)))))
         (kill-buffer (process-buffer process))))
     (setq dwim-shell-command--commands
           (map-delete dwim-shell-command--commands (process-name process)))))
