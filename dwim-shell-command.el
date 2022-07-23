@@ -82,6 +82,7 @@ Templates
     <<e>> (extension)
     <<td>> (generate a temporary directory)
     <<*>> (all files joined)
+    <<cb>> (clipboard)
 
   For example:
 
@@ -174,6 +175,7 @@ Templates
     <<e>> (extension)
     <<td>> (generate a temporary directory)
     <<*>> (all files joined)
+    <<cb>> (clipboard)
 
   For example:
 
@@ -232,7 +234,7 @@ Quick exit
                                      :on-completion on-completion
                                      :silent-success (string-prefix-p " " script)))
 
-(cl-defun dwim-shell-command-execute-script (buffer-name script &key files extensions shell-util shell-args shell-pipe utils post-process-template on-completion silent-success gen-temp-dir)
+(cl-defun dwim-shell-command-execute-script (buffer-name script &key files extensions shell-util shell-args shell-pipe utils post-process-template on-completion silent-success gen-temp-dir clipboard)
   "Execute a script asynchronously, DWIM style with SCRIPT and BUFFER-NAME.
 
 :FILES are used to instantiate SCRIPT as a noweb template.
@@ -244,6 +246,7 @@ Quick exit
     <<e>> (extension)
     <<td>> (generate a temporary directory)
     <<*>> (all files joined)
+    <<cb>> (clipboard)
 
   For example:
 
@@ -415,6 +418,11 @@ Set TEMP-DIR to a unique temp directory to this template."
   ;; "<<td>>" with TEMP-DIR -> "/var/folders/m7/ky091cp56d5g68nyhl4y7frc0000gn/T/dwim-shell-command-JNK4V5"
   (setq template (replace-regexp-in-string "\\(\<\<td\>\>\\)" temp-dir template nil nil 1))
 
+  ;; "<<cb>>" with (current-kill 0) -> "whatever was in kill ring"
+  (setq template (replace-regexp-in-string "\\(\<\<cb\>\>\\)" (or (current-kill 0)
+                                                              (user-error "Nothing in clipboard"))
+                                           template nil nil 1))
+
   (when post-process-template
     (setq template (funcall post-process-template template files)))
   template)
@@ -455,6 +463,11 @@ Set TEMP-DIR to a unique temp directory to this template."
 
   ;; "<<td>>" with TEMP-DIR -> "/var/folders/m7/ky091cp56d5g68nyhl4y7frc0000gn/T/dwim-shell-command-JNK4V5"
   (setq template (replace-regexp-in-string "\\(\<\<td\>\>\\)" temp-dir template nil nil 1))
+
+  ;; "<<cb>>" with (current-kill 0) -> "whatever was in kill ring"
+  (setq template (replace-regexp-in-string "\\(\<\<cb\>\>\\)" (or (current-kill 0)
+                                                              (user-error "Nothing in clipboard"))
+                                           template nil nil 1))
 
   (when post-process-template
     (setq template (funcall post-process-template template file)))
