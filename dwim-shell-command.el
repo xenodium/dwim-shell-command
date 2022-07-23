@@ -563,7 +563,28 @@ ON-COMPLETION SILENT-SUCCESS are all needed to finalize processing."
   "Return buffer file (if available) or marked files for a `dired' buffer."
   (if (buffer-file-name)
       (list (buffer-file-name))
-    (dired-get-marked-files)))
+    (or
+     (dwim-shell-command--dired-paths-in-region)
+     (dired-get-marked-files))))
+
+(defun dwim-shell-command--dired-paths-in-region ()
+  "If `dired' buffer, return region files.  nil otherwise."
+  (when (and (equal major-mode 'dired-mode)
+             mark-active)
+    (let ((start (region-beginning))
+          (end (region-end))
+          (paths))
+      (save-excursion
+        (save-restriction
+          (goto-char start)
+          (while (< (point) end)
+            ;; Skip non-file lines.
+            (while (and (< (point) end) (dired-between-files))
+              (forward-line 1))
+            (when (dired-get-filename nil t)
+              (setq paths (append paths (list (dired-get-filename nil t)))))
+            (forward-line 1))))
+      paths)))
 
 (provide 'dwim-shell-command)
 
