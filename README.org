@@ -46,6 +46,7 @@ Operate on drawn files using either the following:
   - =<<e>>= (extension)
   - =<<td>>= (generate a temporary directory)
   - =<<*>>= (all files joined)
+  - =<<cb>>= (clipboard)
 
 For example:
 
