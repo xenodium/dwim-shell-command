@@ -159,7 +159,7 @@ M-x =dwim-shell-command=
 
 ** use-package
 
-You can load with use-package and remap to `shell-command`'s existing binding using something like:
+You can load with use-package and remap to =shell-command='s existing binding using something like:
 
 #+begin_src emacs-lisp :lexical no
   (use-package dwim-shell-command
