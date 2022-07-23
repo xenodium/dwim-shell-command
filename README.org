@@ -140,6 +140,10 @@ This makes wrapping one-liners a breeze, so let's do some more...
 * Quick exit
 
 Process buffers are read-only and can be quickly closed by pressing =q=.
+* More reusable history
+Because of templates, command history becomes automatically reusable in other contexts.
+
+[[file:images/history.png]]
 
 * Install
 
