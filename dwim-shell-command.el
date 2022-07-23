@@ -40,13 +40,13 @@
 
 (defcustom dwim-shell-command-prompt
   "DWIM shell command (<<f>> <<fne>> <<e>> <<td>> <<*>> <<cb>>): "
-  "`dwim-shell-command' prompt. Modify if shorter is preferred."
+  "`dwim-shell-command' prompt.  Modify if shorter is preferred."
   :type 'string
   :group 'dwim-shell-command)
 
 (defcustom dwim-shell-command-buffer-name
   "DWIM shell command"
-  "`dwim-shell-command' buffer name. Modify if shorter is preferred."
+  "`dwim-shell-command' buffer name.  Modify if shorter is preferred."
   :type 'string
   :group 'dwim-shell-command)
 
