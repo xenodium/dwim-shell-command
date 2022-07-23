@@ -133,7 +133,7 @@ Quick exit
   (dwim-shell-command-on-marked-files
    "DWIM shell command"
    (read-shell-command (if dwim-shell-command-show-placeholders-in-prompt
-                           "DWIM shell command (<<f>> <<fne>> <<e>> <<td>> <<*>>): "
+                           "DWIM shell command (<<f>> <<fne>> <<e>> <<td>> <<*>> <<cb>>): "
                          "DWIM shell command: "))))
 
 (cl-defun dwim-shell-command-on-marked-files (buffer-name script &key utils extensions shell-util shell-args shell-pipe post-process-template on-completion)
