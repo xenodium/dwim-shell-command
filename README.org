@@ -1,15 +1,15 @@
 * dwim-shell-command
 
-** Run M-x =dwim-shell-command= to execute [[https://en.wikipedia.org/wiki/DWIM][DWIM]] shell commands
+[[file:images/template.png]]
 
+** Run M-x =dwim-shell-command= to execute [[https://en.wikipedia.org/wiki/DWIM][DWIM]] shell commands
 - Asynchronously.
 - Using noweb templates.
-- Automatically injecting files (from [[https://www.gnu.org/software/emacs/manual/html_node/emacs/Dired.html][dired]] or other buffers).
+- Automatically injecting files (from [[https://www.gnu.org/software/emacs/manual/html_node/emacs/Dired.html][dired]] or other buffers) or kill ring.
 - Managing buffer focus with heuristics.
 - Showing progress bar.
 - Quick buffer exit.
-
-[[file:images/template.png]]
+- More reusable history.
 
 ** Bring command-line utilities to your Emacs workflows
 
