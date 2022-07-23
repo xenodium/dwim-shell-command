@@ -35,6 +35,7 @@ If visiting a [[https://www.gnu.org/software/emacs/manual/html_node/emacs/Dired.
 
 If visiting any other buffer with an associated file, use that.
 
+#+ATTR_html: :width 600px
 [[file:images/blur.png]]
 
 * noweb templates
