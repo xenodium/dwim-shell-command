@@ -332,7 +332,7 @@ internal behavior).
          (proc)
          (progress-reporter))
     (if (seq-empty-p files)
-        (setq script template)
+        (setq script (dwim-shell-command--expand-file-template template nil post-process-template gen-temp-dir))
       (if (dwim-shell-command--contains-multi-file-ref template)
           (setq script (dwim-shell-command--expand-files-template template files post-process-template gen-temp-dir))
         (seq-do (lambda (file)
@@ -437,7 +437,7 @@ Set TEMP-DIR to a unique temp directory to this template."
 Expand using <<f>> for FILE, <<fne>> for FILE without extension, and
  <<e>> for FILE extension.
 
-Note: This expander cannot be used to expand <<*>>, <<fne>>, or <<e>>.
+Note: This expander cannot be used to expand <<*>>.
 
   For example:
 
@@ -455,15 +455,16 @@ Set TEMP-DIR to a unique temp directory to this template."
              nil "Must not have %s and %s in the same template"
              (dwim-shell-command--contains-multi-file-ref template)
              (dwim-shell-command--contains-single-file-ref template))
-  (setq file (expand-file-name file))
-  ;; "<<fne>>" with "/path/tmp.txt" -> "/path/tmp"
-  (setq template (replace-regexp-in-string "\\(\<\<fne\>\>\\)" (file-name-sans-extension file) template nil nil 1))
+  (when file
+    (setq file (expand-file-name file))
+    ;; "<<fne>>" with "/path/tmp.txt" -> "/path/tmp"
+    (setq template (replace-regexp-in-string "\\(\<\<fne\>\>\\)" (file-name-sans-extension file) template nil nil 1))
 
-  ;; "<<e>>" with "/path/tmp.txt" -> "txt"
-  (setq template (replace-regexp-in-string "\\(\<\<e\>\>\\)" (file-name-extension file) template nil nil 1))
+    ;; "<<e>>" with "/path/tmp.txt" -> "txt"
+    (setq template (replace-regexp-in-string "\\(\<\<e\>\>\\)" (file-name-extension file) template nil nil 1))
 
-  ;; "<<f>>" with "/path/file.jpg" -> "/path/file.jpg"
-  (setq template (replace-regexp-in-string "\\(\<\<f\>\>\\)" file template nil nil 1))
+    ;; "<<f>>" with "/path/file.jpg" -> "/path/file.jpg"
+    (setq template (replace-regexp-in-string "\\(\<\<f\>\>\\)" file template nil nil 1)))
 
   ;; "<<td>>" with TEMP-DIR -> "/var/folders/m7/ky091cp56d5g68nyhl4y7frc0000gn/T/dwim-shell-command-JNK4V5"
   (setq template (replace-regexp-in-string "\\(\<\<td\>\>\\)" temp-dir template nil nil 1))
