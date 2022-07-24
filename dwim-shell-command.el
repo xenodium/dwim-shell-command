@@ -350,13 +350,13 @@ internal behavior).
       (view-mode +1)
       (setq view-exit-action 'kill-buffer))
     (setq files-before (dwim-shell-command--default-directory-files))
-    (setq proc (apply 'start-process (seq-concatenate 'list
-                                                      (list (buffer-name proc-buffer) proc-buffer)
-                                                      (or shell-util '("zsh"))
-                                                      (or shell-args '("-x" "-c"))
-                                                      (if shell-pipe
-                                                          (list (format "echo '%s' | %s" script shell-pipe))
-                                                        (list script)))))
+    (setq proc (apply #'start-process (seq-concatenate 'list
+                                                       (list (buffer-name proc-buffer) proc-buffer)
+                                                       (or shell-util '("zsh"))
+                                                       (or shell-args '("-x" "-c"))
+                                                       (if shell-pipe
+                                                           (list (format "echo '%s' | %s" script shell-pipe))
+                                                         (list script)))))
     (setq progress-reporter (make-progress-reporter
                              ;; Append space so "done" is spaced when
                              ;; progress reporter is finished:
