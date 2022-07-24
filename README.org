@@ -143,7 +143,7 @@ Process buffers are read-only and can be quickly closed by pressing =q=.
 * More reusable history
 Because of templates, command history becomes automatically reusable in other contexts.
 
-[[file:images/history.png]]
+#+HTML: <img src="https://raw.githubusercontent.com/xenodium/dwim-shell-command/main/images/history.png" width="75%" />
 
 * Install
 
