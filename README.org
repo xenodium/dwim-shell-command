@@ -31,7 +31,7 @@ Use =dwim-shell-command-on-marked-files= to easily integrate command-line utilit
 
 If visiting a [[https://www.gnu.org/software/emacs/manual/html_node/emacs/Dired.html][dired]] buffer, draw the marked file(s).
 
-#+HTML: <video src="https://raw.githubusercontent.com/xenodium/dwim-shell-command/main/images/diredmark_x0.50.mov" controls="controls" width="75%"></video>
+#+HTML: <img src="https://raw.githubusercontent.com/xenodium/dwim-shell-command/main/images/diredmark.webp" width="75%" />
 
 If visiting any other buffer with an associated file, use that.
 
