@@ -35,7 +35,7 @@ If visiting a [[https://www.gnu.org/software/emacs/manual/html_node/emacs/Dired.
 
 If visiting any other buffer with an associated file, use that.
 
-#+HTML: <img src="/xenodium/dwim-shell-command/raw/main/images/blur.png" width="300" />
+#+HTML: <img src="https://raw.githubusercontent.com/xenodium/dwim-shell-command/main/images/blur.png" width="300" />
 
 * noweb templates
 
