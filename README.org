@@ -71,7 +71,7 @@ With drawn files =path/to/image1.png= and =path/to/image2.png=
 
 While the process is busy, show a spinner in the minibuffer. No focus changes.
 
-[[file:images/progress.gif]]
+#+HTML: <img src="https://raw.githubusercontent.com/xenodium/dwim-shell-command/main/images/progress.webp" width="50%" />
 
 After process is finished:
 
@@ -82,7 +82,7 @@ If there were any files created in the =default-directory=, jump to a [[https://
 
 If no new files were created, automatically switch focus to the process buffer and display its output.
 
-[[file:images/apple.gif]]
+#+HTML: <img src="https://raw.githubusercontent.com/xenodium/dwim-shell-command/main/images/apple.webp" width="50%" />
 
 Note: You can prevent this automatic focus by prepending your command with whitespace.
 
@@ -90,7 +90,7 @@ Note: You can prevent this automatic focus by prepending your command with white
 
 If the shell command caused any errors, offer to focus the process buffer and display its output.
 
-[[file:images/couldnt.png]]
+#+HTML: <img src="https://raw.githubusercontent.com/xenodium/dwim-shell-command/main/images/couldnt.png" width="75%" />
 
 *** Easily create utilities
 
@@ -108,7 +108,7 @@ All gifs in this README were created via M-x =dwim-shell-command-convert-to-gif=
      :utils "ffmpeg"))
 #+end_src
 
-[[file:images/togif_x1.5.gif]]
+#+HTML: <img src="https://raw.githubusercontent.com/xenodium/dwim-shell-command/main/images/togif.webp" width="60%" />
 
 This makes wrapping one-liners a breeze, so let's do some more...
 
