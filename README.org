@@ -1,6 +1,6 @@
 * dwim-shell-command
 
-[[file:images/template.png]]
+#+HTML: <img src="https://raw.githubusercontent.com/xenodium/dwim-shell-command/main/images/template.png" width="75%" />
 
 ** Run M-x =dwim-shell-command= to execute [[https://en.wikipedia.org/wiki/DWIM][DWIM]] shell commands
 - Asynchronously.
