@@ -113,7 +113,7 @@
      (format "gifsicle -U '<<f>>' <<frames>> -O2 -o '<<fne>>_x%s.<<e>>'" factor)
      :extensions "gif" :utils '("gifsicle" "identify")
      :post-process-template (lambda (script file)
-                              (string-replace "<<frames>>" (dwim-shell-command--gifsicle-frames-every factor file) script)))))
+                              (string-replace "<<frames>>" (dwim-shell-commands--gifsicle-frames-every factor file) script)))))
 
 (defun dwim-shell-commands-resize-gif ()
   "Resize marked gif(s)."
@@ -121,7 +121,7 @@
   (dwim-shell-command-on-marked-files
    "Resize marked gif(s)"
    (let ((factor (read-number "Resize scaling factor: " 0.5)))
-     (format "gifsicle --scale %.2f '<<f>>' -o '<<fne>>_x%.2f.gif'" factor))
+     (format "gifsicle --scale %.2f '<<f>>' -o '<<fne>>_x%.2f.gif'" factor factor))
    :extensions "gif"
    :utils "gifsicle"))
 
@@ -188,7 +188,7 @@ if [[ $((width%%2)) -ne 0 ]] then
   width=$(($width - 1))
 fi
 ffmpeg -n -i '<<f>>' -vf \"scale=$width:-2\" '<<fne>>_x%.2f.<<e>>'
-" factor factor factor))
+" factor factor))
    :utils "ffmpeg"))
 
 (defun dwim-shell-commands-bin-plist-to-xml ()
