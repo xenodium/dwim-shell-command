@@ -1,5 +1,7 @@
 ;;; dwim-shell-command.el --- Shell commands with DWIM behaviour -*- lexical-binding: t; -*-
 
+;; Copyright (C) 2022 Alvaro Ramirez
+
 ;; Author: Alvaro Ramirez
 ;; Package-Requires: ((emacs "27.1"))
 ;; URL: https://github.com/xenodium/dwim-shell-command

@@ -183,3 +183,36 @@ Alternatively, can also install via [[https://github.com/jwiegley/use-package][u
        "ffmpeg -loglevel quiet -stats -y -i <<f>> -pix_fmt rgb24 -r 15 <<fne>>.gif"
        :utils "ffmpeg")))
 #+end_src
+
+* Install command line utilities
+
+I'm including an optional package ([[https://github.com/xenodium/dwim-shell-command/blob/dwim-shell-command-commands.el][dwim-shell-commands.el]]), with all the command line utilities I've brought in via =dwim-shell-command-on-marked-files=. Feel free to optionally load it via:
+
+#+begin_src emacs-lisp :lexical no
+  (require 'dwim-shell-commands)
+#+end_src
+
+To give you an idea, here's what I got so far:
+
+- =dwim-shell-commands-audio-to-mp3=
+- =dwim-shell-commands-bin-plist-to-xml=
+- =dwim-shell-commands-clipboard-to-qr=
+- =dwim-shell-commands-drop-video-audio=
+- =dwim-shell-commands-files-combined-size=
+- =dwim-shell-commands-git-clone-clipboard-url=
+- =dwim-shell-commands-git-clone-clipboard-url-to-downloads=
+- =dwim-shell-commands-image-to-grayscale=
+- =dwim-shell-commands-image-to-icns=
+- =dwim-shell-commands-image-to-jpg=
+- =dwim-shell-commands-image-to-png=
+- =dwim-shell-commands-pdf-password-protect=
+- =dwim-shell-commands-reorient-image=
+- =dwim-shell-commands-resize-gif=
+- =dwim-shell-commands-resize-image=
+- =dwim-shell-commands-resize-video=
+- =dwim-shell-commands-speed-up-gif=
+- =dwim-shell-commands-speed-up-video=
+- =dwim-shell-commands-unzip=
+- =dwim-shell-commands-video-to-gif=
+- =dwim-shell-commands-video-to-optimized-gif=
+- =dwim-shell-commands-video-to-webp=
