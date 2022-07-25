@@ -57,6 +57,18 @@
   :type 'boolean
   :group 'dwim-shell-command)
 
+(defcustom dwim-shell-command-shell-util
+  "zsh"
+  "Shell util, for example: \"zsh\" or \"bash\"."
+  :type 'string
+  :group 'dwim-shell-command)
+
+(defcustom dwim-shell-command-shell-args
+  '("-x" "-c")
+  "Shell util, for example: '(\"-x\" \"-c\")."
+  :type '(repeat string)
+  :group 'dwim-shell-command)
+
 (defvar dwim-shell-command--commands nil "All commands in progress.")
 
 (cl-defstruct
@@ -140,7 +152,9 @@ Quick exit
   pressing `q'."
   (interactive)
   (dwim-shell-command-on-marked-files
-   dwim-shell-command-buffer-name (read-shell-command dwim-shell-command-prompt)))
+   dwim-shell-command-buffer-name (read-shell-command dwim-shell-command-prompt)
+   :shell-util dwim-shell-command-shell-util
+   :shell-args dwim-shell-command-shell-args))
 
 (cl-defun dwim-shell-command-on-marked-files (buffer-name script &key utils extensions shell-util shell-args shell-pipe post-process-template on-completion)
   "Create DWIM utilities executing templated SCRIPT on given files.
