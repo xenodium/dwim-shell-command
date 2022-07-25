@@ -147,7 +147,12 @@ Because of templates, command history becomes automatically reusable in other co
 
 * Install
 
-Use your preferred way to install /dwim-shell-command/. Until available on [[https://melpa.org/][Melpa]], you'll have to download it from github.
+=dwim-shell-command= is available on [[https://melpa.org/#/company-org-block][MELPA]].
+
+[[https://melpa.org/#/dwim-shell-command][file:https://melpa.org/packages/dwim-shell-command.svg]]
+
+1. Install via M-x /package-install/.
+2. Require, set edit style, and add company backend:
 
 #+begin_src emacs-lisp
   (require 'dwim-shell-command)
@@ -159,13 +164,22 @@ M-x =dwim-shell-command=
 
 ** use-package
 
-You can load with use-package and remap to =shell-command='s existing binding using something like:
+Alternatively, can also install via [[https://github.com/jwiegley/use-package][use-package]], define your own commands and remap to =shell-command='s existing binding using something like:
 
 #+begin_src emacs-lisp :lexical no
   (use-package dwim-shell-command
+    :ensure t
     :bind (([remap shell-command] . dwim-shell-command)
            :map dired-mode-map
            ([remap dired-do-async-shell-command] . dwim-shell-command)
            ([remap dired-do-shell-command] . dwim-shell-command)
-           ([remap dired-smart-shell-command] . dwim-shell-command)))
+           ([remap dired-smart-shell-command] . dwim-shell-command))
+    :config
+    (defun dwim-shell-command-convert-to-gif ()
+      "Convert all marked videos to optimized gif(s)."
+      (interactive)
+      (dwim-shell-command-on-marked-files
+       "Convert to gif"
+       "ffmpeg -loglevel quiet -stats -y -i <<f>> -pix_fmt rgb24 -r 15 <<fne>>.gif"
+       :utils "ffmpeg")))
 #+end_src
