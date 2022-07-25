@@ -16,7 +16,7 @@
 Use =dwim-shell-command-on-marked-files= to easily integrate command-line utilities into frequent Emacs workflows (ie. operate on current buffer or [[https://www.gnu.org/software/emacs/manual/html_node/emacs/Dired.html][dired]] files).
 
 #+begin_src emacs-lisp :lexical no
-  (defun dwim-shell-command-convert-to-gif ()
+  (defun my/dwim-shell-command-convert-to-gif ()
     "Convert all marked videos to optimized gif(s)."
     (interactive)
     (dwim-shell-command-on-marked-files
@@ -99,7 +99,7 @@ Command-line utilities like [[https://ffmpeg.org/][ffmpeg]] can be easily integr
 All gifs in this README were created via M-x =dwim-shell-command-convert-to-gif=, powered by =dwim-shell-command-on-marked-files=:
 
 #+begin_src emacs-lisp :lexical no
-  (defun dwim-shell-command-convert-to-gif ()
+  (defun my/dwim-shell-command-convert-to-gif ()
     "Convert all marked videos to optimized gif(s)."
     (interactive)
     (dwim-shell-command-on-marked-files
@@ -113,7 +113,7 @@ All gifs in this README were created via M-x =dwim-shell-command-convert-to-gif=
 This makes wrapping one-liners a breeze, so let's do some more...
 
 #+begin_src emacs-lisp :lexical no
-  (defun dwim-shell-command-convert-audio-to-mp3 ()
+  (defun my/dwim-shell-command-convert-audio-to-mp3 ()
     "Convert all marked audio to mp3(s)."
     (interactive)
     (dwim-shell-command-on-marked-files
@@ -121,7 +121,7 @@ This makes wrapping one-liners a breeze, so let's do some more...
      "ffmpeg -stats -n -i '<<f>>' -acodec libmp3lame '<<fne>>.mp3'"
      :utils "ffmpeg"))
 
-  (defun dwim-shell-command-convert-image-to-jpg ()
+  (defun my/dwim-shell-command-convert-image-to-jpg ()
     "Convert all marked images to jpg(s)."
     (interactive)
     (dwim-shell-command-on-marked-files
@@ -129,7 +129,7 @@ This makes wrapping one-liners a breeze, so let's do some more...
      "convert -verbose '<<f>>' '<<fne>>.jpg'"
      :utils "convert"))
 
-  (defun dwim-shell-command-drop-video-audio ()
+  (defun my/dwim-shell-command-drop-video-audio ()
     "Drop audio from all marked videos."
     (interactive)
     (dwim-shell-command-on-marked-files
@@ -175,7 +175,7 @@ Alternatively, can also install via [[https://github.com/jwiegley/use-package][u
            ([remap dired-do-shell-command] . dwim-shell-command)
            ([remap dired-smart-shell-command] . dwim-shell-command))
     :config
-    (defun dwim-shell-command-convert-to-gif ()
+    (defun my/dwim-shell-command-convert-to-gif ()
       "Convert all marked videos to optimized gif(s)."
       (interactive)
       (dwim-shell-command-on-marked-files
