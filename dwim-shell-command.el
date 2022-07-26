@@ -5,7 +5,7 @@
 ;; Author: Alvaro Ramirez
 ;; Package-Requires: ((emacs "27.1"))
 ;; URL: https://github.com/xenodium/dwim-shell-command
-;; Version: 0.3
+;; Version: 0.4
 
 ;; This package is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -37,6 +37,7 @@
 (require 'map)
 (require 'seq)
 (require 'shell)
+(require 'simple)
 (require 'subr-x)
 (require 'view)
 
@@ -57,15 +58,16 @@
   :type 'boolean
   :group 'dwim-shell-command)
 
-(defcustom dwim-shell-command-shell-util
-  "zsh"
-  "Shell util, for example: \"zsh\" or \"bash\"."
+(defcustom dwim-shell-command-shell-util nil
+  "Shell util, for example: \"zsh\" or \"bash\".
+Set to nil to use `shell-file-name'."
   :type 'string
   :group 'dwim-shell-command)
 
 (defcustom dwim-shell-command-shell-args
   '("-x" "-c")
-  "Shell util, for example: '(\"-x\" \"-c\")."
+  "Shell util, for example: '(\"-x\" \"-c\").
+Set to nil to use `shell-command-switch'."
   :type '(repeat string)
   :group 'dwim-shell-command)
 
@@ -368,8 +370,14 @@ internal behavior).
     (setq files-before (dwim-shell-command--default-directory-files))
     (setq proc (apply #'start-process (seq-concatenate 'list
                                                        (list (buffer-name proc-buffer) proc-buffer)
-                                                       (or shell-util '("zsh"))
-                                                       (or shell-args '("-x" "-c"))
+                                                       (or shell-util
+                                                           (when shell-file-name
+                                                             (list shell-file-name))
+                                                           '("zsh"))
+                                                       (or shell-args
+                                                           (when shell-command-switch
+                                                             (list shell-command-switch))
+                                                           '("-x" "-c"))
                                                        (if shell-pipe
                                                            (list (format "echo '%s' | %s" script shell-pipe))
                                                          (list script)))))
