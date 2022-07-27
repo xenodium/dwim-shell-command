@@ -485,7 +485,10 @@ Set TEMP-DIR to a unique temp directory to this template."
     (setq template (replace-regexp-in-string "\\(\<\<fne\>\>\\)" (file-name-sans-extension file) template nil nil 1))
 
     ;; "<<e>>" with "/path/tmp.txt" -> "txt"
-    (setq template (replace-regexp-in-string "\\(\<\<e\>\>\\)" (file-name-extension file) template nil nil 1))
+    (if (file-name-extension file)
+        (setq template (replace-regexp-in-string "\\(\<\<e\>\>\\)" (file-name-extension file) template nil nil 1))
+      ;; File had no extension. Attempt to remove .<<e>>.
+      (setq template (replace-regexp-in-string "\\(\.\<\<e\>\>\\)" "" template nil nil 1)))
 
     ;; "<<f>>" with "/path/file.jpg" -> "/path/file.jpg"
     (setq template (replace-regexp-in-string "\\(\<\<f\>\>\\)" file template nil nil 1)))
