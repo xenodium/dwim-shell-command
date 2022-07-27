@@ -594,6 +594,7 @@ ON-COMPLETION SILENT-SUCCESS are all needed to finalize processing."
 (defun dwim-shell-command--files ()
   "Return buffer file (if available) or marked/region files for a `dired' buffer."
   (cl-assert (not (and mark-active (let ((files (dired-get-marked-files nil nil nil t)))
+                                     ;; Based on `dired-number-of-marked-files'.
                                      (cond ((null (cdr files))
                                             nil)
                                            ((and (= (length files) 2)
