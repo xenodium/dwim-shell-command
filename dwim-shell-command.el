@@ -54,7 +54,8 @@
   :group 'dwim-shell-command)
 
 (defcustom dwim-shell-command-prompt-on-error t
-  "If t, prompt user to focus buffer on process error."
+  "If t, prompt user to focus buffer on process error.
+Otherwise, automatically focus buffer on process error."
   :type 'boolean
   :group 'dwim-shell-command)
 
