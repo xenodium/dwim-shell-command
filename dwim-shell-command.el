@@ -246,7 +246,7 @@ Quick exit
   Process buffers are read-only and can be quickly closed by
   pressing `q'."
   (dwim-shell-command-execute-script buffer-name script
-                                     :files (dwim-shell-command--marked-files)
+                                     :files (dwim-shell-command--files)
                                      :utils utils
                                      :extensions extensions
                                      :shell-util shell-util
@@ -590,8 +590,17 @@ ON-COMPLETION SILENT-SUCCESS are all needed to finalize processing."
     (progress-reporter-update reporter))
   (comint-output-filter process output))
 
-(defun dwim-shell-command--marked-files ()
-  "Return buffer file (if available) or marked files for a `dired' buffer."
+(defun dwim-shell-command--files ()
+  "Return buffer file (if available) or marked/region files for a `dired' buffer."
+  (cl-assert (not (and mark-active (let ((files (dired-get-marked-files nil nil nil t)))
+                                     (cond ((null (cdr files))
+                                            nil)
+                                           ((and (= (length files) 2)
+                                                 (eq (car files) t))
+                                            t)
+                                           (t
+                                            (not (seq-empty-p (length files))))))))
+             nil "Region and marked files both active. Choose one only.")
   (if (buffer-file-name)
       (list (buffer-file-name))
     (or
