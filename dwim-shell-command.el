@@ -42,7 +42,7 @@
 (require 'view)
 
 (defcustom dwim-shell-command-prompt
-  "DWIM shell command (<<f>> <<fne>> <<e>> <<td>> <<*>> <<cb>>): "
+  "DWIM shell command (<<f>> <<fne>> <<e>> <<td>> <<*>> <<cb>> <<n>>): "
   "`dwim-shell-command' prompt.  Modify if shorter is preferred."
   :type 'string
   :group 'dwim-shell-command)
@@ -107,6 +107,7 @@ Templates
     <<td>> (generate a temporary directory)
     <<*>> (all files joined)
     <<cb>> (clipboard)
+    <<n>>, <<1n>>, or <<An>> (for current iteration)
 
   For example:
 
@@ -199,6 +200,7 @@ Templates
     <<td>> (generate a temporary directory)
     <<*>> (all files joined)
     <<cb>> (clipboard)
+    <<n>>, <<1n>>, or <<An>> (for current iteration)
 
   For example:
 
@@ -270,6 +272,7 @@ Quick exit
     <<td>> (generate a temporary directory)
     <<*>> (all files joined)
     <<cb>> (clipboard)
+    <<n>>, <<1n>>, or <<An>> (for current iteration)
 
   For example:
 
@@ -349,15 +352,17 @@ internal behavior).
          (script "")
          (files-before)
          (proc)
-         (progress-reporter))
+         (progress-reporter)
+         (n (or (dwim-shell-command--n-start-value template) "1")))
     (if (seq-empty-p files)
-        (setq script (dwim-shell-command--expand-file-template template nil post-process-template gen-temp-dir))
+        (setq script (dwim-shell-command--expand-file-template template nil post-process-template gen-temp-dir n))
       (if (dwim-shell-command--contains-multi-file-ref template)
           (setq script (dwim-shell-command--expand-files-template template files post-process-template gen-temp-dir))
         (seq-do (lambda (file)
                   (setq script
                         (concat script "\n"
-                                (dwim-shell-command--expand-file-template template file post-process-template gen-temp-dir))))
+                                (dwim-shell-command--expand-file-template template file post-process-template gen-temp-dir n)))
+                  (setq n (dwim-shell-command--increment-string n)))
                 files)))
     (setq script (string-trim script))
     (with-current-buffer proc-buffer
@@ -456,11 +461,12 @@ Set TEMP-DIR to a unique temp directory to this template."
     (setq template (funcall post-process-template template files)))
   template)
 
-(defun dwim-shell-command--expand-file-template (template file &optional post-process-template temp-dir)
+(defun dwim-shell-command--expand-file-template (template file &optional post-process-template temp-dir current)
   "Expand TEMPLATE using FILE.
 
 Expand using <<f>> for FILE, <<fne>> for FILE without extension, and
- <<e>> for FILE extension.
+<<e>> for FILE extension.  <<n>>, <<1n>>, or <<an>> is replaced with
+CURRENT.
 
 Note: This expander cannot be used to expand <<*>>.
 
@@ -500,6 +506,10 @@ Set TEMP-DIR to a unique temp directory to this template."
   ;; "<<cb>>" with (current-kill 0) -> "whatever was in kill ring"
   (setq template (replace-regexp-in-string "\\(\<\<cb\>\>\\)" (or (current-kill 0)
                                                               (user-error "Nothing in clipboard"))
+                                           template nil nil 1))
+
+  ;; "<<n>>" or "<<an>" or "<<1n>" with current.
+  (setq template (replace-regexp-in-string "\\(\<\<[[:alnum:]]?+n\>\>\\)" current
                                            template nil nil 1))
 
   (when post-process-template
@@ -627,6 +637,23 @@ ON-COMPLETION SILENT-SUCCESS are all needed to finalize processing."
               (setq paths (append paths (list (dired-get-filename nil t)))))
             (forward-line 1))))
       paths)))
+
+(defun dwim-shell-command--n-start-value (template)
+  "Extract n start value from TEMPLATE.
+Falls back to \"1\"."
+  (when (string-match "\<\<\\([[:alnum:]]?+\\)n\>\>" template)
+    (if (string-empty-p (match-string 1 template))
+        "1"
+      (match-string 1 template))))
+
+(defun dwim-shell-command--increment-string (text)
+  "Increment TEXT.
+\"a\" -> \"b\"
+\"1\" -> \"2\""
+  (cond ((string-match "^[[:alpha:]]$" text) ;; char
+         (char-to-string (1+ (string-to-char (match-string 0 text)))))
+        ((string-match "^[[:digit:]]+$" text) ;; char
+         (number-to-string (1+ (string-to-number (match-string 0 text)))))))
 
 (provide 'dwim-shell-command)
 
