@@ -86,7 +86,7 @@ Set to nil to use `shell-command-switch'."
   files-before
   silent-success)
 
-(defun dwim-shell-command ()
+(defun dwim-shell-command (prefix)
   "Execute DWIM shell command asynchronously using noweb templates.
 
 Which files
@@ -153,14 +153,19 @@ Focus
 Quick exit
 
   Process buffers are read-only and can be quickly closed by
-  pressing `q'."
-  (interactive)
+  pressing `q'.
+
+Prefix
+
+  With prefix, execute command that number of times."
+  (interactive "p")
   (dwim-shell-command-on-marked-files
    dwim-shell-command-buffer-name (read-shell-command dwim-shell-command-prompt)
+   :repeat prefix
    :shell-util dwim-shell-command-shell-util
    :shell-args dwim-shell-command-shell-args))
 
-(cl-defun dwim-shell-command-on-marked-files (buffer-name script &key utils extensions shell-util shell-args shell-pipe post-process-template on-completion)
+(cl-defun dwim-shell-command-on-marked-files (buffer-name script &key utils extensions shell-util shell-args shell-pipe post-process-template on-completion repeat)
   "Create DWIM utilities executing templated SCRIPT on given files.
 
 Here's a simple utility invoking SCRIPT to convert image files to jpg.
@@ -257,9 +262,10 @@ Quick exit
                                      :shell-pipe shell-pipe
                                      :post-process-template post-process-template
                                      :on-completion on-completion
-                                     :silent-success (string-prefix-p " " script)))
+                                     :silent-success (string-prefix-p " " script)
+                                     :repeat repeat))
 
-(cl-defun dwim-shell-command-execute-script (buffer-name script &key files extensions shell-util shell-args shell-pipe utils post-process-template on-completion silent-success gen-temp-dir)
+(cl-defun dwim-shell-command-execute-script (buffer-name script &key files extensions shell-util shell-args shell-pipe utils post-process-template on-completion silent-success gen-temp-dir repeat)
   "Execute a script asynchronously, DWIM style with SCRIPT and BUFFER-NAME.
 
 :FILES are used to instantiate SCRIPT as a noweb template.
@@ -333,6 +339,10 @@ internal behavior).
     (setq utils (list utils)))
   (when (or gen-temp-dir (string-match-p "\<\<td\>\>" script 0))
     (setq gen-temp-dir (make-temp-file "dwim-shell-command-" t)))
+  (when (and repeat (> repeat 1))
+    (cl-assert (<= (length files) 1) nil
+               "Must not repeat when multiple files are selected.")
+    (setq files (make-list repeat (or (seq-first files) "_no_file_selected_"))))
   (when (seq-empty-p files)
     (cl-assert (not (or (dwim-shell-command--contains-multi-file-ref script)
                         (dwim-shell-command--contains-single-file-ref script)))
