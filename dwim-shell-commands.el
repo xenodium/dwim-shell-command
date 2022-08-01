@@ -289,6 +289,15 @@ ffmpeg -n -i '<<f>>' -vf \"scale=$width:-2\" '<<fne>>_x%.2f.<<e>>'
    "git clone <<cb>>"
    :utils "git"))
 
+(defun dwim-shell-commands-install-iphone-device-ipa ()
+  "Install iPhone device .ipa.
+Needs ideviceinstaller and libmobiledevice installed."
+  (interactive)
+  (dwim-shell-command-on-marked-files
+   "Install .ipa"
+   "ideviceinstaller -i <<f>>"
+   :utils "ideviceinstaller"))
+
 (provide 'dwim-shell-commands)
 
 ;;; dwim-shell-commands.el ends here
