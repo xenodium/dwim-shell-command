@@ -84,7 +84,8 @@ Set to nil to use `shell-command-switch'."
   reporter
   on-completion
   files-before
-  silent-success)
+  silent-success
+  error-autofocus)
 
 (defun dwim-shell-command (prefix)
   "Execute DWIM shell command asynchronously using noweb templates.
@@ -157,15 +158,18 @@ Quick exit
 
 Prefix
 
-  With prefix, execute command that number of times."
+  With PREFIX, execute command that number of times."
   (interactive "p")
-  (dwim-shell-command-on-marked-files
-   dwim-shell-command-buffer-name (read-shell-command dwim-shell-command-prompt)
-   :repeat prefix
-   :shell-util dwim-shell-command-shell-util
-   :shell-args dwim-shell-command-shell-args))
+  (let ((script (read-shell-command dwim-shell-command-prompt)))
+    (dwim-shell-command-on-marked-files
+     dwim-shell-command-buffer-name script
+     :repeat prefix
+     :shell-util dwim-shell-command-shell-util
+     :shell-args dwim-shell-command-shell-args
+     :silent-success (string-prefix-p " " script)
+     :error-autofocus (not dwim-shell-command-prompt-on-error))))
 
-(cl-defun dwim-shell-command-on-marked-files (buffer-name script &key utils extensions shell-util shell-args shell-pipe post-process-template on-completion repeat)
+(cl-defun dwim-shell-command-on-marked-files (buffer-name script &key utils extensions shell-util shell-args shell-pipe post-process-template on-completion repeat silent-success no-progress error-autofocus)
   "Create DWIM utilities executing templated SCRIPT on given files.
 
 Here's a simple utility invoking SCRIPT to convert image files to jpg.
@@ -181,9 +185,6 @@ Here's a simple utility invoking SCRIPT to convert image files to jpg.
 Check `dwim-shell-command-commands.el' for more examples.
 
 All command process output is written to a buffer with BUFFER-NAME.
-
-If SCRIPT starts with whitespace, imply `:SILENT-SUCCESS' in
- `dwim-shell-command-execute-script'.
 
 All params explained in `dwim-shell-command-execute-script'.
 
@@ -262,10 +263,12 @@ Quick exit
                                      :shell-pipe shell-pipe
                                      :post-process-template post-process-template
                                      :on-completion on-completion
-                                     :silent-success (string-prefix-p " " script)
-                                     :repeat repeat))
+                                     :silent-success silent-success
+                                     :no-progress no-progress
+                                     :repeat repeat
+                                     :error-autofocus error-autofocus))
 
-(cl-defun dwim-shell-command-execute-script (buffer-name script &key files extensions shell-util shell-args shell-pipe utils post-process-template on-completion silent-success gen-temp-dir repeat)
+(cl-defun dwim-shell-command-execute-script (buffer-name script &key files extensions shell-util shell-args shell-pipe utils post-process-template on-completion silent-success gen-temp-dir repeat no-progress error-autofocus)
   "Execute a script asynchronously, DWIM style with SCRIPT and BUFFER-NAME.
 
 :FILES are used to instantiate SCRIPT as a noweb template.
@@ -326,7 +329,14 @@ instantiation.
 internal behavior).
 
 :SILENT-SUCCESS to avoid jumping to process buffer if neither error
- nor file generated."
+ nor file generated.
+
+:GEN-TEMP-DIR to generate a temporary directory for this command.
+This is implied when <<td>> appears in the script.
+
+:REPEAT Use to repeat script N number of times.
+
+:NO-PROGRESS Suppress progress reporting."
   (cl-assert buffer-name nil "Script must have a buffer name")
   (cl-assert (not (string-empty-p script)) nil "Script must not be empty")
   (when (stringp extensions)
@@ -397,13 +407,15 @@ internal behavior).
                                                        (if shell-pipe
                                                            (list (format "echo '%s' | %s" script shell-pipe))
                                                          (list script)))))
-    (setq progress-reporter (make-progress-reporter
-                             ;; Append space so "done" is spaced when
-                             ;; progress reporter is finished:
-                             ;;
-                             ;; *DWIM shell command* done
-                             (concat (process-name proc) " ")))
-    (progress-reporter-update progress-reporter)
+    (if no-progress
+        (minibuffer-message "%s started" (process-name proc))
+      (setq progress-reporter (make-progress-reporter
+                               ;; Append space so "done" is spaced when
+                               ;; progress reporter is finished:
+                               ;;
+                               ;; *DWIM shell command* done
+                               (concat (process-name proc) " ")))
+      (progress-reporter-update progress-reporter))
     ;; Momentarily set buffer to same window, so it's next in recent stack.
     ;; Makes finding the shell command buffer a lot easier.
     (let ((current (current-buffer)))
@@ -415,7 +427,8 @@ internal behavior).
                                       proc
                                       progress-reporter
                                       on-completion
-                                      silent-success)
+                                      silent-success
+                                      error-autofocus)
       (setq dwim-shell-command--commands
             (push (cons (process-name proc)
                         (make-dwim-shell-command--command :script script
@@ -425,7 +438,8 @@ internal behavior).
                                                           :files-before files-before
                                                           :reporter progress-reporter
                                                           :on-completion on-completion
-                                                          :silent-success silent-success))
+                                                          :silent-success silent-success
+                                                          :error-autofocus error-autofocus))
                   dwim-shell-command--commands))
       (set-process-sentinel proc #'dwim-shell-command--sentinel)
       (set-process-filter proc #'dwim-shell-command--filter))))
@@ -552,14 +566,15 @@ Set TEMP-DIR to a unique temp directory to this template."
   (car (last (seq-sort #'file-newer-than-file-p
                        (seq-difference after before)))))
 
-(defun dwim-shell-command--finalize (calling-buffer files-before process progress-reporter on-completion silent-success)
+(defun dwim-shell-command--finalize (calling-buffer files-before process progress-reporter on-completion silent-success error-autofocus)
   "Finalize script execution.
 
  CALLING-BUFFER, FILES-BEFORE, PROCESS, PROGRESS-REPORTER, and
 ON-COMPLETION SILENT-SUCCESS are all needed to finalize processing."
   (let ((oldest-new-file))
-    (when progress-reporter
-      (progress-reporter-done progress-reporter))
+    (if progress-reporter
+        (progress-reporter-done progress-reporter)
+      (minibuffer-message "%s finished" (process-name process)))
     (if (= (process-exit-status process) 0)
         (if on-completion
             (funcall on-completion (process-buffer process))
@@ -578,17 +593,17 @@ ON-COMPLETION SILENT-SUCCESS are all needed to finalize processing."
               (dired-jump nil oldest-new-file)))
           (unless (equal (process-buffer process)
                          (window-buffer (selected-window)))
-            (if oldest-new-file
+            (if (or oldest-new-file silent-success)
                 (kill-buffer (process-buffer process))
               (unless silent-success
                 (switch-to-buffer (process-buffer process))))))
       (if (and (buffer-name (process-buffer process))
-               (or (not dwim-shell-command-prompt-on-error)
+               (or error-autofocus
                    (y-or-n-p (format "Error in %s, see output? "
                                      (buffer-name (process-buffer process))))))
           (progn
             (switch-to-buffer (process-buffer process))
-            (unless dwim-shell-command-prompt-on-error
+            (when error-autofocus
               (message "Error in %s" (buffer-name (process-buffer process)))))
         (kill-buffer (process-buffer process))))
     (setq dwim-shell-command--commands
@@ -602,7 +617,8 @@ ON-COMPLETION SILENT-SUCCESS are all needed to finalize processing."
                                   process
                                   (dwim-shell-command--command-reporter exec)
                                   (dwim-shell-command--command-on-completion exec)
-                                  (dwim-shell-command--command-silent-success exec))))
+                                  (dwim-shell-command--command-silent-success exec)
+                                  (dwim-shell-command--command-error-autofocus exec))))
 
 (defun dwim-shell-command--filter (process output)
   "Handles PROCESS filtering and STATE and OUTPUT."
