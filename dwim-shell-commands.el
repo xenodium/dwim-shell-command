@@ -39,6 +39,18 @@
    "ffmpeg -stats -n -i '<<f>>' -acodec libmp3lame '<<fne>>.mp3'"
    :utils "ffmpeg"))
 
+(defun dwim-shell-commands-mpv-stream-clipboard-url ()
+  "Stream clipboard URL using mpv."
+  (interactive)
+  (cl-assert (string-match-p "^http[s]?://" (current-kill 0)) nil "Not a URL")
+  (dwim-shell-command-on-marked-files
+   (format "mpv %s" (current-kill 0))
+   "mpv --geometry=30%x30%+100%+0% \"<<cb>>\""
+   :utils "mpv"
+   :no-progress t
+   :error-autofocus t
+   :silent-success t))
+
 (defun dwim-shell-commands-image-to-jpg ()
   "Convert all marked images to jpg(s)."
   (interactive)
