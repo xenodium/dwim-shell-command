@@ -65,8 +65,7 @@ Set to nil to use `shell-file-name'."
   :type 'string
   :group 'dwim-shell-command)
 
-(defcustom dwim-shell-command-shell-args
-  '("-x" "-c")
+(defcustom dwim-shell-command-shell-args nil
   "Shell util, for example: '(\"-x\" \"-c\").
 Set to nil to use `shell-command-switch'."
   :type '(repeat string)
@@ -343,6 +342,20 @@ This is implied when <<td>> appears in the script.
     (setq extensions (list extensions)))
   (when (and shell-util (stringp shell-util))
     (setq shell-util (list shell-util)))
+  (setq shell-util (or shell-util
+                       (when shell-file-name
+                         (list shell-file-name))
+                       '("zsh")))
+  (setq shell-args (or shell-args
+                       (when shell-command-switch
+                         (list shell-command-switch))
+                       '("-x" "-c")))
+  ;; See if -x can be prepended.
+  (when (and (not (seq-contains shell-args "-x"))
+             (apply #'dwim-shell-command--program-test
+                    (seq-concatenate
+                     'list shell-util '("-x") shell-args (list "echo"))))
+    (setq shell-args (seq-concatenate 'list '("-x") shell-args)))
   (when (and shell-args (stringp shell-args))
     (setq shell-args (list shell-args)))
   (when (stringp utils)
@@ -396,19 +409,13 @@ This is implied when <<td>> appears in the script.
     (setq files-before (dwim-shell-command--default-directory-files))
     (setq proc (apply #'start-process (seq-concatenate 'list
                                                        (list (buffer-name proc-buffer) proc-buffer)
-                                                       (or shell-util
-                                                           (when shell-file-name
-                                                             (list shell-file-name))
-                                                           '("zsh"))
-                                                       (or shell-args
-                                                           (when shell-command-switch
-                                                             (list shell-command-switch))
-                                                           '("-x" "-c"))
+                                                       shell-util
+                                                       shell-args
                                                        (if shell-pipe
                                                            (list (format "echo '%s' | %s" script shell-pipe))
                                                          (list script)))))
     (if no-progress
-        (minibuffer-message "%s started" (process-name proc))
+        (dwim-shell-command--message "%s started" (process-name proc))
       (setq progress-reporter (make-progress-reporter
                                ;; Append space so "done" is spaced when
                                ;; progress reporter is finished:
@@ -443,6 +450,17 @@ This is implied when <<td>> appears in the script.
                   dwim-shell-command--commands))
       (set-process-sentinel proc #'dwim-shell-command--sentinel)
       (set-process-filter proc #'dwim-shell-command--filter))))
+
+(defun dwim-shell-command--message (message &rest args)
+  "Like `dwim-shell-command--message' but non-blocking.
+MESSAGE and ARGS same as `dwim-shell-command--message'."
+  (let ((message-id (random)))
+    (message (propertize (apply #'format message args) 'message-id message-id))
+    (run-with-timer 3 nil
+                    (lambda ()
+                      (when (eq (get-text-property 0 'message-id (current-message))
+                                message-id)
+                        (message nil))))))
 
 (defun dwim-shell-command--expand-files-template (template files &optional post-process-template temp-dir)
   "Expand TEMPLATE using FILES.
@@ -569,42 +587,44 @@ Set TEMP-DIR to a unique temp directory to this template."
 (defun dwim-shell-command--finalize (calling-buffer files-before process progress-reporter on-completion silent-success error-autofocus)
   "Finalize script execution.
 
- CALLING-BUFFER, FILES-BEFORE, PROCESS, PROGRESS-REPORTER, and
-ON-COMPLETION SILENT-SUCCESS are all needed to finalize processing."
+CALLING-BUFFER, FILES-BEFORE, PROCESS, PROGRESS-REPORTER,
+ERROR-AUTOFOCUS, ON-COMPLETION, and SILENT-SUCCESS are all needed to
+finalize processing."
   (let ((oldest-new-file))
-    (if progress-reporter
-        (progress-reporter-done progress-reporter)
-      (minibuffer-message "%s finished" (process-name process)))
     (if (= (process-exit-status process) 0)
-        (if on-completion
-            (funcall on-completion (process-buffer process))
-          (with-current-buffer calling-buffer
-            (when (equal major-mode 'dired-mode)
-              (when revert-buffer-function
-                (funcall revert-buffer-function nil t))
-              ;; Region is not accurate if new files added. Wipe it.
-              (when mark-active
-                (deactivate-mark)))
-            (setq oldest-new-file
-                  (dwim-shell-command--last-modified-between
-                   files-before
-                   (dwim-shell-command--default-directory-files)))
-            (when oldest-new-file
-              (dired-jump nil oldest-new-file)))
-          (unless (equal (process-buffer process)
-                         (window-buffer (selected-window)))
-            (if (or oldest-new-file silent-success)
-                (kill-buffer (process-buffer process))
-              (unless silent-success
-                (switch-to-buffer (process-buffer process))))))
+        (progn
+          (if progress-reporter
+              (progress-reporter-done progress-reporter)
+            (dwim-shell-command--message "%s finished" (process-name process)))
+          (if on-completion
+              (funcall on-completion (process-buffer process))
+            (with-current-buffer calling-buffer
+              (when (equal major-mode 'dired-mode)
+                (when revert-buffer-function
+                  (funcall revert-buffer-function nil t))
+                ;; Region is not accurate if new files added. Wipe it.
+                (when mark-active
+                  (deactivate-mark)))
+              (setq oldest-new-file
+                    (dwim-shell-command--last-modified-between
+                     files-before
+                     (dwim-shell-command--default-directory-files)))
+              (when oldest-new-file
+                (dired-jump nil oldest-new-file)))
+            (unless (equal (process-buffer process)
+                           (window-buffer (selected-window)))
+              (if (or oldest-new-file silent-success)
+                  (kill-buffer (process-buffer process))
+                (unless silent-success
+                  (switch-to-buffer (process-buffer process)))))))
       (if (and (buffer-name (process-buffer process))
                (or error-autofocus
-                   (y-or-n-p (format "Error in %s, see output? "
+                   (y-or-n-p (format "%s error, see output? "
                                      (buffer-name (process-buffer process))))))
           (progn
             (switch-to-buffer (process-buffer process))
             (when error-autofocus
-              (message "Error in %s" (buffer-name (process-buffer process)))))
+              (dwim-shell-command--message "%s error" (buffer-name (process-buffer process)))))
         (kill-buffer (process-buffer process))))
     (setq dwim-shell-command--commands
           (map-delete dwim-shell-command--commands (process-name process)))))
@@ -680,6 +700,10 @@ Falls back to \"1\"."
          (char-to-string (1+ (string-to-char (match-string 0 text)))))
         ((string-match "^[[:digit:]]+$" text) ;; char
          (number-to-string (1+ (string-to-number (match-string 0 text)))))))
+
+(defun dwim-shell-command--program-test (program &rest args)
+  "Test that running PROGRAM with ARGS is successful."
+  (eq 0 (apply #'call-process program nil nil nil args)))
 
 (provide 'dwim-shell-command)
 
