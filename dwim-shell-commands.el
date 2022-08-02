@@ -44,7 +44,7 @@
   (interactive)
   (cl-assert (string-match-p "^http[s]?://" (current-kill 0)) nil "Not a URL")
   (dwim-shell-command-on-marked-files
-   (format "mpv %s" (current-kill 0))
+   "Streaming"
    "mpv --geometry=30%x30%+100%+0% \"<<cb>>\""
    :utils "mpv"
    :no-progress t
