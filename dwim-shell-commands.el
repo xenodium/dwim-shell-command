@@ -51,6 +51,19 @@
    :error-autofocus t
    :silent-success t))
 
+(defun dwim-shell-commands-download-clipboard-url ()
+  "Download clipboard URL."
+  (interactive)
+  (cl-assert (string-match-p "^http[s]?://" (current-kill 0)) nil "Not a URL")
+  (dwim-shell-command-on-marked-files
+   "Downloading"
+   "youtube-dl --newline -o \"~/Downloads/%(title)s.%(ext)s\" \"<<cb>>\""
+   :utils "youtube-dl"
+   :no-progress t
+   :error-autofocus t
+   :dir-override "~/Downloads"
+   :silent-success t))
+
 (defun dwim-shell-commands-image-to-jpg ()
   "Convert all marked images to jpg(s)."
   (interactive)
