@@ -595,7 +595,9 @@ finalize processing."
         (progn
           (if progress-reporter
               (progress-reporter-done progress-reporter)
-            (dwim-shell-command--message "%s finished" (process-name process)))
+            (dwim-shell-command--message "%s done" (process-name process)))
+          (with-current-buffer (process-buffer process)
+            (rename-buffer (format "%s done" (process-name process))))
           (if on-completion
               (funcall on-completion (process-buffer process))
             (with-current-buffer calling-buffer
@@ -623,6 +625,7 @@ finalize processing."
                                      (buffer-name (process-buffer process))))))
           (progn
             (switch-to-buffer (process-buffer process))
+            (rename-buffer (format "%s error" (process-name process)))
             (when error-autofocus
               (dwim-shell-command--message "%s error" (buffer-name (process-buffer process)))))
         (kill-buffer (process-buffer process))))
