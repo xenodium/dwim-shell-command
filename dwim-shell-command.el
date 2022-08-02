@@ -84,7 +84,8 @@ Set to nil to use `shell-command-switch'."
   on-completion
   files-before
   silent-success
-  error-autofocus)
+  error-autofocus
+  dir-override)
 
 (defun dwim-shell-command (prefix)
   "Execute DWIM shell command asynchronously using noweb templates.
@@ -168,7 +169,7 @@ Prefix
      :silent-success (string-prefix-p " " script)
      :error-autofocus (not dwim-shell-command-prompt-on-error))))
 
-(cl-defun dwim-shell-command-on-marked-files (buffer-name script &key utils extensions shell-util shell-args shell-pipe post-process-template on-completion repeat silent-success no-progress error-autofocus)
+(cl-defun dwim-shell-command-on-marked-files (buffer-name script &key utils extensions shell-util shell-args shell-pipe post-process-template on-completion repeat silent-success no-progress error-autofocus dir-override)
   "Create DWIM utilities executing templated SCRIPT on given files.
 
 Here's a simple utility invoking SCRIPT to convert image files to jpg.
@@ -265,9 +266,10 @@ Quick exit
                                      :silent-success silent-success
                                      :no-progress no-progress
                                      :repeat repeat
-                                     :error-autofocus error-autofocus))
+                                     :error-autofocus error-autofocus
+                                     :dir-override dir-override))
 
-(cl-defun dwim-shell-command-execute-script (buffer-name script &key files extensions shell-util shell-args shell-pipe utils post-process-template on-completion silent-success gen-temp-dir repeat no-progress error-autofocus)
+(cl-defun dwim-shell-command-execute-script (buffer-name script &key files extensions shell-util shell-args shell-pipe utils post-process-template on-completion silent-success gen-temp-dir repeat no-progress error-autofocus dir-override)
   "Execute a script asynchronously, DWIM style with SCRIPT and BUFFER-NAME.
 
 :FILES are used to instantiate SCRIPT as a noweb template.
@@ -406,7 +408,7 @@ This is implied when <<td>> appears in the script.
       (shell-command-save-pos-or-erase)
       (view-mode +1)
       (setq view-exit-action 'kill-buffer))
-    (setq files-before (dwim-shell-command--default-directory-files))
+    (setq files-before (dwim-shell-command--default-directory-files dir-override))
     (setq proc (apply #'start-process (seq-concatenate 'list
                                                        (list (buffer-name proc-buffer) proc-buffer)
                                                        shell-util
@@ -435,7 +437,8 @@ This is implied when <<td>> appears in the script.
                                       progress-reporter
                                       on-completion
                                       silent-success
-                                      error-autofocus)
+                                      error-autofocus
+                                      dir-override)
       (setq dwim-shell-command--commands
             (push (cons (process-name proc)
                         (make-dwim-shell-command--command :script script
@@ -446,7 +449,8 @@ This is implied when <<td>> appears in the script.
                                                           :reporter progress-reporter
                                                           :on-completion on-completion
                                                           :silent-success silent-success
-                                                          :error-autofocus error-autofocus))
+                                                          :error-autofocus error-autofocus
+                                                          :dir-override dir-override))
                   dwim-shell-command--commands))
       (set-process-sentinel proc #'dwim-shell-command--sentinel)
       (set-process-filter proc #'dwim-shell-command--filter))))
@@ -572,11 +576,11 @@ Set TEMP-DIR to a unique temp directory to this template."
   (when (string-match "\<\<\\*\>\>" template)
     "<<*>>"))
 
-(defun dwim-shell-command--default-directory-files ()
+(defun dwim-shell-command--default-directory-files (override)
   "List of files in current buffer's `default-directory'."
-  (when default-directory
+  (when-let ((default-directory (or override default-directory)))
     (seq-map (lambda (filename)
-               (concat default-directory filename))
+               (file-name-concat default-directory filename))
              (process-lines "ls" "-1"))))
 
 (defun dwim-shell-command--last-modified-between (before after)
@@ -584,12 +588,12 @@ Set TEMP-DIR to a unique temp directory to this template."
   (car (last (seq-sort #'file-newer-than-file-p
                        (seq-difference after before)))))
 
-(defun dwim-shell-command--finalize (calling-buffer files-before process progress-reporter on-completion silent-success error-autofocus)
+(defun dwim-shell-command--finalize (calling-buffer files-before process progress-reporter on-completion silent-success error-autofocus dir-override)
   "Finalize script execution.
 
 CALLING-BUFFER, FILES-BEFORE, PROCESS, PROGRESS-REPORTER,
-ERROR-AUTOFOCUS, ON-COMPLETION, and SILENT-SUCCESS are all needed to
-finalize processing."
+ERROR-AUTOFOCUS, ON-COMPLETION, SILENT-SUCCESS, and DIR-OVERRIDE are
+all needed to finalize processing."
   (let ((oldest-new-file))
     (if (= (process-exit-status process) 0)
         (progn
@@ -610,7 +614,7 @@ finalize processing."
               (setq oldest-new-file
                     (dwim-shell-command--last-modified-between
                      files-before
-                     (dwim-shell-command--default-directory-files)))
+                     (dwim-shell-command--default-directory-files dir-override)))
               (when oldest-new-file
                 (dired-jump nil oldest-new-file)))
             (unless (equal (process-buffer process)
@@ -641,7 +645,8 @@ finalize processing."
                                   (dwim-shell-command--command-reporter exec)
                                   (dwim-shell-command--command-on-completion exec)
                                   (dwim-shell-command--command-silent-success exec)
-                                  (dwim-shell-command--command-error-autofocus exec))))
+                                  (dwim-shell-command--command-error-autofocus exec)
+                                  (dwim-shell-command--command-dir-override exec))))
 
 (defun dwim-shell-command--filter (process output)
   "Handles PROCESS filtering and STATE and OUTPUT."
