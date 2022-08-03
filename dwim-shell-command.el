@@ -576,9 +576,10 @@ Set TEMP-DIR to a unique temp directory to this template."
   (when (string-match "\<\<\\*\>\>" template)
     "<<*>>"))
 
-(defun dwim-shell-command--default-directory-files (override)
-  "List of files in current buffer's `default-directory'."
-  (when-let ((default-directory (or override default-directory)))
+(defun dwim-shell-command--default-directory-files (dir-override)
+  "List of files in current buffer's `default-directory'.
+Use DIR-OVERRIDE to override `default-directory'."
+  (when-let ((default-directory (or dir-override default-directory)))
     (seq-map (lambda (filename)
                (file-name-concat default-directory filename))
              (process-lines "ls" "-1"))))
