@@ -5,7 +5,7 @@
 ;; Author: Alvaro Ramirez
 ;; Package-Requires: ((emacs "27.1"))
 ;; URL: https://github.com/xenodium/dwim-shell-command
-;; Version: 0.10
+;; Version: 0.11
 
 ;; This package is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -71,6 +71,22 @@ Set to nil to use `shell-file-name'."
   "Shell util, for example: '(\"-x\" \"-c\").
 Set to nil to use `shell-command-switch'."
   :type '(repeat string)
+  :group 'dwim-shell-command)
+
+(defcustom dwim-shell-command-done-buffer-name
+  (lambda (name)
+    (format "✅ %s done" name))
+  "Function to format buffer name on success.
+Use `identify' to remove formatting."
+  :type 'function
+  :group 'dwim-shell-command)
+
+(defcustom dwim-shell-command-error-buffer-name
+  (lambda (name)
+    (format "⛔️ %s error" name))
+  "Function to format buffer name on error.
+Use `identify' to remove formatting."
+  :type 'function
   :group 'dwim-shell-command)
 
 (defvar dwim-shell-command--commands nil "All commands in progress.")
@@ -605,7 +621,7 @@ all needed to finalize processing."
         (progn
           (dwim-shell-command--message "%s done" (process-name process))
           (with-current-buffer (process-buffer process)
-            (rename-buffer (format "%s done" (process-name process))))
+            (rename-buffer (funcall dwim-shell-command-done-buffer-name (process-name process))))
           (if on-completion
               (funcall on-completion (process-buffer process))
             (with-current-buffer calling-buffer
@@ -636,7 +652,7 @@ all needed to finalize processing."
                                      (buffer-name (process-buffer process))))))
           (progn
             (with-current-buffer (process-buffer process)
-              (rename-buffer (format "%s error" (process-name process))))
+              (rename-buffer (funcall dwim-shell-command-error-buffer-name (process-name process))))
             (when (or error-autofocus
                       (equal (process-buffer process)
                              (window-buffer (selected-window))))
