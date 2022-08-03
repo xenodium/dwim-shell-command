@@ -462,8 +462,9 @@ MESSAGE and ARGS same as `dwim-shell-command--message'."
     (message (propertize (apply #'format message args) 'message-id message-id))
     (run-with-timer 3 nil
                     (lambda ()
-                      (when (eq (get-text-property 0 'message-id (current-message))
-                                message-id)
+                      (when (and (current-message)
+                                 (eq (get-text-property 0 'message-id (current-message))
+                                     message-id))
                         (message nil))))))
 
 (defun dwim-shell-command--expand-files-template (template files &optional post-process-template temp-dir)
@@ -596,11 +597,11 @@ CALLING-BUFFER, FILES-BEFORE, PROCESS, PROGRESS-REPORTER,
 ERROR-AUTOFOCUS, ON-COMPLETION, SILENT-SUCCESS, and MONITOR-DIRECTORY are
 all needed to finalize processing."
   (let ((oldest-new-file))
+    (when progress-reporter
+        (progress-reporter-done progress-reporter))
     (if (= (process-exit-status process) 0)
         (progn
-          (if progress-reporter
-              (progress-reporter-done progress-reporter)
-            (dwim-shell-command--message "%s done" (process-name process)))
+          (dwim-shell-command--message "%s done" (process-name process))
           (with-current-buffer (process-buffer process)
             (rename-buffer (format "%s done" (process-name process))))
           (if on-completion
@@ -626,13 +627,19 @@ all needed to finalize processing."
                   (switch-to-buffer (process-buffer process)))))))
       (if (and (buffer-name (process-buffer process))
                (or error-autofocus
+                   ;; Buffer already selected. Don't ask.
+                   (equal (process-buffer process)
+                          (window-buffer (selected-window)))
                    (y-or-n-p (format "%s error, see output? "
                                      (buffer-name (process-buffer process))))))
           (progn
-            (switch-to-buffer (process-buffer process))
-            (rename-buffer (format "%s error" (process-name process)))
-            (when error-autofocus
-              (dwim-shell-command--message "%s error" (buffer-name (process-buffer process)))))
+            (with-current-buffer (process-buffer process)
+              (rename-buffer (format "%s error" (process-name process))))
+            (when (or error-autofocus
+                      (equal (process-buffer process)
+                             (window-buffer (selected-window))))
+              (dwim-shell-command--message "%s error" (process-name process)))
+            (switch-to-buffer (process-buffer process)))
         (kill-buffer (process-buffer process))))
     (setq dwim-shell-command--commands
           (map-delete dwim-shell-command--commands (process-name process)))))
