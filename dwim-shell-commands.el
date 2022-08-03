@@ -61,7 +61,7 @@
    :utils "youtube-dl"
    :no-progress t
    :error-autofocus t
-   :dir-override "~/Downloads"
+   :monitor-directory "~/Downloads"
    :silent-success t))
 
 (defun dwim-shell-commands-image-to-jpg ()
