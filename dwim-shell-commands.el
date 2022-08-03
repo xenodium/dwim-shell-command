@@ -259,7 +259,7 @@ ffmpeg -n -i '<<f>>' -vf \"scale=$width:-2\" '<<fne>>_x%.2f.<<e>>'
    "
     # Based on http://stackoverflow.com/questions/12306223/how-to-manually-create-icns-files-using-iconutil
     # Note: png must be 1024x1024
-    mkdir <<fne>>.iconset
+    mkdir '<<fne>>.iconset'
     sips -z 16 16 '<<f>>' --out '<<fne>>.iconset/icon_16x16.png'
     sips -z 32 32 '<<f>>' --out '<<fne>>.iconset/icon_16x16@2x.png'
     sips -z 32 32 '<<f>>' --out '<<fne>>.iconset/icon_32x32.png'
@@ -270,7 +270,7 @@ ffmpeg -n -i '<<f>>' -vf \"scale=$width:-2\" '<<fne>>_x%.2f.<<e>>'
     sips -z 512 512 '<<f>>' --out '<<fne>>.iconset/icon_512x512.png'
     sips -z 512 512 '<<f>>' --out '<<fne>>.iconset/icon_256x256@2x.png'
     sips -z 1024 1024 '<<f>>' --out '<<fne>>.iconset/icon_512x512@2x.png'
-    iconutil -c icns `<<fne>>.iconset'"
+    iconutil -c icns '<<fne>>.iconset'"
    :utils '("sips" "iconutil")
    :extensions "png"))
 
@@ -308,7 +308,7 @@ Needs ideviceinstaller and libmobiledevice installed."
   (interactive)
   (dwim-shell-command-on-marked-files
    "Install .ipa"
-   "ideviceinstaller -i <<f>>"
+   "ideviceinstaller -i '<<f>>'"
    :utils "ideviceinstaller"))
 
 (provide 'dwim-shell-commands)
