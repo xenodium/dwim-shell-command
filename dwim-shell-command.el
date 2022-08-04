@@ -616,7 +616,7 @@ ERROR-AUTOFOCUS, ON-COMPLETION, SILENT-SUCCESS, and MONITOR-DIRECTORY are
 all needed to finalize processing."
   (let ((oldest-new-file))
     (when progress-reporter
-        (progress-reporter-done progress-reporter))
+      (progress-reporter-done progress-reporter))
     (if (= (process-exit-status process) 0)
         (progn
           (dwim-shell-command--message "%s done" (process-name process))
@@ -648,8 +648,9 @@ all needed to finalize processing."
                    ;; Buffer already selected. Don't ask.
                    (equal (process-buffer process)
                           (window-buffer (selected-window)))
-                   (y-or-n-p (format "%s error, see output? "
-                                     (buffer-name (process-buffer process))))))
+                   (ignore-error quit
+                     (y-or-n-p (format "%s error, see output? "
+                                       (buffer-name (process-buffer process)))))))
           (progn
             (with-current-buffer (process-buffer process)
               (rename-buffer (funcall dwim-shell-command-error-buffer-name (process-name process))))
