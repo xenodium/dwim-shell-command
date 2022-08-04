@@ -621,7 +621,7 @@ all needed to finalize processing."
         (progn
           (dwim-shell-command--message "%s done" (process-name process))
           (with-current-buffer (process-buffer process)
-            (rename-buffer (funcall dwim-shell-command-done-buffer-name (process-name process))))
+            (rename-buffer (generate-new-buffer-name (funcall dwim-shell-command-done-buffer-name (process-name process)))))
           (if on-completion
               (funcall on-completion (process-buffer process))
             (with-current-buffer calling-buffer
@@ -653,7 +653,7 @@ all needed to finalize processing."
                                        (buffer-name (process-buffer process)))))))
           (progn
             (with-current-buffer (process-buffer process)
-              (rename-buffer (funcall dwim-shell-command-error-buffer-name (process-name process))))
+              (rename-buffer (generate-new-buffer-name (funcall dwim-shell-command-error-buffer-name (process-name process)))))
             (when (or error-autofocus
                       (equal (process-buffer process)
                              (window-buffer (selected-window))))
