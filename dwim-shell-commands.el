@@ -150,6 +150,24 @@
    :extensions "gif"
    :utils "gifsicle"))
 
+(defun dwim-shell-commands-epub-to-org ()
+  "Convert epub(s) to org."
+  (interactive)
+  (dwim-shell-command-on-marked-files
+   "epub to org"
+   "pandoc --from=epub --to=org '<<f>>' > '<<fne>>.org'"
+   :extensions "epub"
+   :utils "pandoc"))
+
+(defun dwim-shell-commands-docx-to-pdf-via-latex ()
+  "Convert docx(s) to pdf (via latex)."
+  (interactive)
+  (dwim-shell-command-on-marked-files
+   "docx to pdf (via latex)"
+   "pandoc -t latex '<<f>>' -o '<<fne>>.pdf'"
+   :extensions "docx" ;; brew install mactex
+   :utils "pdflatex"))
+
 (defun dwim-shell-commands-resize-image ()
   "Resize marked image(s)."
   (interactive)
