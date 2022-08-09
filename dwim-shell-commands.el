@@ -262,6 +262,18 @@ ffmpeg -n -i '<<f>>' -vf \"scale=$width:-2\" '<<fne>>_x%.2f.<<e>>'
    "system_profiler SPHardwareDataType"
    :utils "system_profiler"))
 
+(defun dwim-shell-commands-macos-toggle-display-rotation ()
+  "View macOS hardware overview."
+  (interactive)
+  ;; #  Display_ID    Resolution  ____Display_Bounds____  Rotation
+  ;; 2  0x2b347692    1440x2560      0     0  1440  2560    270    [main]
+  ;; From fb-rotate output, get the `current-rotation' from Column 7, row 1 zero-based.
+  (let ((current-rotation (nth 7 (split-string (nth 1 (process-lines "fb-rotate" "-i"))))))
+    (dwim-shell-command-on-marked-files
+     "macOS hardware overview"
+     (format "fb-rotate -d 1 -r %s" (if (equal current-rotation "270") "0" "270"))
+     :utils "fb-rotate")))
+
 (defun dwim-shell-commands-files-combined-size ()
   "Get files combined file size."
   (interactive)
