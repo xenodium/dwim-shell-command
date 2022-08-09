@@ -254,6 +254,14 @@ ffmpeg -n -i '<<f>>' -vf \"scale=$width:-2\" '<<fne>>_x%.2f.<<e>>'
                       (kill-buffer buffer)
                       (switch-to-buffer (find-file-noselect temp-file t))))))
 
+(defun dwim-shell-commands-macos-hardware-overview ()
+  "View macOS hardware overview."
+  (interactive)
+  (dwim-shell-command-on-marked-files
+   "macOS hardware overview"
+   "system_profiler SPHardwareDataType"
+   :utils "system_profiler"))
+
 (defun dwim-shell-commands-files-combined-size ()
   "Get files combined file size."
   (interactive)
