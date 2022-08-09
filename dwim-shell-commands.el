@@ -238,7 +238,7 @@ ffmpeg -n -i '<<f>>' -vf \"scale=$width:-2\" '<<fne>>_x%.2f.<<e>>'
   "Convert binary plist to xml."
   (interactive)
   (dwim-shell-command-on-marked-files
-   "Convert binary plist to xml."
+   "Convert binary plist to xml"
    "plutil -convert xml1 -o '<<fne>>.xml' '<<f>>'"
    :utils "plutil"))
 
