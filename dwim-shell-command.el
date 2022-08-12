@@ -75,7 +75,7 @@ Set to nil to use `shell-command-switch'."
 
 (defcustom dwim-shell-command-done-buffer-name
   (lambda (name)
-    (format "✅ %s done" name))
+    (format "✅ %s %s" name (propertize "done" 'face 'success)))
   "Function to format buffer name on success.
 Use `identify' to remove formatting."
   :type 'function
@@ -83,7 +83,7 @@ Use `identify' to remove formatting."
 
 (defcustom dwim-shell-command-error-buffer-name
   (lambda (name)
-    (format "⛔️ %s error" name))
+    (format "⛔️ %s %s" name (propertize "error" 'face 'error)))
   "Function to format buffer name on error.
 Use `identify' to remove formatting."
   :type 'function
@@ -642,7 +642,7 @@ all needed to finalize processing."
       (progress-reporter-done progress-reporter))
     (if (= (process-exit-status process) 0)
         (progn
-          (dwim-shell-command--message "%s done" (process-name process))
+          (dwim-shell-command--message (funcall dwim-shell-command-done-buffer-name (process-name process)))
           (with-current-buffer (process-buffer process)
             (rename-buffer (generate-new-buffer-name (funcall dwim-shell-command-done-buffer-name (process-name process)))))
           (if on-completion
@@ -680,7 +680,7 @@ all needed to finalize processing."
             (when (or error-autofocus
                       (equal (process-buffer process)
                              (window-buffer (selected-window))))
-              (dwim-shell-command--message "%s error" (process-name process)))
+              (dwim-shell-command--message (funcall dwim-shell-command-error-buffer-name (process-name process))))
             (switch-to-buffer (process-buffer process)))
         (kill-buffer (process-buffer process))))
     (setq dwim-shell-command--commands
