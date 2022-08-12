@@ -511,6 +511,19 @@ Set TEMP-DIR to a unique temp directory to this template."
   (setq files (seq-map (lambda (file)
                          (expand-file-name file))
                        files))
+  ;; Try to use quotes surrounding <<*>> in each path.
+  ;; "'<<*>>'" with '("path/to/image1.png" "path/to/image2.png") -> "'path/to/image1.png' 'path/to/image2.png'"
+  (when-let ((found (string-match "\\([^ ]\\)\\(\<\<\\*\>\>\\)\\([^ ]\\)" template))
+             (before (match-string 1 template))
+             (after (match-string 3 template)))
+    (setq template (replace-regexp-in-string "\\([^ ]\\)\\(\<\<\\*\>\>\\)\\([^ ]\\)"
+                                             (string-join (seq-map (lambda (file)
+                                                                     (concat before file after)) files) " ")
+                                             template nil nil 0)))
+  ;; "<<*>>" with ("path/to/image1.png" "path/to/image2.png") -> "path/to/image1.png path/to/image2.png"
+  (setq template (replace-regexp-in-string "\\(\<\<\\*\>\>\\)" (string-join (seq-map (lambda (file)
+                                                                                                ) files) " ") template nil nil 1))
+
   ;; "<<*>>" with '("path/to/image1.png" "path/to/image2.png") -> "path/to/image1.png path/to/image2.png"
   (setq template (replace-regexp-in-string "\\(\<\<\\*\>\>\\)" (string-join files " ") template nil nil 1))
 
