@@ -187,7 +187,7 @@ Prefix
      :silent-success (string-prefix-p " " script)
      :error-autofocus (not dwim-shell-command-prompt-on-error))))
 
-(cl-defun dwim-shell-command-on-marked-files (buffer-name script &key utils extensions shell-util shell-args shell-pipe post-process-template on-completion repeat silent-success no-progress error-autofocus monitor-directory)
+(cl-defun dwim-shell-command-on-marked-files (buffer-name script &key utils extensions shell-util shell-args shell-pipe post-process-template on-completion repeat silent-success no-progress error-autofocus monitor-directory focus-now)
   "Create DWIM utilities executing templated SCRIPT on given files.
 
 Here's a simple utility invoking SCRIPT to convert image files to jpg.
@@ -285,9 +285,10 @@ Quick exit
                                      :no-progress no-progress
                                      :repeat repeat
                                      :error-autofocus error-autofocus
-                                     :monitor-directory monitor-directory))
+                                     :monitor-directory monitor-directory
+                                     :focus-now focus-now))
 
-(cl-defun dwim-shell-command-execute-script (buffer-name script &key files extensions shell-util shell-args shell-pipe utils post-process-template on-completion silent-success gen-temp-dir repeat no-progress error-autofocus monitor-directory)
+(cl-defun dwim-shell-command-execute-script (buffer-name script &key files extensions shell-util shell-args shell-pipe utils post-process-template on-completion silent-success gen-temp-dir repeat no-progress error-autofocus monitor-directory focus-now)
   "Execute a script asynchronously, DWIM style with SCRIPT and BUFFER-NAME.
 
 :FILES are used to instantiate SCRIPT as a noweb template.
@@ -355,7 +356,14 @@ This is implied when <<td>> appears in the script.
 
 :REPEAT Use to repeat script N number of times.
 
-:NO-PROGRESS Suppress progress reporting."
+:NO-PROGRESS Suppress progress reporting.
+
+:ERROR-AUTOFOCUS Automatically focus process buffer on error.
+
+:MONITOR-DIRECTORY Monitor this directory for new files.
+
+:FOCUS-NOW Immediately focus process buffer once started.
+"
   (cl-assert buffer-name nil "Script must have a buffer name")
   (cl-assert (not (string-empty-p script)) nil "Script must not be empty")
   (when (stringp extensions)
@@ -448,6 +456,8 @@ This is implied when <<td>> appears in the script.
     (let ((current (current-buffer)))
       (pop-to-buffer-same-window proc-buffer)
       (pop-to-buffer-same-window current))
+    (when focus-now
+      (switch-to-buffer proc-buffer))
     (if (equal (process-status proc) 'exit)
         (dwim-shell-command--finalize (current-buffer)
                                       files-before
