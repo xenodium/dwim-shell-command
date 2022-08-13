@@ -85,7 +85,7 @@
   (interactive)
   (dwim-shell-command-on-marked-files
    "Join as pdf"
-   "convert -verbose '<<*>>' '<<joined.pdf(i)>>'"
+   "convert -verbose '<<*>>' '<<joined.pdf(u)>>'"
    :utils "convert"))
 
 (defun dwim-shell-commands-image-to-grayscale ()

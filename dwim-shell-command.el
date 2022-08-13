@@ -531,11 +531,11 @@ Set TEMP-DIR to a unique temp directory to this template."
                                                                      (concat before file after)) files) " ")
                                              template nil nil 0)))
 
-  ;; "<<some.txt(i)>>" -> some.txt (if unique)
+  ;; "<<some.txt(u)>>" -> some.txt (if unique)
   ;;                   -> some(1).txt (if it exist)
-  (when-let* ((found (string-match "\<\<\\([^ ]?+\\)(i)\>\>" template))
+  (when-let* ((found (string-match "\<\<\\([^ ]?+\\)(u)\>\>" template))
               (name (match-string 1 template)))
-    (setq template (replace-regexp-in-string "\<\<\\([^ ]?+\\)(i)\>\>"
+    (setq template (replace-regexp-in-string "\<\<\\([^ ]?+\\)(u)\>\>"
                                              (dwim-shell-command--unique-file-path name)
                                              template nil nil 0)))
 
@@ -559,7 +559,7 @@ Set TEMP-DIR to a unique temp directory to this template."
 
 Expand using <<f>> for FILE, <<fne>> for FILE without extension, and
 <<e>> for FILE extension.  <<n>>, <<1n>>, or <<an>> is replaced with
-CURRENT. <<some.txt(i)>> expands to unique \"some(1).txt\".
+CURRENT. <<some.txt(u)>> expands to unique \"some(1).txt\".
 
 Note: This expander cannot be used to expand <<*>>.
 
@@ -593,11 +593,11 @@ Set TEMP-DIR to a unique temp directory to this template."
     ;; "<<f>>" with "/path/file.jpg" -> "/path/file.jpg"
     (setq template (replace-regexp-in-string "\\(\<\<f\>\>\\)" file template nil nil 1)))
 
-  ;; "<<some.txt(i)>>" -> some.txt (if unique)
+  ;; "<<some.txt(u)>>" -> some.txt (if unique)
   ;;                   -> some(1).txt (if it exist)
-  (when-let* ((found (string-match "\<\<\\([^ ]?+\\)(i)\>\>" template))
+  (when-let* ((found (string-match "\<\<\\([^ ]?+\\)(u)\>\>" template))
               (name (match-string 1 template)))
-    (setq template (replace-regexp-in-string "\<\<\\([^ ]?+\\)(i)\>\>"
+    (setq template (replace-regexp-in-string "\<\<\\([^ ]?+\\)(u)\>\>"
                                              (dwim-shell-command--unique-file-path name)
                                              template nil nil 0)))
 
