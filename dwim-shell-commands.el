@@ -205,6 +205,15 @@
    "ffmpeg -i '<<f>>' -c copy -an '<<fne>>_no_audio.<<e>>'"
    :utils "ffmpeg"))
 
+(defun dwim-shell-commands-ping-google ()
+  "Ping duckduckgo.com."
+  (interactive)
+  (dwim-shell-command-on-marked-files
+   "Ping google.com"
+   "ping -c 3 google.com"
+   :utils "ping"
+   :focus-now t))
+
 (defun dwim-shell-commands-speed-up-video ()
   "Speed up video(s)."
   (interactive)
