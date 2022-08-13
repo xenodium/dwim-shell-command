@@ -80,6 +80,14 @@
    "convert -verbose '<<f>>' '<<fne>>.png'"
    :utils "convert"))
 
+(defun dwim-shell-commands-join-as-pdf ()
+  "Join all marked images as a single pdf."
+  (interactive)
+  (dwim-shell-command-on-marked-files
+   "Join as pdf"
+   "convert -verbose '<<*>>' '<<joined.pdf(i)>>'"
+   :utils "convert"))
+
 (defun dwim-shell-commands-image-to-grayscale ()
   "Convert all marked images to grayscale."
   (interactive)
