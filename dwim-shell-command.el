@@ -5,7 +5,7 @@
 ;; Author: Alvaro Ramirez
 ;; Package-Requires: ((emacs "27.1"))
 ;; URL: https://github.com/xenodium/dwim-shell-command
-;; Version: 0.14
+;; Version: 0.15
 
 ;; This package is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -536,7 +536,7 @@ Set TEMP-DIR to a unique temp directory to this template."
   (when-let* ((found (string-match "\<\<\\([^ ]?+\\)(u)\>\>" template))
               (name (match-string 1 template)))
     (setq template (replace-regexp-in-string "\<\<\\([^ ]?+\\)(u)\>\>"
-                                             (dwim-shell-command--unique-file-path name)
+                                             (dwim-shell-command--unique-new-file-path name)
                                              template nil nil 0)))
 
   ;; "<<*>>" with '("path/to/image1.png" "path/to/image2.png") -> "path/to/image1.png path/to/image2.png"
@@ -598,7 +598,7 @@ Set TEMP-DIR to a unique temp directory to this template."
   (when-let* ((found (string-match "\<\<\\([^ ]?+\\)(u)\>\>" template))
               (name (match-string 1 template)))
     (setq template (replace-regexp-in-string "\<\<\\([^ ]?+\\)(u)\>\>"
-                                             (dwim-shell-command--unique-file-path name)
+                                             (dwim-shell-command--unique-new-file-path name)
                                              template nil nil 0)))
 
   ;; "<<td>>" with TEMP-DIR -> "/var/folders/m7/ky091cp56d5g68nyhl4y7frc0000gn/T/dwim-shell-command-JNK4V5"
