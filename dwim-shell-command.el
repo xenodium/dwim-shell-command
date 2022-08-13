@@ -559,7 +559,7 @@ Set TEMP-DIR to a unique temp directory to this template."
 
 Expand using <<f>> for FILE, <<fne>> for FILE without extension, and
 <<e>> for FILE extension.  <<n>>, <<1n>>, or <<an>> is replaced with
-CURRENT. <<some.txt(i)>> expands to unique \"some(1).txt\."
+CURRENT. <<some.txt(i)>> expands to unique \"some(1).txt\".
 
 Note: This expander cannot be used to expand <<*>>.
 
