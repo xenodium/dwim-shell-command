@@ -530,9 +530,14 @@ Set TEMP-DIR to a unique temp directory to this template."
                                              (string-join (seq-map (lambda (file)
                                                                      (concat before file after)) files) " ")
                                              template nil nil 0)))
-  ;; "<<*>>" with ("path/to/image1.png" "path/to/image2.png") -> "path/to/image1.png path/to/image2.png"
-  (setq template (replace-regexp-in-string "\\(\<\<\\*\>\>\\)" (string-join (seq-map (lambda (file)
-                                                                                                ) files) " ") template nil nil 1))
+
+  ;; "<<some.txt(i)>>" -> some.txt (if unique)
+  ;;                   -> some(1).txt (if it exist)
+  (when-let* ((found (string-match "\<\<\\([^ ]?+\\)(i)\>\>" template))
+              (name (match-string 1 template)))
+    (setq template (replace-regexp-in-string "\<\<\\([^ ]?+\\)(i)\>\>"
+                                             (dwim-shell-command--unique-file-path name)
+                                             template nil nil 0)))
 
   ;; "<<*>>" with '("path/to/image1.png" "path/to/image2.png") -> "path/to/image1.png path/to/image2.png"
   (setq template (replace-regexp-in-string "\\(\<\<\\*\>\>\\)" (string-join files " ") template nil nil 1))
@@ -554,7 +559,7 @@ Set TEMP-DIR to a unique temp directory to this template."
 
 Expand using <<f>> for FILE, <<fne>> for FILE without extension, and
 <<e>> for FILE extension.  <<n>>, <<1n>>, or <<an>> is replaced with
-CURRENT.
+CURRENT. <<some.txt(i)>> expands to unique \"some(1).txt\."
 
 Note: This expander cannot be used to expand <<*>>.
 
@@ -587,6 +592,14 @@ Set TEMP-DIR to a unique temp directory to this template."
 
     ;; "<<f>>" with "/path/file.jpg" -> "/path/file.jpg"
     (setq template (replace-regexp-in-string "\\(\<\<f\>\>\\)" file template nil nil 1)))
+
+  ;; "<<some.txt(i)>>" -> some.txt (if unique)
+  ;;                   -> some(1).txt (if it exist)
+  (when-let* ((found (string-match "\<\<\\([^ ]?+\\)(i)\>\>" template))
+              (name (match-string 1 template)))
+    (setq template (replace-regexp-in-string "\<\<\\([^ ]?+\\)(i)\>\>"
+                                             (dwim-shell-command--unique-file-path name)
+                                             template nil nil 0)))
 
   ;; "<<td>>" with TEMP-DIR -> "/var/folders/m7/ky091cp56d5g68nyhl4y7frc0000gn/T/dwim-shell-command-JNK4V5"
   (setq template (replace-regexp-in-string "\\(\<\<td\>\>\\)" temp-dir template nil nil 1))
@@ -685,6 +698,21 @@ all needed to finalize processing."
         (kill-buffer (process-buffer process))))
     (setq dwim-shell-command--commands
           (map-delete dwim-shell-command--commands (process-name process)))))
+
+(defun dwim-shell-command--unique-new-file-path (file-path)
+  "Return a unique FILE-PATH.
+\"/tmp/blah.txt\" -> \"/tmp/blah(1).txt\"
+\"/tmp/blah\" -> \"/tmp/blah(1)\"
+"
+  (let ((counter 1)
+        (name (file-name-sans-extension file-path))
+        (extension (file-name-extension file-path)))
+    (while (file-exists-p file-path)
+      (if extension
+          (setq file-path (format "%s(%d).%s" name counter extension))
+        (setq file-path (format "%s(%d)" name counter)))
+      (setq counter (1+ counter)))
+    file-path))
 
 (defun dwim-shell-command--sentinel (process _)
   "Handles PROCESS sentinel and STATE."
