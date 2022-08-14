@@ -167,7 +167,7 @@
    :extensions "epub"
    :utils "pandoc"))
 
-(defun dwim-shell-commands-docx-to-pdf-via-latex ()
+(defun dwim-shell-commands-docx-to-pdf ()
   "Convert docx(s) to pdf (via latex)."
   (interactive)
   (dwim-shell-command-on-marked-files
