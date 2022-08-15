@@ -362,8 +362,7 @@ This is implied when <<td>> appears in the script.
 
 :MONITOR-DIRECTORY Monitor this directory for new files.
 
-:FOCUS-NOW Immediately focus process buffer once started.
-"
+:FOCUS-NOW Immediately focus process buffer once started."
   (cl-assert buffer-name nil "Script must have a buffer name")
   (cl-assert (not (string-empty-p script)) nil "Script must not be empty")
   (when (stringp extensions)
@@ -574,7 +573,7 @@ Set TEMP-DIR to a unique temp directory to this template."
 
 Expand using <<f>> for FILE, <<fne>> for FILE without extension, and
 <<e>> for FILE extension.  <<n>>, <<1n>>, or <<an>> is replaced with
-CURRENT. <<some.txt(u)>> expands to unique \"some(1).txt\".
+CURRENT.  <<some.txt(u)>> expands to unique \"some(1).txt\".
 
 Note: This expander cannot be used to expand <<*>>.
 
@@ -717,8 +716,7 @@ all needed to finalize processing."
 (defun dwim-shell-command--unique-new-file-path (file-path)
   "Return a unique FILE-PATH.
 \"/tmp/blah.txt\" -> \"/tmp/blah(1).txt\"
-\"/tmp/blah\" -> \"/tmp/blah(1)\"
-"
+\"/tmp/blah\" -> \"/tmp/blah(1)\""
   (let ((counter 1)
         (name (file-name-sans-extension file-path))
         (extension (file-name-extension file-path)))
