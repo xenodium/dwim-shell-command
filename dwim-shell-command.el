@@ -482,12 +482,12 @@ This is implied when <<td>> appears in the script.
       (set-process-sentinel proc #'dwim-shell-command--sentinel)
       (set-process-filter proc #'dwim-shell-command--filter))))
 
-(defun dwim-shell-command-read-file-name (prompt extension)
+(cl-defun dwim-shell-command-read-file-name (prompt &key extension default)
   "Invoke `read-string' with PROMPT and validate EXTENSION.
 Return nil if empty input."
   (let ((file-name (read-string prompt)))
     (cond ((string-empty-p (string-trim file-name))
-           nil)
+           default)
           ((and extension
                 (string-equal (file-name-extension file-name) extension))
            file-name)
