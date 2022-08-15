@@ -731,7 +731,7 @@ all needed to finalize processing."
           (map-delete dwim-shell-command--commands (process-name process)))))
 
 (cl-defun dwim-shell-command--unique-new-file-path (file-path &key expand)
-  "Return a unique FILE-PATH.
+  "Return a unique FILE-PATH using :EXPAND to expand FILE-PATH.
 \"/tmp/blah.txt\" -> \"/tmp/blah(1).txt\"
 \"/tmp/blah\" -> \"/tmp/blah(1)\""
   (let ((counter 1)
