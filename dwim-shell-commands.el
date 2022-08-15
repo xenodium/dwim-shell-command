@@ -198,7 +198,8 @@
    (format "qpdf --verbose --encrypt '%s' '%s' 256 -- '<<f>>' '<<fne>>_enc.<<e>>'"
            (read-passwd "user-password: ")
            (read-passwd "owner-password: "))
-   :utils "qpdf"))
+   :utils "qpdf"
+   :extensions "pdf"))
 
 (defun dwim-shell-commands--gifsicle-frames-every (skipping-every file)
   "Generate frames SKIPPING-EVERY count for video FILE."
