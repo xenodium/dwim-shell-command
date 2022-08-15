@@ -483,8 +483,8 @@ This is implied when <<td>> appears in the script.
       (set-process-filter proc #'dwim-shell-command--filter))))
 
 (cl-defun dwim-shell-command-read-file-name (prompt &key extension default)
-  "Invoke `read-string' with PROMPT and validate EXTENSION.
-Return nil if empty input."
+  "Invoke `read-string' with PROMPT.
+Validates :EXTENSION and returns :DEFAULT if empty input."
   (let ((file-name (read-string prompt)))
     (cond ((string-empty-p (string-trim file-name))
            default)
