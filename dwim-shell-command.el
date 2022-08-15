@@ -553,6 +553,12 @@ Set TEMP-DIR to a unique temp directory to this template."
                                              (dwim-shell-command--unique-new-file-path name)
                                              template nil nil 0)))
 
+  ;; "<<~>>" -> "/home/user" (or equivalent).
+  (when (string-match "\<\<~\>\>" template)
+    (setq template (replace-regexp-in-string "\<\<~\>\>"
+                                             (expand-file-name "~")
+                                             template nil nil 0)))
+
   ;; "<<*>>" with '("path/to/image1.png" "path/to/image2.png") -> "path/to/image1.png path/to/image2.png"
   (setq template (replace-regexp-in-string "\\(\<\<\\*\>\>\\)" (string-join files " ") template nil nil 1))
 
@@ -598,6 +604,9 @@ Set TEMP-DIR to a unique temp directory to this template."
     ;; "<<fne>>" with "/path/tmp.txt" -> "/path/tmp"
     (setq template (replace-regexp-in-string "\\(\<\<fne\>\>\\)" (file-name-sans-extension file) template nil nil 1))
 
+    ;; "<<fbn>>" with "/path/tmp.txt" -> "tmp.txt"
+    (setq template (replace-regexp-in-string "\\(\<\<fbn\>\>\\)" (file-name-nondirectory file) template nil nil 1))
+
     ;; "<<e>>" with "/path/tmp.txt" -> "txt"
     (if (file-name-extension file)
         (setq template (replace-regexp-in-string "\\(\<\<e\>\>\\)" (file-name-extension file) template nil nil 1))
@@ -613,6 +622,12 @@ Set TEMP-DIR to a unique temp directory to this template."
               (name (match-string 1 template)))
     (setq template (replace-regexp-in-string "\<\<\\([^ ]?+\\)(u)\>\>"
                                              (dwim-shell-command--unique-new-file-path name)
+                                             template nil nil 0)))
+
+  ;; "<<~>>" -> "/home/user" (or equivalent).
+  (when (string-match "\<\<~\>\>" template)
+    (setq template (replace-regexp-in-string "\<\<~\>\>"
+                                             (expand-file-name "~")
                                              template nil nil 0)))
 
   ;; "<<td>>" with TEMP-DIR -> "/var/folders/m7/ky091cp56d5g68nyhl4y7frc0000gn/T/dwim-shell-command-JNK4V5"
@@ -637,6 +652,8 @@ Set TEMP-DIR to a unique temp directory to this template."
          "<<f>>")
         ((string-match "\<\<fne\>\>" template)
          "<<fne>>")
+        ((string-match "\<\<fbn\>\>" template)
+         "<<fbn>>")
         ((string-match "\<\<e\>\>" template)
          "<<e>>")))
 
@@ -713,7 +730,7 @@ all needed to finalize processing."
     (setq dwim-shell-command--commands
           (map-delete dwim-shell-command--commands (process-name process)))))
 
-(defun dwim-shell-command--unique-new-file-path (file-path)
+(cl-defun dwim-shell-command--unique-new-file-path (file-path &key expand)
   "Return a unique FILE-PATH.
 \"/tmp/blah.txt\" -> \"/tmp/blah(1).txt\"
 \"/tmp/blah\" -> \"/tmp/blah(1)\""
@@ -725,7 +742,9 @@ all needed to finalize processing."
           (setq file-path (format "%s(%d).%s" name counter extension))
         (setq file-path (format "%s(%d)" name counter)))
       (setq counter (1+ counter)))
-    file-path))
+    (if expand
+        (expand-file-name file-path)
+      file-path)))
 
 (defun dwim-shell-command--sentinel (process _)
   "Handles PROCESS sentinel and STATE."
