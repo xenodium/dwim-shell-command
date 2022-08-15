@@ -85,7 +85,11 @@
   (interactive)
   (dwim-shell-command-on-marked-files
    "Join as pdf"
-   "convert -verbose '<<*>>' '<<joined.pdf(u)>>'"
+   (format "convert -verbose '<<*>>' '%s'"
+           (dwim-shell-command-read-file-name
+            "Join as pdf named (default \"joined.pdf\"): "
+            :extension "pdf"
+            :default "<<joined.pdf(u)>>"))
    :utils "convert"))
 
 (defun dwim-shell-commands-image-to-grayscale ()
