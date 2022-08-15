@@ -382,6 +382,110 @@ Needs ideviceinstaller and libmobiledevice installed."
    "ideviceinstaller -i '<<f>>'"
    :utils "ideviceinstaller"))
 
+(defun dwim-shell-commands-copy-to-downloads ()
+  "Copy file to ~/Downloads."
+  (interactive)
+  (dwim-shell-command-on-marked-files
+   "Copy file to ~/Downloads"
+   "set -e
+if [[ -f '<<~>>/Downloads/<<fbn>>' ]]; then
+  echo \"File already exists\"
+  exit 1
+fi
+cp '<<f>>' '<<~>>/Downloads/<<fbn>>'"
+   :utils "cp"
+   :monitor-directory "~/Downloads"
+   :error-autofocus t))
+
+(defun dwim-shell-commands-copy-to-downloads-forced ()
+  "Copy file to ~/Downloads."
+  (interactive)
+  (dwim-shell-command-on-marked-files
+   "Copy file to ~/Downloads forced"
+   "cp '<<f>>' '<<~>>/Downloads/<<fbn>>'"
+   :utils "cp"
+   :monitor-directory "~/Downloads"
+   :error-autofocus t
+   :silent-success t))
+
+(defun dwim-shell-commands-move-to-downloads ()
+  "Move file to ~/Downloads."
+  (interactive)
+  (dwim-shell-command-on-marked-files
+   "Move file to ~/Downloads"
+   "set -e
+if [[ -f '<<~>>/Downloads/<<fbn>>' ]]; then
+  echo \"File already exists\"
+  exit 1
+fi
+mv '<<f>>' '<<~>>/Downloads/<<fbn>>'"
+   :utils "mv"
+   :monitor-directory "~/Downloads"
+   :error-autofocus t))
+
+(defun dwim-shell-commands-move-to-downloads-forced ()
+  "Move file to ~/Downloads."
+  (interactive)
+  (dwim-shell-command-on-marked-files
+   "Move file to ~/Downloads forced"
+   "mv '<<f>>' '<<~>>/Downloads/<<fbn>>'"
+   :utils "mv"
+   :monitor-directory "~/Downloads"
+   :error-autofocus t
+   :silent-success t))
+
+(defun dwim-shell-commands-copy-to-desktop ()
+  "Copy file to ~/Desktop."
+  (interactive)
+  (dwim-shell-command-on-marked-files
+   "Copy file to ~/Desktop"
+   "set -e
+if [[ -f '<<~>>/Desktop/<<fbn>>' ]]; then
+  echo \"File already exists\"
+  exit 1
+fi
+cp '<<f>>' '<<~>>/Desktop/<<fbn>>'"
+   :utils "cp"
+   :monitor-directory "~/Desktop"
+   :error-autofocus t))
+
+(defun dwim-shell-commands-copy-to-desktop-forced ()
+  "Copy file to ~/Desktop."
+  (interactive)
+  (dwim-shell-command-on-marked-files
+   "Copy file to ~/Desktop forced"
+   "cp '<<f>>' '<<~>>/Desktop/<<fbn>>'"
+   :utils "cp"
+   :monitor-directory "~/Desktop"
+   :error-autofocus t
+   :silent-success t))
+
+(defun dwim-shell-commands-move-to-desktop ()
+  "Move file to ~/Desktop."
+  (interactive)
+  (dwim-shell-command-on-marked-files
+   "Move file to ~/Desktop"
+   "set -e
+if [[ -f '<<~>>/Desktop/<<fbn>>' ]]; then
+  echo \"File already exists\"
+  exit 1
+fi
+mv '<<f>>' '<<~>>/Desktop/<<fbn>>'"
+   :utils "mv"
+   :monitor-directory "~/Desktop"
+   :error-autofocus t))
+
+(defun dwim-shell-commands-move-to-desktop-forced ()
+  "Move file to ~/Desktop."
+  (interactive)
+  (dwim-shell-command-on-marked-files
+   "Move file to ~/Desktop forced"
+   "mv '<<f>>' '<<~>>/Desktop/<<fbn>>'"
+   :utils "mv"
+   :monitor-directory "~/Desktop"
+   :error-autofocus t
+   :silent-success t))
+
 (provide 'dwim-shell-commands)
 
 ;;; dwim-shell-commands.el ends here
