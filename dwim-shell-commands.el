@@ -428,17 +428,6 @@ Needs ideviceinstaller and libmobiledevice installed."
      (file-name-concat "~/Desktop" (file-name-nondirectory file)))
    :monitor-directory "~/Desktop"))
 
-(defun dwim-shell-commands-move-to-desktop-forced ()
-  "Move file to ~/Desktop."
-  (interactive)
-  (dwim-shell-command-on-marked-files
-   "Move file to ~/Desktop forced"
-   "mv '<<f>>' '<<~>>/Desktop/<<fbn>>'"
-   :utils "mv"
-   :monitor-directory "~/Desktop"
-   :error-autofocus t
-   :silent-success t))
-
 (provide 'dwim-shell-commands)
 
 ;;; dwim-shell-commands.el ends here
