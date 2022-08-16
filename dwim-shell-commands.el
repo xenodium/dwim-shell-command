@@ -385,95 +385,48 @@ Needs ideviceinstaller and libmobiledevice installed."
 (defun dwim-shell-commands-copy-to-downloads ()
   "Copy file to ~/Downloads."
   (interactive)
-  (dwim-shell-command-on-marked-files
-   "Copy file to ~/Downloads"
-   "set -e
-if [[ -f '<<~>>/Downloads/<<fbn>>' ]]; then
-  echo \"File already exists\"
-  exit 1
-fi
-cp '<<f>>' '<<~>>/Downloads/<<fbn>>'"
-   :utils "cp"
-   :monitor-directory "~/Downloads"
-   :error-autofocus t))
-
-(defun dwim-shell-commands-copy-to-downloads-forced ()
-  "Copy file to ~/Downloads."
-  (interactive)
-  (dwim-shell-command-on-marked-files
-   "Copy file to ~/Downloads forced"
-   "cp '<<f>>' '<<~>>/Downloads/<<fbn>>'"
-   :utils "cp"
-   :monitor-directory "~/Downloads"
-   :error-autofocus t
-   :silent-success t))
+  (dwim-shell-command-foreach
+   (lambda (file)
+     (copy-file file "~/Downloads/" 1)
+     (file-name-concat "~/Downloads" (file-name-nondirectory file)))
+   :monitor-directory "~/Downloads"))
 
 (defun dwim-shell-commands-move-to-downloads ()
   "Move file to ~/Downloads."
   (interactive)
-  (dwim-shell-command-on-marked-files
-   "Move file to ~/Downloads"
-   "set -e
-if [[ -f '<<~>>/Downloads/<<fbn>>' ]]; then
-  echo \"File already exists\"
-  exit 1
-fi
-mv '<<f>>' '<<~>>/Downloads/<<fbn>>'"
-   :utils "mv"
-   :monitor-directory "~/Downloads"
-   :error-autofocus t))
-
-(defun dwim-shell-commands-move-to-downloads-forced ()
-  "Move file to ~/Downloads."
-  (interactive)
-  (dwim-shell-command-on-marked-files
-   "Move file to ~/Downloads forced"
-   "mv '<<f>>' '<<~>>/Downloads/<<fbn>>'"
-   :utils "mv"
-   :monitor-directory "~/Downloads"
-   :error-autofocus t
-   :silent-success t))
+  (dwim-shell-command-foreach
+   (lambda (file)
+     (rename-file file "~/Downloads/" 1)
+     (when (buffer-file-name)
+       (rename-buffer (file-name-nondirectory file))
+       (set-visited-file-name
+        (file-name-concat "~/Downloads" (file-name-nondirectory file)))
+       (set-buffer-modified-p nil))
+     (file-name-concat "~/Downloads" (file-name-nondirectory file)))
+   :monitor-directory "~/Downloads"))
 
 (defun dwim-shell-commands-copy-to-desktop ()
   "Copy file to ~/Desktop."
   (interactive)
-  (dwim-shell-command-on-marked-files
-   "Copy file to ~/Desktop"
-   "set -e
-if [[ -f '<<~>>/Desktop/<<fbn>>' ]]; then
-  echo \"File already exists\"
-  exit 1
-fi
-cp '<<f>>' '<<~>>/Desktop/<<fbn>>'"
-   :utils "cp"
-   :monitor-directory "~/Desktop"
-   :error-autofocus t))
-
-(defun dwim-shell-commands-copy-to-desktop-forced ()
-  "Copy file to ~/Desktop."
-  (interactive)
-  (dwim-shell-command-on-marked-files
-   "Copy file to ~/Desktop forced"
-   "cp '<<f>>' '<<~>>/Desktop/<<fbn>>'"
-   :utils "cp"
-   :monitor-directory "~/Desktop"
-   :error-autofocus t
-   :silent-success t))
+  (dwim-shell-command-foreach
+   (lambda (file)
+     (copy-file file "~/Desktop/" 1)
+     (file-name-concat "~/Desktop" (file-name-nondirectory file)))
+   :monitor-directory "~/Desktop"))
 
 (defun dwim-shell-commands-move-to-desktop ()
   "Move file to ~/Desktop."
   (interactive)
-  (dwim-shell-command-on-marked-files
-   "Move file to ~/Desktop"
-   "set -e
-if [[ -f '<<~>>/Desktop/<<fbn>>' ]]; then
-  echo \"File already exists\"
-  exit 1
-fi
-mv '<<f>>' '<<~>>/Desktop/<<fbn>>'"
-   :utils "mv"
-   :monitor-directory "~/Desktop"
-   :error-autofocus t))
+  (dwim-shell-command-foreach
+   (lambda (file)
+     (rename-file file "~/Desktop/" 1)
+     (when (buffer-file-name)
+       (rename-buffer (file-name-nondirectory file))
+       (set-visited-file-name
+        (file-name-concat "~/Desktop" (file-name-nondirectory file)))
+       (set-buffer-modified-p nil))
+     (file-name-concat "~/Desktop" (file-name-nondirectory file)))
+   :monitor-directory "~/Desktop"))
 
 (defun dwim-shell-commands-move-to-desktop-forced ()
   "Move file to ~/Desktop."
