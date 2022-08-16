@@ -823,6 +823,25 @@ Falls back to \"1\"."
   "Test that running PROGRAM with ARGS is successful."
   (eq 0 (apply #'call-process program nil nil nil args)))
 
+(cl-defun dwim-shell-command-foreach (fun &key monitor-directory)
+  "Execute FUN for each file.
+Monitor :MONITOR-DIRECTORY for new file and `dired-jump' to it."
+  (let ((files (dwim-shell-command--files))
+        (files-before (dwim-shell-command--default-directory-files  monitor-directory))
+        (oldest-new-file)
+        (created-file)
+        (jump-to))
+    (mapc (lambda (file-path)
+            (setq created-file (or (funcall fun file-path)
+                                   created-file)))
+          files)
+    (setq oldest-new-file (dwim-shell-command--last-modified-between
+                           files-before
+                           (dwim-shell-command--default-directory-files monitor-directory)))
+    (setq jump-to (or oldest-new-file created-file))
+    (when jump-to
+      (dired-jump nil jump-to))))
+
 (provide 'dwim-shell-command)
 
 ;;; dwim-shell-command.el ends here
