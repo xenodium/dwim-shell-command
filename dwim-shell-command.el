@@ -536,10 +536,13 @@ For example:
                       (default-value (if (string-empty-p (nth-value 1 query))
                                          nil
                                        (nth-value 1 query)))
-                      (value (string-trim (read-string (concat prompt
-                                                               (if default-value
-                                                                   (format " (default %s): " default-value)
-                                                                 ": ")))))
+                      (value (if (string-match-p "^[0-9]+$" default-value)
+                                 (number-to-string (read-number (format "%s: " prompt)
+                                                                (string-to-number default-value)))
+                               (string-trim (read-string (concat prompt
+                                                                 (if default-value
+                                                                     (format " (default %s): " default-value)
+                                                                   ": "))))))
                       (result (cons match (if (string-empty-p value)
                                               default-value
                                             value))))
