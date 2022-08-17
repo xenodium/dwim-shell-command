@@ -250,18 +250,16 @@
   (interactive)
   (dwim-shell-command-on-marked-files
    "Convert to gif"
-   (let ((factor (read-number "Resize scaling factor: " 0.5)))
-     (format "
+   "
 eval $(ffprobe -v quiet -show_format -of flat=s=_ -show_entries stream=width '<<f>>');
 width=${streams_stream_0_width};
 zmodload zsh/mathfunc
-width=$((rint($width * %s)));
+width=$((rint($width * <<Scaling factor:0.5>>)));
 # Make it even or face 'not divisible by 2' errors.
-if [[ $((width%%2)) -ne 0 ]] then
+if [[ $((width%2)) -ne 0 ]] then
   width=$(($width - 1))
 fi
-ffmpeg -n -i '<<f>>' -vf \"scale=$width:-2\" '<<fne>>_x%.2f.<<e>>'
-" factor factor))
+ffmpeg -n -i '<<f>>' -vf \"scale=$width:-2\" '<<fne>>_x<<Scaling factor:0.5>>.<<e>>'"
    :utils "ffmpeg"))
 
 (defun dwim-shell-commands-bin-plist-to-xml ()
