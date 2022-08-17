@@ -83,13 +83,10 @@
 (defun dwim-shell-commands-make-transparent-png ()
   "Create a transparent png."
   (interactive)
-  (let ((width (read-number "Width: " 200))
-        (height (read-number "Height: " 200)))
-    (dwim-shell-command-on-marked-files
-     "Create transparent png"
-     (format "convert -verbose -size %dx%d xc:none '<<empty%dx%d.png(u)>>'"
-             width height width height)
-     :utils "convert")))
+  (dwim-shell-command-on-marked-files
+   "Create transparent png"
+   "convert -verbose -size <<width:200>>x<<height:200>> xc:none '<<empty<<width:200>>x<<height:200>>.png(u)>>'"
+   :utils "convert"))
 
 (defun dwim-shell-commands-join-as-pdf ()
   "Join all marked images as a single pdf."

@@ -407,7 +407,8 @@ This is implied when <<td>> appears in the script.
   (seq-do (lambda (util)
             (cl-assert (executable-find util) nil (format "%s not installed" util)))
           utils)
-  (let* ((proc-buffer (generate-new-buffer (format "*%s*" buffer-name)))
+  (let* ((replacements (dwim-shell-command--extract-queries script))
+         (proc-buffer (generate-new-buffer (format "*%s*" buffer-name)))
          (template script)
          (script "")
          (files-before)
@@ -415,13 +416,13 @@ This is implied when <<td>> appears in the script.
          (progress-reporter)
          (n (or (dwim-shell-command--n-start-value template) "1")))
     (if (seq-empty-p files)
-        (setq script (dwim-shell-command--expand-file-template template nil post-process-template gen-temp-dir n))
+        (setq script (dwim-shell-command--expand-file-template template nil post-process-template gen-temp-dir n replacements))
       (if (dwim-shell-command--contains-multi-file-ref template)
-          (setq script (dwim-shell-command--expand-files-template template files post-process-template gen-temp-dir))
+          (setq script (dwim-shell-command--expand-files-template template files post-process-template gen-temp-dir replacements))
         (seq-do (lambda (file)
                   (setq script
                         (concat script "\n"
-                                (dwim-shell-command--expand-file-template template file post-process-template gen-temp-dir n)))
+                                (dwim-shell-command--expand-file-template template file post-process-template gen-temp-dir n replacements)))
                   (setq n (dwim-shell-command--increment-string n)))
                 files)))
     (setq script (string-trim script))
@@ -509,7 +510,43 @@ MESSAGE and ARGS same as `dwim-shell-command--message'."
                                      message-id))
                         (message nil))))))
 
-(defun dwim-shell-command--expand-files-template (template files &optional post-process-template temp-dir)
+(defun dwim-shell-command--extract-queries (template)
+  "Extract queries from TEMPLATE.
+
+For all queries, request a value from the user.
+
+For example:
+
+  \"Hello <<Width:100>> world <<Height:200>>\" =>
+
+    ((\"<<Width:100>>\" . \"100\")
+     (\"<<Height:200>>\" . \"200\"))"
+  (let ((matches)
+        (pos 0))
+    (while (and (< pos (length template))
+                (string-match "<<\\([[:alpha:]]\\|[[:blank:]]\\)+:\\([[:alnum:]]\\|[.]\\)*>>" template pos))
+      (setq pos (1+ (match-beginning 0)))
+      (let ((num-matches (/ (length (match-data)) 2))
+            (match 0))
+        (push (match-string match template) matches)
+        (setq match (1+ match))))
+    (seq-map (lambda (match)
+               (let* ((query (split-string (string-remove-suffix ">>" (string-remove-prefix "<<" match)) ":"))
+                      (prompt (nth 0 query))
+                      (default-value (if (string-empty-p (nth-value 1 query))
+                                         nil
+                                       (nth-value 1 query)))
+                      (value (string-trim (read-string (concat prompt
+                                                               (if default-value
+                                                                   (format " (default %s): " default-value)
+                                                                 ": ")))))
+                      (result (cons match (if (string-empty-p value)
+                                              default-value
+                                            value))))
+                 (cl-assert (cdr result) nil "Must have a value")result))
+             (seq-uniq (nreverse matches)))))
+
+(defun dwim-shell-command--expand-files-template (template files &optional post-process-template temp-dir replacements)
   "Expand TEMPLATE using FILES.
 
 Expand using <<*>> for FILES.
@@ -526,7 +563,9 @@ Note: This expander cannot be used to expand <<f>>, <<fne>>, or <<e>>.
 
 Use POST-PROCESS-TEMPLATE to further expand template given own logic.
 
-Set TEMP-DIR to a unique temp directory to this template."
+Set TEMP-DIR to a unique temp directory to this template.
+
+REPLACEMENTS is a cons list of literals to replace with values."
   (cl-assert (not (and (dwim-shell-command--contains-multi-file-ref template)
                        (dwim-shell-command--contains-single-file-ref template)))
              nil "Must not have %s and %s in the same template"
@@ -535,6 +574,12 @@ Set TEMP-DIR to a unique temp directory to this template."
   (setq files (seq-map (lambda (file)
                          (expand-file-name file))
                        files))
+
+  (mapc (lambda (replacement)
+          (setq template
+                (string-replace (car replacement) (cdr replacement) template)))
+        replacements)
+
   ;; Try to use quotes surrounding <<*>> in each path.
   ;; "'<<*>>'" with '("path/to/image1.png" "path/to/image2.png") -> "'path/to/image1.png' 'path/to/image2.png'"
   (when-let ((found (string-match "\\([^ ]\\)\\(\<\<\\*\>\>\\)\\([^ ]\\)" template))
@@ -574,7 +619,7 @@ Set TEMP-DIR to a unique temp directory to this template."
     (setq template (funcall post-process-template template files)))
   template)
 
-(defun dwim-shell-command--expand-file-template (template file &optional post-process-template temp-dir current)
+(defun dwim-shell-command--expand-file-template (template file &optional post-process-template temp-dir current replacements)
   "Expand TEMPLATE using FILE.
 
 Expand using <<f>> for FILE, <<fne>> for FILE without extension, and
@@ -593,12 +638,20 @@ Note: This expander cannot be used to expand <<*>>.
 
 Use POST-PROCESS-TEMPLATE to further expand template given own logic.
 
-Set TEMP-DIR to a unique temp directory to this template."
+Set TEMP-DIR to a unique temp directory to this template.
+
+REPLACEMENTS is a cons list of literals to replace with values."
   (cl-assert (not (and (dwim-shell-command--contains-multi-file-ref template)
                        (dwim-shell-command--contains-single-file-ref template)))
              nil "Must not have %s and %s in the same template"
              (dwim-shell-command--contains-multi-file-ref template)
              (dwim-shell-command--contains-single-file-ref template))
+
+  (mapc (lambda (replacement)
+          (setq template
+                (string-replace (car replacement) (cdr replacement) template)))
+        replacements)
+
   (when file
     (setq file (expand-file-name file))
     ;; "<<fne>>" with "/path/tmp.txt" -> "/path/tmp"
