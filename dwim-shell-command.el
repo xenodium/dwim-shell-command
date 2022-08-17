@@ -536,7 +536,7 @@ For example:
                       (default-value (if (string-empty-p (nth-value 1 query))
                                          nil
                                        (nth-value 1 query)))
-                      (value (if (string-match-p "^[0-9]+$" default-value)
+                      (value (if (string-match-p "^\\([[:alnum:]]\\|[.]\\)+$" default-value)
                                  (number-to-string (read-number (format "%s: " prompt)
                                                                 (string-to-number default-value)))
                                (string-trim (read-string (concat prompt
