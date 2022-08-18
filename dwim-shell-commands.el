@@ -165,8 +165,7 @@
   (interactive)
   (dwim-shell-command-on-marked-files
    "Resize marked gif(s)"
-   (let ((factor (read-number "Resize scaling factor: " 0.5)))
-     (format "gifsicle --scale %.2f '<<f>>' -o '<<fne>>_x%.2f.gif'" factor factor))
+   "gifsicle --scale <<Scaling factor:0.5>> '<<f>>' -o '<<fne>>_x<<Scaling factor:0.5>>.gif'"
    :extensions "gif"
    :utils "gifsicle"))
 
