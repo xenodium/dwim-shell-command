@@ -427,9 +427,7 @@ This is implied when <<td>> appears in the script.
                 files)))
     (setq script (string-trim script))
     (with-current-buffer proc-buffer
-      (require 'shell)
-      (shell-mode))
-    (with-current-buffer proc-buffer
+      (shell-mode)
       (setq default-directory default-directory)
       (shell-command-save-pos-or-erase)
       (view-mode +1)
