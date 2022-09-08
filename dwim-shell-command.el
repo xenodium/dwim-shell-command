@@ -531,9 +531,9 @@ For example:
     (seq-map (lambda (match)
                (let* ((query (split-string (string-remove-suffix ">>" (string-remove-prefix "<<" match)) ":"))
                       (prompt (nth 0 query))
-                      (default-value (if (string-empty-p (nth-value 1 query))
+                      (default-value (if (string-empty-p (nth 1 query))
                                          nil
-                                       (nth-value 1 query)))
+                                       (nth 1 query)))
                       (value (if (string-match-p "^\\([[:alnum:]]\\|[.]\\)+$" default-value)
                                  (number-to-string (read-number (format "%s: " prompt)
                                                                 (string-to-number default-value)))
