@@ -378,7 +378,7 @@ This is implied when <<td>> appears in the script.
                          (list shell-command-switch))
                        '("-x" "-c")))
   ;; See if -x can be prepended.
-  (when (and (not (seq-contains shell-args "-x"))
+  (when (and (not (seq-contains-p shell-args "-x"))
              (apply #'dwim-shell-command--program-test
                     (seq-concatenate
                      'list shell-util '("-x") shell-args (list "echo"))))
@@ -524,8 +524,7 @@ For example:
     (while (and (< pos (length template))
                 (string-match "<<\\([[:alpha:]]\\|[[:blank:]]\\)+:\\([[:alnum:]]\\|[.]\\)*>>" template pos))
       (setq pos (1+ (match-beginning 0)))
-      (let ((num-matches (/ (length (match-data)) 2))
-            (match 0))
+      (let ((match 0))
         (push (match-string match template) matches)
         (setq match (1+ match))))
     (seq-map (lambda (match)
