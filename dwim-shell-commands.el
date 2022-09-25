@@ -39,7 +39,34 @@
    "ffmpeg -stats -n -i '<<f>>' -acodec libmp3lame '<<fne>>.mp3'"
    :utils "ffmpeg"))
 
-(defun dwim-shell-commands-mpv-stream-clipboard-url ()
+(defun dwim-shell-commands-open-clipboard-url ()
+  "Open clipboard URL.  Offer to stream if possible."
+  (interactive)
+  (let ((url (or (current-kill 0)
+                 (user-error "Nothing in clipboard"))))
+    (dwim-shell-commands-url-browse url)))
+
+(defun dwim-shell-commands-url-browse (url &rest args)
+  "If URL is playable media, offer to open in mpv.  Else browser.
+Optional argument ARGS as per `browse-url-default-browser'"
+  (if (and (or (string-match-p "^http[s]?://.*youtube.com" url)
+               (string-match-p "^http[s]?://.*m.youtube.com" url)
+               (string-match-p "^http[s]?://.*youtu.be" url)
+               (string-match-p "^http[s]?://.*soundcloud.com" url)
+               (string-match-p "^http[s]?://.*redditmedia.com" url)
+               (string-match-p "^http[s]?://.*reddit.com" url)
+               (string-match-p "^http[s]?://.*bandcamp.com" url))
+           (y-or-n-p "Stream from mpv? "))
+      (dwim-shell-command-on-marked-files
+       "Streaming"
+       (format "mpv --geometry=30%%x30%%+100%%+0%% '%s'" url)
+       :utils "mpv"
+       :no-progress t
+       :error-autofocus t
+       :silent-success t)
+    (funcall #'browse-url-default-browser url args)))
+
+(defun dwim-shell-commands-stream-clipboard-url ()
   "Stream clipboard URL using mpv."
   (interactive)
   (cl-assert (string-match-p "^http[s]?://" (current-kill 0)) nil "Not a URL")
@@ -51,7 +78,7 @@
    :error-autofocus t
    :silent-success t))
 
-(defun dwim-shell-commands-download-clipboard-url ()
+(defun dwim-shell-commands-download-clipboard-stream-url ()
   "Download clipboard URL."
   (interactive)
   (cl-assert (string-match-p "^http[s]?://" (current-kill 0)) nil "Not a URL")
