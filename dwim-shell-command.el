@@ -440,6 +440,7 @@ This is implied when <<td>> appears in the script.
                                                        (if shell-pipe
                                                            (list (format "echo '%s' | %s" script shell-pipe))
                                                          (list script)))))
+    (set-process-query-on-exit-flag proc nil)
     (if no-progress
         (dwim-shell-command--message "%s started" (process-name proc))
       (setq progress-reporter (make-progress-reporter
