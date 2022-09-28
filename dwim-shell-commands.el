@@ -214,6 +214,14 @@ Optional argument ARGS as per `browse-url-default-browser'"
    :extensions "docx" ;; brew install mactex
    :utils "pdflatex"))
 
+(defun dwim-shell-commands-pdf-to-txt ()
+  "Convert pdf to txt."
+  (interactive)
+  (dwim-shell-command-on-marked-files
+   "pdf to txt"
+   "pdftotext -layout '<<f>>' '<<fne>>.txt'"
+   :utils "pdftotext"))
+
 (defun dwim-shell-commands-resize-image ()
   "Resize marked image(s)."
   (interactive)
