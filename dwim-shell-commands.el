@@ -107,6 +107,14 @@ Optional argument ARGS as per `browse-url-default-browser'"
    "convert -verbose '<<f>>' '<<fne>>.png'"
    :utils "convert"))
 
+(defun dwim-shell-commands-svg-to-png ()
+  "Convert all marked svg(s) to png(s)"
+  (interactive)
+  (dwim-shell-command-on-marked-files
+   "Convert to png"
+   "rsvg-convert -b white <<f>> -f png -o <<fne>>.png"
+   :utils "rsvg-convert"))
+
 (defun dwim-shell-commands-make-transparent-png ()
   "Create a transparent png."
   (interactive)
