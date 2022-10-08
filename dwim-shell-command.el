@@ -5,7 +5,7 @@
 ;; Author: Alvaro Ramirez
 ;; Package-Requires: ((emacs "27.1"))
 ;; URL: https://github.com/xenodium/dwim-shell-command
-;; Version: 0.20
+;; Version: 0.21
 
 ;; This package is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -583,12 +583,15 @@ REPLACEMENTS is a cons list of literals to replace with values."
 
   ;; Try to use quotes surrounding <<*>> in each path.
   ;; "'<<*>>'" with '("path/to/image1.png" "path/to/image2.png") -> "'path/to/image1.png' 'path/to/image2.png'"
-  (when-let ((found (string-match "\\([^ ]\\)\\(\<\<\\*\>\>\\)\\([^ ]\\)" template))
-             (before (match-string 1 template))
-             (after (match-string 3 template)))
+  (when-let* ((quoting (dwim-shell-command--escaped-quote-around "\<\<\\*\>\>" template))
+              (unescaped-quote (nth 0 quoting))
+              (escaped-quote (nth 1 quoting)))
     (setq template (replace-regexp-in-string "\\([^ ]\\)\\(\<\<\\*\>\>\\)\\([^ ]\\)"
                                              (string-join (seq-map (lambda (file)
-                                                                     (concat before file after)) files) " ")
+                                                                     (concat unescaped-quote
+                                                                             (string-replace unescaped-quote
+                                                                                             escaped-quote file) unescaped-quote))
+                                                                   files) " ")
                                              template nil nil 0)))
 
   ;; "<<some.txt(u)>>" -> some.txt (if unique)
@@ -619,6 +622,43 @@ REPLACEMENTS is a cons list of literals to replace with values."
   (when post-process-template
     (setq template (funcall post-process-template template files)))
   template)
+
+(defun dwim-shell-command--escaped-quote-around (needle haystack &optional unbalanced)
+  "Find NEEDLE in HAYSTACK that's surrounded by either ' or \".
+
+Set UNBALANCED to t if NEEDLE isn't surrounded by quotes on both sides.
+
+For example:
+
+(dwim-shell-command--escaped-quote-around \"\<\<fne\>\>\" \"before \"<<fne>>\" after\")
+  => (\"\"\" \"\\\\\"\")
+
+(dwim-shell-command--escaped-quote-around \"\<\<fne\>\>\" \"before '<<fne>>' after\")
+  => (\"'\" \"'\"'\"'\")
+"
+  (when-let ((found (string-match (format "\\([^ ]\\)\\(%s\\)\\([^ ]\\)" needle) haystack))
+             (unescaped-quote (if unbalanced
+                                  (or (match-string 1 haystack)
+                                      (match-string 3 haystack))
+                                (cl-assert (string-equal (match-string 1 haystack)
+                                                         (match-string 3 haystack)) nil
+                                                         "%s must match %s"
+                                                         (match-string 1 haystack)
+                                                         (match-string 3 haystack))
+                                (match-string 1 haystack)))
+             (escaped-quote "'"))
+    ;; Known quoted quotes.
+    (cond
+     ((string-equal unescaped-quote "\"")
+      (setq escaped-quote "\\\\\""))
+     ((string-equal unescaped-quote "'")
+      (setq escaped-quote "'\"'\"'"))
+     (t
+      (error "Couldn't figure out how to quote for \"%s\" using %s and %s"
+             haystack
+             (match-string 1 haystack)
+             (match-string 3 haystack))))
+    (list unescaped-quote escaped-quote)))
 
 (defun dwim-shell-command--expand-file-template (template file &optional post-process-template temp-dir current replacements)
   "Expand TEMPLATE using FILE.
@@ -656,10 +696,22 @@ REPLACEMENTS is a cons list of literals to replace with values."
   (when file
     (setq file (expand-file-name file))
     ;; "<<fne>>" with "/path/tmp.txt" -> "/path/tmp"
-    (setq template (replace-regexp-in-string "\\(\<\<fne\>\>\\)" (file-name-sans-extension file) template nil nil 1))
+    (if-let* ((quoting (dwim-shell-command--escaped-quote-around "\<\<fne\>\>" template t))
+              (unescaped-quote (nth 0 quoting))
+              (escaped-quote (nth 1 quoting)))
+        (setq template (replace-regexp-in-string "\\([^ ]\\)\\(\<\<fne\>\>\\)"
+                                                 (string-replace unescaped-quote escaped-quote (file-name-sans-extension file))
+                                                 template nil nil 2))
+      (setq template (replace-regexp-in-string "\\(\<\<fne\>\>\\)" (file-name-sans-extension file) template nil nil 1)))
 
     ;; "<<fbn>>" with "/path/tmp.txt" -> "tmp.txt"
-    (setq template (replace-regexp-in-string "\\(\<\<fbn\>\>\\)" (file-name-nondirectory file) template nil nil 1))
+    (if-let* ((quoting (dwim-shell-command--escaped-quote-around "\<\<fbn\>\>" template t))
+              (unescaped-quote (nth 0 quoting))
+              (escaped-quote (nth 1 quoting)))
+        (setq template (replace-regexp-in-string "\\(\<\<fbn\>\>\\)\\([^ ]\\)"
+                                                 (string-replace unescaped-quote escaped-quote (file-name-nondirectory file))
+                                                 template nil nil 1))
+      (setq template (replace-regexp-in-string "\\(\<\<fbn\>\>\\)" (file-name-nondirectory file) template nil nil 1)))
 
     ;; "<<e>>" with "/path/tmp.txt" -> "txt"
     (if (file-name-extension file)
@@ -668,7 +720,13 @@ REPLACEMENTS is a cons list of literals to replace with values."
       (setq template (replace-regexp-in-string "\\(\.\<\<e\>\>\\)" "" template nil nil 1)))
 
     ;; "<<f>>" with "/path/file.jpg" -> "/path/file.jpg"
-    (setq template (replace-regexp-in-string "\\(\<\<f\>\>\\)" file template nil nil 1)))
+    (if-let* ((quoting (dwim-shell-command--escaped-quote-around "\<\<f\>\>" template))
+              (unescaped-quote (nth 0 quoting))
+              (escaped-quote (nth 1 quoting)))
+        (setq template (replace-regexp-in-string "\\([^ ]\\)\\(\<\<f\>\>\\)\\([^ ]\\)"
+                                                 (string-replace unescaped-quote escaped-quote file)
+                                                 template nil nil 2))
+      (setq template (replace-regexp-in-string "\\(\<\<f\>\>\\)" file template nil nil 1))))
 
   ;; "<<some.txt(u)>>" -> some.txt (if unique)
   ;;                   -> some(1).txt (if it exist)
