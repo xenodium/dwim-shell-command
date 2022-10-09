@@ -5,7 +5,7 @@
 ;; Author: Alvaro Ramirez
 ;; Package-Requires: ((emacs "27.1"))
 ;; URL: https://github.com/xenodium/dwim-shell-command
-;; Version: 0.21
+;; Version: 0.22
 
 ;; This package is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -187,7 +187,7 @@ Prefix
      :silent-success (string-prefix-p " " script)
      :error-autofocus (not dwim-shell-command-prompt-on-error))))
 
-(cl-defun dwim-shell-command-on-marked-files (buffer-name script &key utils extensions shell-util shell-args shell-pipe post-process-template on-completion repeat silent-success no-progress error-autofocus monitor-directory focus-now)
+(cl-defun dwim-shell-command-on-marked-files (buffer-name script &key utils extensions shell-util shell-args shell-pipe post-process-template on-completion repeat silent-success no-progress error-autofocus monitor-directory focus-now join-separator)
   "Create DWIM utilities executing templated SCRIPT on given files.
 
 Here's a simple utility invoking SCRIPT to convert image files to jpg.
@@ -286,9 +286,10 @@ Quick exit
                                      :repeat repeat
                                      :error-autofocus error-autofocus
                                      :monitor-directory monitor-directory
-                                     :focus-now focus-now))
+                                     :focus-now focus-now
+                                     :join-separator join-separator))
 
-(cl-defun dwim-shell-command-execute-script (buffer-name script &key files extensions shell-util shell-args shell-pipe utils post-process-template on-completion silent-success gen-temp-dir repeat no-progress error-autofocus monitor-directory focus-now)
+(cl-defun dwim-shell-command-execute-script (buffer-name script &key files extensions shell-util shell-args shell-pipe utils post-process-template on-completion silent-success gen-temp-dir repeat no-progress error-autofocus monitor-directory focus-now join-separator)
   "Execute a script asynchronously, DWIM style with SCRIPT and BUFFER-NAME.
 
 :FILES are used to instantiate SCRIPT as a noweb template.
@@ -418,7 +419,7 @@ This is implied when <<td>> appears in the script.
     (if (seq-empty-p files)
         (setq script (dwim-shell-command--expand-file-template template nil post-process-template gen-temp-dir n replacements))
       (if (dwim-shell-command--contains-multi-file-ref template)
-          (setq script (dwim-shell-command--expand-files-template template files post-process-template gen-temp-dir replacements))
+          (setq script (dwim-shell-command--expand-files-template template files post-process-template gen-temp-dir replacements join-separator))
         (seq-do (lambda (file)
                   (setq script
                         (concat script "\n"
@@ -547,7 +548,7 @@ For example:
                  (cl-assert (cdr result) nil "Must have a value")result))
              (seq-uniq (nreverse matches)))))
 
-(defun dwim-shell-command--expand-files-template (template files &optional post-process-template temp-dir replacements)
+(defun dwim-shell-command--expand-files-template (template files &optional post-process-template temp-dir replacements join-separator)
   "Expand TEMPLATE using FILES.
 
 Expand using <<*>> for FILES.
@@ -558,7 +559,7 @@ Note: This expander cannot be used to expand <<f>>, <<fne>>, or <<e>>.
 
     Given FILES '(\"path/to/image1.png\" \"path/to/image2.png\")
 
-    \"du -csh <<*>>\" expands to
+    \"du -csh '<<*>>'\" expands to
 
       \"du -csh 'path/to/image1.png' 'path/to/image2.png'\"
 
@@ -566,7 +567,9 @@ Use POST-PROCESS-TEMPLATE to further expand template given own logic.
 
 Set TEMP-DIR to a unique temp directory to this template.
 
-REPLACEMENTS is a cons list of literals to replace with values."
+REPLACEMENTS is a cons list of literals to replace with values.
+
+JOIN-SEPARATOR is used to join files from <<*>>."
   (cl-assert (not (and (dwim-shell-command--contains-multi-file-ref template)
                        (dwim-shell-command--contains-single-file-ref template)))
              nil "Must not have %s and %s in the same template"
@@ -591,7 +594,8 @@ REPLACEMENTS is a cons list of literals to replace with values."
                                                                      (concat unescaped-quote
                                                                              (string-replace unescaped-quote
                                                                                              escaped-quote file) unescaped-quote))
-                                                                   files) " ")
+                                                                   files)
+                                                          (or join-separator " "))
                                              template nil nil 0)))
 
   ;; "<<some.txt(u)>>" -> some.txt (if unique)
@@ -609,7 +613,7 @@ REPLACEMENTS is a cons list of literals to replace with values."
                                              template nil nil 0)))
 
   ;; "<<*>>" with '("path/to/image1.png" "path/to/image2.png") -> "path/to/image1.png path/to/image2.png"
-  (setq template (replace-regexp-in-string "\\(\<\<\\*\>\>\\)" (string-join files " ") template nil nil 1))
+  (setq template (replace-regexp-in-string "\\(\<\<\\*\>\>\\)" (string-join files (or join-separator " ")) template nil nil 1))
 
   ;; "<<td>>" with TEMP-DIR -> "/var/folders/m7/ky091cp56d5g68nyhl4y7frc0000gn/T/dwim-shell-command-JNK4V5"
   (setq template (replace-regexp-in-string "\\(\<\<td\>\>\\)" temp-dir template nil nil 1))
