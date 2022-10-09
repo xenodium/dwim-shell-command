@@ -332,6 +332,17 @@ ffmpeg -n -i '<<f>>' -vf \"scale=$width:-2\" '<<fne>>_x<<Scaling factor:0.5>>.<<
    "system_profiler SPHardwareDataType"
    :utils "system_profiler"))
 
+(defun dwim-shell-commands-macos-reveal-in-finder ()
+  "Reveal selected files in macOS Finder."
+  (interactive)
+  (dwim-shell-command-on-marked-files
+   "Reveal in Finder"
+   "import AppKit
+    NSWorkspace.shared.activateFileViewerSelecting([\"<<*>>\"].map{URL(fileURLWithPath:$0)})"
+   :silent-success t
+   :shell-pipe "swift -"
+   :join-separator ", "))
+
 (defun dwim-shell-commands-macos-toggle-display-rotation ()
   "View macOS hardware overview."
   (interactive)
