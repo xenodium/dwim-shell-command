@@ -630,12 +630,9 @@ Set UNBALANCED to t if NEEDLE isn't surrounded by quotes on both sides.
 
 For example:
 
-(dwim-shell-command--escaped-quote-around \"\<\<fne\>\>\" \"before \"<<fne>>\" after\")
-  => (\"\"\" \"\\\\\"\")
+ \"\<\<fne\>\>\" \"before \"<<fne>>\" after\" => (\"\"\" \"\\\\\"\")
 
-(dwim-shell-command--escaped-quote-around \"\<\<fne\>\>\" \"before '<<fne>>' after\")
-  => (\"'\" \"'\"'\"'\")
-"
+ \"\<\<fne\>\>\" \"before '<<fne>>' after\" => (\"'\" \"'\"'\"'\")"
   (when-let ((found (string-match (format "\\([^ ]\\)\\(%s\\)\\([^ ]\\)" needle) haystack))
              (unescaped-quote (if unbalanced
                                   (or (match-string 1 haystack)
