@@ -337,6 +337,16 @@ ffmpeg -n -i '<<f>>' -vf \"scale=$width:-2\" '<<fne>>_x<<Scaling factor:0.5>>.<<
               "open"
             "xdg-open")))
 
+(defun dwim-shell-commands-macos-caffeinate ()
+  "Invoke caffeinate to prevent mac from sleeping."
+  (interactive)
+  (dwim-shell-command-on-marked-files
+   "Caffeinate"
+   "caffeinate"
+   :utils "caffeinate"
+   :no-progress t
+   :focus-now t))
+
 (defun dwim-shell-commands-macos-hardware-overview ()
   "View macOS hardware overview."
   (interactive)
