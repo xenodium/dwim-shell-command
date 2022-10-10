@@ -324,6 +324,19 @@ ffmpeg -n -i '<<f>>' -vf \"scale=$width:-2\" '<<fne>>_x<<Scaling factor:0.5>>.<<
                       (kill-buffer buffer)
                       (switch-to-buffer (find-file-noselect temp-file t))))))
 
+(defun dwim-shell-commands-open-externally ()
+  "Open file(s) externally."
+  (interactive)
+  (dwim-shell-command-on-marked-files
+   "Open externally"
+   (if (eq system-type 'darwin)
+       "open '<<f>>'"
+     "xdg-open '<<f>>'")
+   :silent-success t
+   :utils (if (eq system-type 'darwin)
+              "open"
+            "xdg-open")))
+
 (defun dwim-shell-commands-macos-hardware-overview ()
   "View macOS hardware overview."
   (interactive)
