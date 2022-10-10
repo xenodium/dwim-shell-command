@@ -354,7 +354,8 @@ ffmpeg -n -i '<<f>>' -vf \"scale=$width:-2\" '<<fne>>_x<<Scaling factor:0.5>>.<<
     NSWorkspace.shared.activateFileViewerSelecting([\"<<*>>\"].map{URL(fileURLWithPath:$0)})"
    :silent-success t
    :shell-pipe "swift -"
-   :join-separator ", "))
+   :join-separator ", "
+   :utils "swift"))
 
 (defun dwim-shell-commands-macos-toggle-display-rotation ()
   "View macOS hardware overview."
