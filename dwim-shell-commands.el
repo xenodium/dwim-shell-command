@@ -108,7 +108,7 @@ Optional argument ARGS as per `browse-url-default-browser'"
    :utils "convert"))
 
 (defun dwim-shell-commands-svg-to-png ()
-  "Convert all marked svg(s) to png(s)"
+  "Convert all marked svg(s) to png(s)."
   (interactive)
   (dwim-shell-command-on-marked-files
    "Convert to png"
@@ -579,7 +579,12 @@ Needs ideviceinstaller and libmobiledevice installed."
    :monitor-directory "~/Desktop"))
 
 (defun dwim-shell-commands-kill-gpg-agent ()
-  "Kill (thus restart) gpg agent."
+  "Kill (thus restart) gpg agent.
+
+Useful for when you get this error:
+
+gpg: public key decryption failed: No pinentry
+gpg: decryption failed: No pinentry"
   (interactive)
   (dwim-shell-command-on-marked-files
    "Kill gpg agent"
