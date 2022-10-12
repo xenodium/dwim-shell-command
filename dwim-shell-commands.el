@@ -578,6 +578,15 @@ Needs ideviceinstaller and libmobiledevice installed."
      (file-name-concat "~/Desktop" (file-name-nondirectory file)))
    :monitor-directory "~/Desktop"))
 
+(defun dwim-shell-commands-kill-gpg-agent ()
+  "Kill (thus restart) gpg agent."
+  (interactive)
+  (dwim-shell-command-on-marked-files
+   "Kill gpg agent"
+   "gpgconf --kill gpg-agent"
+   :utils "gpgconf"
+   :silent-success t))
+
 (provide 'dwim-shell-commands)
 
 ;;; dwim-shell-commands.el ends here
