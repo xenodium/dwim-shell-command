@@ -367,14 +367,30 @@ ffmpeg -n -i '<<f>>' -vf \"scale=$width:-2\" '<<fne>>_x<<Scaling factor:0.5>>.<<
    :join-separator ", "
    :utils "swift"))
 
+(defun dwim-shell-commands--macos-sharing-services ()
+  "Return a list of sharing services."
+  (let* ((source (format "import AppKit
+                         NSSharingService.sharingServices(forItems: [
+                           %s
+                         ]).forEach {
+                           print(\"\\($0.title)\")
+                         }"
+                         (string-join (mapcar (lambda (file)
+                                                (format "URL(fileURLWithPath: \"%s\")" file))
+                                              (dwim-shell-command--files))
+                                      ", ")))
+         (services (split-string (string-trim (shell-command-to-string (format "echo '%s' | swift -" source)))
+                                 "\n")))
+    (when (seq-empty-p services)
+      (error "No sharing services available"))
+    services))
+
 (defun dwim-shell-commands-macos-share ()
   "Share selected files from macOS."
   (interactive)
-  (let* ((position (window-absolute-pixel-position))
-         (x (car position))
-         (y (- (x-display-pixel-height)
-               (cdr position)
-               (line-pixel-height))))
+  (let* ((services (dwim-shell-commands--macos-sharing-services))
+         (service-name (completing-read "Share via: " services))
+         (selection (seq-position services service-name #'string-equal)))
     (dwim-shell-command-on-marked-files
      "Share"
      (format
@@ -384,44 +400,7 @@ ffmpeg -n -i '<<f>>' -vf \"scale=$width:-2\" '<<fne>>_x<<Scaling factor:0.5>>.<<
 
        NSApp.setActivationPolicy(.regular)
 
-       let window = InvisibleWindow(
-         contentRect: NSRect(x: %d, y: %s, width: 0, height: 0),
-         styleMask: [],
-         backing: .buffered,
-         defer: false)
-
-       NSApp.activate(ignoringOtherApps: true)
-
-       DispatchQueue.main.async {
-         let picker = NSSharingServicePicker(items: [\"<<*>>\"].map{URL(fileURLWithPath:$0)})
-         picker.delegate = window
-         picker.show(
-           relativeTo: .zero, of: window.contentView!, preferredEdge: .minY)
-       }
-
-       NSApp.run()
-
-       class InvisibleWindow: NSWindow, NSSharingServicePickerDelegate, NSSharingServiceDelegate {
-         func sharingServicePicker(
-           _ sharingServicePicker: NSSharingServicePicker, didChoose service: NSSharingService?
-         ) {
-           if service == nil {
-             print(\"Cancelled\")
-
-             // Delay so \"More...\" menu can launch System Preferences
-             DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-               NSApplication.shared.terminate(nil)
-             }
-           }
-         }
-
-         func sharingServicePicker(
-           _ sharingServicePicker: NSSharingServicePicker,
-           delegateFor sharingService: NSSharingService
-         ) -> NSSharingServiceDelegate? {
-           return self
-         }
-
+       class MyWindow: NSWindow, NSSharingServiceDelegate {
          func sharingService(
            _ sharingService: NSSharingService,
            didShareItems items: [Any]
@@ -438,7 +417,22 @@ ffmpeg -n -i '<<f>>' -vf \"scale=$width:-2\" '<<fne>>_x<<Scaling factor:0.5>>.<<
            }
            exit(1)
          }
-       }" x y)
+       }
+
+       let window = MyWindow(
+         contentRect: NSRect(x: 0, y: 0, width: 0, height: 0),
+         styleMask: [],
+         backing: .buffered,
+         defer: false)
+
+       let services = NSSharingService.sharingServices(forItems: [\"<<*>>\"].map{URL(fileURLWithPath:$0)})
+
+       let service = services[%s]
+       service.perform(withItems: [\"<<*>>\"].map{URL(fileURLWithPath:$0)})
+
+       service.delegate = window
+
+       NSApp.run()" selection)
      :silent-success t
      :shell-pipe "swift -"
      :join-separator ", "
