@@ -367,6 +367,84 @@ ffmpeg -n -i '<<f>>' -vf \"scale=$width:-2\" '<<fne>>_x<<Scaling factor:0.5>>.<<
    :join-separator ", "
    :utils "swift"))
 
+(defun dwim-shell-commands-macos-share ()
+  "Share selected files from macOS."
+  (interactive)
+  (let* ((position (window-absolute-pixel-position))
+         (x (car position))
+         (y (- (x-display-pixel-height)
+               (cdr position)
+               (line-pixel-height))))
+    (dwim-shell-command-on-marked-files
+     "Share"
+     (format
+      "import AppKit
+
+       _ = NSApplication.shared
+
+       NSApp.setActivationPolicy(.regular)
+
+       let window = InvisibleWindow(
+         contentRect: NSRect(x: %d, y: %s, width: 0, height: 0),
+         styleMask: [],
+         backing: .buffered,
+         defer: false)
+
+       NSApp.activate(ignoringOtherApps: true)
+
+       DispatchQueue.main.async {
+         let picker = NSSharingServicePicker(items: [\"<<*>>\"].map{URL(fileURLWithPath:$0)})
+         picker.delegate = window
+         picker.show(
+           relativeTo: .zero, of: window.contentView!, preferredEdge: .minY)
+       }
+
+       NSApp.run()
+
+       class InvisibleWindow: NSWindow, NSSharingServicePickerDelegate, NSSharingServiceDelegate {
+         func sharingServicePicker(
+           _ sharingServicePicker: NSSharingServicePicker, didChoose service: NSSharingService?
+         ) {
+           if service == nil {
+             print(\"Cancelled\")
+
+             // Delay so \"More...\" menu can launch System Preferences
+             DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+               NSApplication.shared.terminate(nil)
+             }
+           }
+         }
+
+         func sharingServicePicker(
+           _ sharingServicePicker: NSSharingServicePicker,
+           delegateFor sharingService: NSSharingService
+         ) -> NSSharingServiceDelegate? {
+           return self
+         }
+
+         func sharingService(
+           _ sharingService: NSSharingService,
+           didShareItems items: [Any]
+         ) {
+           NSApplication.shared.terminate(nil)
+         }
+
+         func sharingService(
+           _ sharingService: NSSharingService, didFailToShareItems items: [Any], error: Error
+         ) {
+           let error = error as NSError
+           if error.domain == NSCocoaErrorDomain && error.code == NSUserCancelledError {
+             NSApplication.shared.terminate(nil)
+           }
+           exit(1)
+         }
+       }" x y)
+     :silent-success t
+     :shell-pipe "swift -"
+     :join-separator ", "
+     :no-progress t
+     :utils "swift")))
+
 (defun dwim-shell-commands-macos-toggle-display-rotation ()
   "View macOS hardware overview."
   (interactive)
