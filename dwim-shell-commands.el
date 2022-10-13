@@ -28,7 +28,6 @@
 (require 'cl-lib)
 (require 'dwim-shell-command)
 (require 'files)
-(require 'rx)
 (require 'seq)
 (require 'subr-x)
 
@@ -455,9 +454,11 @@ ffmpeg -n -i '<<f>>' -vf \"scale=$width:-2\" '<<fne>>_x<<Scaling factor:0.5>>.<<
 (defun dwim-shell-commands-macos-open-with ()
   "Convert all marked images to jpg(s)."
   (interactive)
-  (let* ((apps (seq-concatenate 'list
-                                (dwim-shell-commands--macos-apps "/Applications")
-                                (dwim-shell-commands--macos-apps "~/Applications")))
+  (let* ((apps (seq-mapcat (lambda (paths)
+                             (directory-files-recursively
+                              paths "\\.app$" t (lambda (path)
+                                                 (not (string-suffix-p ".app" path)))))
+                           '("/Applications" "~/Applications")))
          (selection (progn
                       (cl-assert apps nil "No apps found")
                       (completing-read "Open with: "
@@ -471,22 +472,6 @@ ffmpeg -n -i '<<f>>' -vf \"scale=$width:-2\" '<<fne>>_x<<Scaling factor:0.5>>.<<
      :silent-success t
      :no-progress t
      :utils "open")))
-
-;; From https://github.com/xuchunyang/helm-osx-app/blob/master/helm-osx-app.el
-(defun dwim-shell-commands--macos-apps (dir)
-  "Return *.app in DIR recursively."
-  (when (file-exists-p dir)
-    (seq-mapcat
-     (lambda (path)
-       (cond
-        ((string-match (rx "/" (or "." "..") eos) path)
-         nil)
-        ((string-match (rx ".app" eos) path)
-         (list path))
-        ((file-directory-p path)
-         (dwim-shell-commands--macos-apps path))
-        (t nil)))
-     (directory-files dir 'full))))
 
 (defun dwim-shell-commands-files-combined-size ()
   "Get files combined file size."
