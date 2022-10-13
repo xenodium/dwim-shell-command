@@ -531,6 +531,30 @@ ffmpeg -n -i '<<f>>' -vf \"scale=$width:-2\" '<<fne>>_x<<Scaling factor:0.5>>.<<
                         (kill-buffer buffer)
                         (dired project-dir))))))
 
+(defun dwim-shell-commands-http-serve-dir ()
+  "HTTP serve current directory."
+  (interactive)
+  (cond ((executable-find "python3")
+         (dwim-shell-command-on-marked-files
+          "HTTP serve current dir"
+          "python3 -m http.server"
+          :utils "python3"
+          :no-progress t))
+        ((executable-find "python2")
+         (dwim-shell-command-on-marked-files
+          "HTTP serve current dir"
+          "python2 -m SimpleHTTPServer"
+          :utils "python2"
+          :no-progress t))
+        ((executable-find "python")
+         (dwim-shell-command-on-marked-files
+          "HTTP serve current dir"
+          "python -m SimpleHTTPServer"
+          :utils "python"
+          :no-progress t))
+        (t
+         (error "No python found"))))
+
 (defun dwim-shell-commands-git-clone-clipboard-url ()
   "Clone git URL in clipboard to `default-directory'."
   (interactive)
