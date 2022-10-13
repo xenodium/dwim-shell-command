@@ -112,7 +112,7 @@ Optional argument ARGS as per `browse-url-default-browser'"
   (interactive)
   (dwim-shell-command-on-marked-files
    "Convert to png"
-   "rsvg-convert -b white <<f>> -f png -o <<fne>>.png"
+   "rsvg-convert -b white '<<f>>' -f png -o '<<fne>>.png'"
    :utils "rsvg-convert"))
 
 (defun dwim-shell-commands-make-transparent-png ()
@@ -478,7 +478,7 @@ ffmpeg -n -i '<<f>>' -vf \"scale=$width:-2\" '<<fne>>_x<<Scaling factor:0.5>>.<<
   (interactive)
   (dwim-shell-command-on-marked-files
    "Get files combined file size"
-   "du -csh <<*>>"
+   "du -csh '<<*>>'"
    :utils "du"
    :on-completion (lambda (buffer)
                     (with-current-buffer buffer
