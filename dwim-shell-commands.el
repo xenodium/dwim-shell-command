@@ -426,11 +426,9 @@ ffmpeg -n -i '<<f>>' -vf \"scale=$width:-2\" '<<fne>>_x<<Scaling factor:0.5>>.<<
          defer: false)
 
        let services = NSSharingService.sharingServices(forItems: [\"<<*>>\"].map{URL(fileURLWithPath:$0)})
-
        let service = services[%s]
-       service.perform(withItems: [\"<<*>>\"].map{URL(fileURLWithPath:$0)})
-
        service.delegate = window
+       service.perform(withItems: [\"<<*>>\"].map{URL(fileURLWithPath:$0)})
 
        NSApp.run()" selection)
      :silent-success t
