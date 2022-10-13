@@ -28,6 +28,7 @@
 (require 'cl-lib)
 (require 'dwim-shell-command)
 (require 'files)
+(require 'rx)
 (require 'seq)
 (require 'subr-x)
 
@@ -450,6 +451,39 @@ ffmpeg -n -i '<<f>>' -vf \"scale=$width:-2\" '<<fne>>_x<<Scaling factor:0.5>>.<<
      "macOS hardware overview"
      (format "fb-rotate -d 1 -r %s" (if (equal current-rotation "270") "0" "270"))
      :utils "fb-rotate")))
+
+(defun dwim-shell-commands-macos-open-with ()
+  "Convert all marked images to jpg(s)."
+  (interactive)
+  (let* ((apps (seq-concatenate 'list
+                                (dwim-shell-commands--macos-apps "/Applications")
+                                (dwim-shell-commands--macos-apps "~/Applications")))
+         (selection (completing-read "Open with: "
+                                     (seq-sort #'string-lessp
+                                               (mapcar (lambda (path)
+                                                         (propertize (file-name-base path) 'path path))
+                                                       apps)))))
+    (dwim-shell-command-on-marked-files
+     "Open with"
+     (format "open -a %s '<<*>>'" (get-text-property 0 'path selection))
+     :silent-success t
+     :no-progress t
+     :utils "open")))
+
+;; From https://github.com/xuchunyang/helm-osx-app/blob/master/helm-osx-app.el
+(defun dwim-shell-commands--macos-apps (dir)
+  "Return *.app in DIR recursively."
+  (seq-mapcat
+   (lambda (file)
+     (cond
+      ((string-match (rx "/" (or "." "..") eos) file)
+       nil)
+      ((string-match (rx ".app" eos) file)
+       (list file))
+      ((file-directory-p file)
+       (helm-osx-app-get-apps file))
+      (t nil)))
+   (directory-files dir 'full)))
 
 (defun dwim-shell-commands-files-combined-size ()
   "Get files combined file size."
