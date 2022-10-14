@@ -467,8 +467,7 @@ ffmpeg -n -i '<<f>>' -vf \"scale=$width:-2\" '<<fne>>_x<<Scaling factor:0.5>>.<<
                                                apps)))))
     (dwim-shell-command-on-marked-files
      "Open with"
-     ;; The likes of GIMP prefer <<f>> than <<*>>.
-     (format "open -a '%s' '<<f>>'" (get-text-property 0 'path selection))
+     (format "open -a '%s' '<<*>>'" (get-text-property 0 'path selection))
      :silent-success t
      :no-progress t
      :utils "open")))
