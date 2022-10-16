@@ -193,7 +193,7 @@ Optional argument ARGS as per `browse-url-default-browser'"
      (format "gifsicle -U '<<f>>' <<frames>> -O2 -o '<<fne>>_x%s.<<e>>'" factor)
      :extensions "gif" :utils '("gifsicle" "identify")
      :post-process-template (lambda (script file)
-                              (string-replace "<<frames>>" (dwim-shell-commands--gifsicle-frames-every factor file) script)))))
+                              (dwim-shell-command--string-replace "<<frames>>" (dwim-shell-commands--gifsicle-frames-every factor file) script)))))
 
 (defun dwim-shell-commands-resize-gif ()
   "Resize marked gif(s)."
