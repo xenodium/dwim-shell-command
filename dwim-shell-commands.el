@@ -222,6 +222,15 @@ Optional argument ARGS as per `browse-url-default-browser'"
    :extensions "docx" ;; brew install mactex
    :utils "pdflatex"))
 
+(defun dwim-shell-commands-macos-toggle-dark-mode ()
+  "Toggle macOS dark mode."
+  (interactive)
+  (dwim-shell-command-on-marked-files
+   "Toggle dark mode"
+   "dark-mode"
+   :utils "dark-mode" ;; Brew install dark-mode
+   :silent-success t))
+
 (defun dwim-shell-commands-pdf-to-txt ()
   "Convert pdf to txt."
   (interactive)
