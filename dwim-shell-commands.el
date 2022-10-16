@@ -25,6 +25,7 @@
 
 ;;; Code:
 
+(require 'browse-url)
 (require 'cl-lib)
 (require 'dwim-shell-command)
 (require 'files)
