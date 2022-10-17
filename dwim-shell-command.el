@@ -3,9 +3,9 @@
 ;; Copyright (C) 2022 Alvaro Ramirez
 
 ;; Author: Alvaro Ramirez
-;; Package-Requires: ((emacs "27.1"))
+;; Package-Requires: ((emacs "28.1"))
 ;; URL: https://github.com/xenodium/dwim-shell-command
-;; Version: 0.29
+;; Version: 0.30
 
 ;; This package is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -581,7 +581,7 @@ JOIN-SEPARATOR is used to join files from <<*>>."
 
   (mapc (lambda (replacement)
           (setq template
-                (dwim-shell-command--string-replace (car replacement) (cdr replacement) template)))
+                (string-replace (car replacement) (cdr replacement) template)))
         replacements)
 
   ;; Try to use quotes surrounding <<*>> in each path.
@@ -592,7 +592,7 @@ JOIN-SEPARATOR is used to join files from <<*>>."
     (setq template (replace-regexp-in-string "\\([^ ]\\)\\(\<\<\\*\>\>\\)\\([^ ]\\)"
                                              (string-join (seq-map (lambda (file)
                                                                      (concat unescaped-quote
-                                                                             (dwim-shell-command--string-replace unescaped-quote
+                                                                             (string-replace unescaped-quote
                                                                                                                  escaped-quote file) unescaped-quote))
                                                                    files)
                                                           (or join-separator " "))
@@ -691,7 +691,7 @@ REPLACEMENTS is a cons list of literals to replace with values."
 
   (mapc (lambda (replacement)
           (setq template
-                (dwim-shell-command--string-replace (car replacement) (cdr replacement) template)))
+                (string-replace (car replacement) (cdr replacement) template)))
         replacements)
 
   (when file
@@ -701,7 +701,7 @@ REPLACEMENTS is a cons list of literals to replace with values."
               (unescaped-quote (nth 0 quoting))
               (escaped-quote (nth 1 quoting)))
         (setq template (replace-regexp-in-string "\\([^ ]\\)\\(\<\<fne\>\>\\)"
-                                                 (dwim-shell-command--string-replace unescaped-quote escaped-quote (file-name-sans-extension file))
+                                                 (string-replace unescaped-quote escaped-quote (file-name-sans-extension file))
                                                  template nil nil 2))
       (setq template (replace-regexp-in-string "\\(\<\<fne\>\>\\)" (file-name-sans-extension file) template nil nil 1)))
 
@@ -710,7 +710,7 @@ REPLACEMENTS is a cons list of literals to replace with values."
               (unescaped-quote (nth 0 quoting))
               (escaped-quote (nth 1 quoting)))
         (setq template (replace-regexp-in-string "\\(\<\<fbn\>\>\\)\\([^ ]\\)"
-                                                 (dwim-shell-command--string-replace unescaped-quote escaped-quote (file-name-nondirectory file))
+                                                 (string-replace unescaped-quote escaped-quote (file-name-nondirectory file))
                                                  template nil nil 1))
       (setq template (replace-regexp-in-string "\\(\<\<fbn\>\>\\)" (file-name-nondirectory file) template nil nil 1)))
 
@@ -725,7 +725,7 @@ REPLACEMENTS is a cons list of literals to replace with values."
               (unescaped-quote (nth 0 quoting))
               (escaped-quote (nth 1 quoting)))
         (setq template (replace-regexp-in-string "\\([^ ]\\)\\(\<\<f\>\>\\)\\([^ ]\\)"
-                                                 (dwim-shell-command--string-replace unescaped-quote escaped-quote file)
+                                                 (string-replace unescaped-quote escaped-quote file)
                                                  template nil nil 2))
       (setq template (replace-regexp-in-string "\\(\<\<f\>\>\\)" file template nil nil 1))))
 
@@ -954,10 +954,6 @@ Monitor :MONITOR-DIRECTORY for new file and `dired-jump' to it."
     (setq jump-to (or oldest-new-file created-file))
     (when jump-to
       (dired-jump nil jump-to))))
-
-(defun dwim-shell-command--string-replace (old new s)
-  "Replace OLD with NEW in S. Needed for backwards compatibility with Emacs 27.1."
-  (replace-regexp-in-string (regexp-quote old) new s t t))
 
 (provide 'dwim-shell-command)
 
