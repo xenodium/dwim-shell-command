@@ -229,7 +229,7 @@ Optional argument ARGS as per `browse-url-default-browser'"
   (dwim-shell-command-on-marked-files
    "Toggle dark mode"
    "dark-mode"
-   :utils "dark-mode" ;; Brew install dark-mode
+   :utils "dark-mode" ;; brew install dark-mode
    :silent-success t))
 
 (defun dwim-shell-commands-pdf-to-txt ()
