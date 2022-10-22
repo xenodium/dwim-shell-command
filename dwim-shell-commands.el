@@ -598,7 +598,7 @@ Needs ideviceinstaller and libmobiledevice installed."
   (interactive)
   (dwim-shell-command-on-marked-files
    "Rename all"
-   (format "mv '<<f>>' '%s(<<n>>).<<e>>'" (read-string "New name (File): " nil nil "File"))
+   "mv '<<f>>' '<<New name:Renamed>>(<<n>>).<<e>>'"
    :utils "mv"))
 
 (defun dwim-shell-commands-move-to-downloads ()

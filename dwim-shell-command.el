@@ -5,7 +5,7 @@
 ;; Author: Alvaro Ramirez
 ;; Package-Requires: ((emacs "28.1"))
 ;; URL: https://github.com/xenodium/dwim-shell-command
-;; Version: 0.30
+;; Version: 0.31
 
 ;; This package is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -535,7 +535,7 @@ For example:
                       (default-value (if (string-empty-p (nth 1 query))
                                          nil
                                        (nth 1 query)))
-                      (value (if (string-match-p "^\\([[:alnum:]]\\|[.]\\)+$" default-value)
+                      (value (if (string-match-p "^\\([[:digit:]]\\|[.]\\)+$" default-value)
                                  (number-to-string (read-number (format "%s: " prompt)
                                                                 (string-to-number default-value)))
                                (string-trim (read-string (concat prompt
