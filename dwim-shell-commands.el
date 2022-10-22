@@ -593,6 +593,14 @@ Needs ideviceinstaller and libmobiledevice installed."
      (file-name-concat "~/Downloads" (file-name-nondirectory file)))
    :monitor-directory "~/Downloads"))
 
+(defun dwim-shell-commands-rename-all-consistently ()
+  "Rename all marked file(s)"
+  (interactive)
+  (dwim-shell-command-on-marked-files
+   "Rename all"
+   (format "mv '<<f>>' '%s(<<n>>).<<e>>'" (read-string "New name (File): " nil nil "File"))
+   :utils "mv"))
+
 (defun dwim-shell-commands-move-to-downloads ()
   "Move file to ~/Downloads."
   (interactive)
