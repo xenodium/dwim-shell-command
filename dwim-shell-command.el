@@ -5,7 +5,7 @@
 ;; Author: Alvaro Ramirez
 ;; Package-Requires: ((emacs "28.1"))
 ;; URL: https://github.com/xenodium/dwim-shell-command
-;; Version: 0.31
+;; Version: 0.32
 
 ;; This package is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -415,7 +415,8 @@ This is implied when <<td>> appears in the script.
          (files-before)
          (proc)
          (progress-reporter)
-         (n (or (dwim-shell-command--n-start-value template) "1")))
+         (padding (dwim-shell-command--digits (length files)))
+         (n (or (dwim-shell-command--n-start-value template padding) "1")))
     (if (seq-empty-p files)
         (setq script (dwim-shell-command--expand-file-template template nil post-process-template gen-temp-dir n replacements))
       (if (dwim-shell-command--contains-multi-file-ref template)
@@ -424,7 +425,7 @@ This is implied when <<td>> appears in the script.
                   (setq script
                         (concat script "\n"
                                 (dwim-shell-command--expand-file-template template file post-process-template gen-temp-dir n replacements)))
-                  (setq n (dwim-shell-command--increment-string n)))
+                  (setq n (dwim-shell-command--increment-string n padding)))
                 files)))
     (setq script (string-trim script))
     (with-current-buffer proc-buffer
@@ -547,6 +548,18 @@ For example:
                                             value))))
                  (cl-assert (cdr result) nil "Must have a value")result))
              (seq-uniq (nreverse matches)))))
+
+(defun dwim-shell-command--digits (n)
+  "Return the number of digits in N."
+  (let ((count 0))
+    (while (> n 0)
+      (setq n (/ n 10))
+      (setq count (1+ count)))
+    count))
+
+(defun dwim-shell-command--number-to-string (n padding)
+  "Convert N to string using PADDING for number of digits."
+  (format (format "%%0%dd" padding) n))
 
 (defun dwim-shell-command--expand-files-template (template files &optional post-process-template temp-dir replacements join-separator)
   "Expand TEMPLATE using FILES.
@@ -915,22 +928,25 @@ all needed to finalize processing."
             (forward-line 1))))
       paths)))
 
-(defun dwim-shell-command--n-start-value (template)
-  "Extract n start value from TEMPLATE.
+(defun dwim-shell-command--n-start-value (template padding)
+  "Extract n start value from TEMPLATE using PADDING.
 Falls back to \"1\"."
   (when (string-match "\<\<\\([[:alnum:]]?+\\)n\>\>" template)
     (if (string-empty-p (match-string 1 template))
-        "1"
-      (match-string 1 template))))
+        (dwim-shell-command--increment-string (number-to-string 0) padding)
+      (if-let* ((start-string (match-string 1 template))
+                (start-n (string-to-number start-string)))
+          (dwim-shell-command--increment-string (number-to-string (1- start-n)) padding)
+        (match-string 1 template)))))
 
-(defun dwim-shell-command--increment-string (text)
-  "Increment TEXT.
+(defun dwim-shell-command--increment-string (text padding)
+  "Increment TEXT using PADDING.
 \"a\" -> \"b\"
 \"1\" -> \"2\""
   (cond ((string-match "^[[:alpha:]]$" text) ;; char
          (char-to-string (1+ (string-to-char (match-string 0 text)))))
         ((string-match "^[[:digit:]]+$" text) ;; char
-         (number-to-string (1+ (string-to-number (match-string 0 text)))))))
+         (dwim-shell-command--number-to-string (1+ (string-to-number (match-string 0 text))) padding))))
 
 (defun dwim-shell-command--program-test (program &rest args)
   "Test that running PROGRAM with ARGS is successful."
