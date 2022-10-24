@@ -301,7 +301,7 @@ Optional argument ARGS as per `browse-url-default-browser'"
   "Resize marked images."
   (interactive)
   (dwim-shell-command-on-marked-files
-   "Convert to gif"
+   "Resize video"
    "
 eval $(ffprobe -v quiet -show_format -of flat=s=_ -show_entries stream=width '<<f>>');
 width=${streams_stream_0_width};
