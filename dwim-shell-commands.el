@@ -460,24 +460,23 @@ ffmpeg -n -i '<<f>>' -vf \"scale=$width:-2\" '<<fne>>_x<<Scaling factor:0.5>>.<<
      :utils "fb-rotate")))
 
 (defun dwim-shell-commands-macos-open-with ()
-  "Convert all marked images to jpg(s)."
+  "Open file(s) with specific external app."
   (interactive)
-  (let* ((apps (seq-sort
-                #'string-lessp
-                (seq-mapcat (lambda (paths)
-                              (directory-files-recursively
-                               paths "\\.app$" t (lambda (path)
-                                                  (not (string-suffix-p ".app" path)))))
-                            '("/Applications" "~/Applications" "/System/Applications"))))
+  (let* ((apps (mapcar (lambda (path)
+                         (cons (file-name-base path) path))
+                       (seq-sort
+                        #'string-lessp
+                        (seq-mapcat (lambda (paths)
+                                      (directory-files-recursively
+                                       paths "\\.app$" t (lambda (path)
+                                                          (not (string-suffix-p ".app" path)))))
+                                    '("/Applications" "~/Applications" "/System/Applications")))))
          (selection (progn
                       (cl-assert apps nil "No apps found")
-                      (completing-read "Open with: "
-                                       (mapcar (lambda (path)
-                                                 (propertize (file-name-base path) 'path path))
-                                               apps)))))
+                      (completing-read "Open with: " apps nil t))))
     (dwim-shell-command-on-marked-files
      "Open with"
-     (format "open -a '%s' '<<*>>'" (get-text-property 0 'path selection))
+     (format "open -a '%s' '<<*>>'" (map-elt apps selection))
      :silent-success t
      :no-progress t
      :utils "open")))
