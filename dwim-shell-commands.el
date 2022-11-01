@@ -92,6 +92,14 @@ Optional argument ARGS as per `browse-url-default-browser'"
    :monitor-directory "~/Downloads"
    :silent-success t))
 
+(defun dwim-shell-commands-image-exif-metadata ()
+  "View EXIF metadata in image(s)."
+  (interactive)
+  (dwim-shell-command-on-marked-files
+   "View EXIF"
+   "exiftool '<<f>>'"
+   :utils "exiftool"))
+
 (defun dwim-shell-commands-image-to-jpg ()
   "Convert all marked images to jpg(s)."
   (interactive)
@@ -573,6 +581,12 @@ ffmpeg -n -i '<<f>>' -vf \"scale=$width:-2\" '<<fne>>_x<<Scaling factor:0.5>>.<<
    (format "Clone %s" (file-name-base (current-kill 0)))
    "git clone <<cb>>"
    :utils "git"))
+
+(defun dwim-shell-commands-external-ip ()
+  (interactive)
+  (let ((ip (car (last (process-lines "curl" "ifconfig.me")))))
+    (kill-new ip)
+    (message "Copied %s" ip)))
 
 (defun dwim-shell-commands-install-iphone-device-ipa ()
   "Install iPhone device .ipa.
