@@ -523,6 +523,31 @@ ffmpeg -n -i '<<f>>' -vf \"scale=$width:-2\" '<<fne>>_x<<Scaling factor:0.5>>.<<
      (format "fb-rotate -d 1 -r %s" (if (equal current-rotation "270") "0" "270"))
      :utils "fb-rotate")))
 
+(defun dwim-shell-commands-macos-set-default-app ()
+  "Set default app for file(s)."
+  (interactive)
+  (let* ((apps (mapcar (lambda (path)
+                         (cons (file-name-base path) path))
+                       (seq-sort
+                        #'string-lessp
+                        (seq-mapcat (lambda (paths)
+                                      (directory-files-recursively
+                                       paths "\\.app$" t (lambda (path)
+                                                          (not (string-suffix-p ".app" path)))))
+                                    '("/Applications" "~/Applications" "/System/Applications")))))
+         (selection (progn
+                      (cl-assert apps nil "No apps found")
+                      (completing-read "Set default app: " apps nil t))))
+    (dwim-shell-command-on-marked-files
+     "Set default app"
+     (format "duti -s \"%s\" '<<e>>' all"
+             (string-trim
+              (shell-command-to-string (format "defaults read '%s/Contents/Info.plist' CFBundleIdentifier"
+                                               (map-elt apps selection)))))
+     :silent-success t
+     :no-progress t
+     :utils "duti")))
+
 (defun dwim-shell-commands-macos-open-with ()
   "Open file(s) with specific external app."
   (interactive)
