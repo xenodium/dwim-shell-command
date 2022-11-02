@@ -523,18 +523,22 @@ ffmpeg -n -i '<<f>>' -vf \"scale=$width:-2\" '<<fne>>_x<<Scaling factor:0.5>>.<<
      (format "fb-rotate -d 1 -r %s" (if (equal current-rotation "270") "0" "270"))
      :utils "fb-rotate")))
 
+(defun dwim-shell-commands-macos-apps ()
+  "Return alist of macOS apps (\"Emacs\" . \"/Applications/Emacs.app\")."
+  (mapcar (lambda (path)
+            (cons (file-name-base path) path))
+          (seq-sort
+           #'string-lessp
+           (seq-mapcat (lambda (paths)
+                         (directory-files-recursively
+                          paths "\\.app$" t (lambda (path)
+                                             (not (string-suffix-p ".app" path)))))
+                       '("/Applications" "~/Applications" "/System/Applications")))))
+
 (defun dwim-shell-commands-macos-set-default-app ()
   "Set default app for file(s)."
   (interactive)
-  (let* ((apps (mapcar (lambda (path)
-                         (cons (file-name-base path) path))
-                       (seq-sort
-                        #'string-lessp
-                        (seq-mapcat (lambda (paths)
-                                      (directory-files-recursively
-                                       paths "\\.app$" t (lambda (path)
-                                                          (not (string-suffix-p ".app" path)))))
-                                    '("/Applications" "~/Applications" "/System/Applications")))))
+  (let* ((apps (dwim-shell-commands-macos-apps))
          (selection (progn
                       (cl-assert apps nil "No apps found")
                       (completing-read "Set default app: " apps nil t))))
@@ -551,15 +555,7 @@ ffmpeg -n -i '<<f>>' -vf \"scale=$width:-2\" '<<fne>>_x<<Scaling factor:0.5>>.<<
 (defun dwim-shell-commands-macos-open-with ()
   "Open file(s) with specific external app."
   (interactive)
-  (let* ((apps (mapcar (lambda (path)
-                         (cons (file-name-base path) path))
-                       (seq-sort
-                        #'string-lessp
-                        (seq-mapcat (lambda (paths)
-                                      (directory-files-recursively
-                                       paths "\\.app$" t (lambda (path)
-                                                          (not (string-suffix-p ".app" path)))))
-                                    '("/Applications" "~/Applications" "/System/Applications")))))
+  (let* ((apps (dwim-shell-commands-macos-apps))
          (selection (progn
                       (cl-assert apps nil "No apps found")
                       (completing-read "Open with: " apps nil t))))
