@@ -664,6 +664,7 @@ ffmpeg -n -i '<<f>>' -vf \"scale=$width:-2\" '<<fne>>_x<<Scaling factor:0.5>>.<<
    :utils "git"))
 
 (defun dwim-shell-commands-external-ip ()
+  "Copy external IP to kill ring."
   (interactive)
   (let ((ip (car (last (process-lines "curl" "ifconfig.me")))))
     (kill-new ip)
@@ -688,7 +689,7 @@ Needs ideviceinstaller and libmobiledevice installed."
    :monitor-directory "~/Downloads"))
 
 (defun dwim-shell-commands-rename-all ()
-  "Rename all marked file(s)"
+  "Rename all marked file(s)."
   (interactive)
   (dwim-shell-command-on-marked-files
    "Rename all"
