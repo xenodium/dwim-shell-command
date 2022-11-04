@@ -5,7 +5,7 @@
 ;; Author: Alvaro Ramirez
 ;; Package-Requires: ((emacs "28.1"))
 ;; URL: https://github.com/xenodium/dwim-shell-command
-;; Version: 0.36
+;; Version: 0.37
 
 ;; This package is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -606,7 +606,7 @@ JOIN-SEPARATOR is used to join files from <<*>>."
                                              (string-join (seq-map (lambda (file)
                                                                      (concat unescaped-quote
                                                                              (string-replace unescaped-quote
-                                                                                                                 escaped-quote file) unescaped-quote))
+                                                                                             escaped-quote file) unescaped-quote))
                                                                    files)
                                                           (or join-separator " "))
                                              template nil nil 0)))
@@ -632,9 +632,9 @@ JOIN-SEPARATOR is used to join files from <<*>>."
   (setq template (replace-regexp-in-string "\\(\<\<td\>\>\\)" temp-dir template nil nil 1))
 
   ;; "<<cb>>" with (current-kill 0) -> "whatever was in kill ring"
-  (setq template (replace-regexp-in-string "\\(\<\<cb\>\>\\)" (or (current-kill 0)
-                                                              (user-error "Nothing in clipboard"))
-                                           template nil nil 1))
+  (when (string-match "\<\<cb\>\>" template)
+    (setq template (replace-regexp-in-string "\\(\<\<cb\>\>\\)" (current-kill 0)
+                                             template nil nil 1)))
 
   (when post-process-template
     (setq template (funcall post-process-template template files)))
@@ -760,9 +760,9 @@ REPLACEMENTS is a cons list of literals to replace with values."
   (setq template (replace-regexp-in-string "\\(\<\<td\>\>\\)" temp-dir template nil nil 1))
 
   ;; "<<cb>>" with (current-kill 0) -> "whatever was in kill ring"
-  (setq template (replace-regexp-in-string "\\(\<\<cb\>\>\\)" (or (current-kill 0)
-                                                              (user-error "Nothing in clipboard"))
-                                           template nil nil 1))
+  (when (string-match "\<\<cb\>\>" template)
+    (setq template (replace-regexp-in-string "\\(\<\<cb\>\>\\)" (current-kill 0)
+                                             template nil nil 1)))
 
   ;; "<<n>>" or "<<an>" or "<<1n>" with current.
   (setq template (replace-regexp-in-string "\\(\<\<[[:alnum:]]?+n\>\>\\)" current
