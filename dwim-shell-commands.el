@@ -331,6 +331,14 @@ Optional argument ARGS as per `browse-url-default-browser'"
        :error-autofocus t
        :silent-success t))))
 
+(defun dwim-shell-commands-macos-bin-plist-to-xml ()
+  "Convert binary plist to xml."
+  (interactive)
+  (dwim-shell-command-on-marked-files
+   "Convert binary plist to xml"
+   "plutil -convert xml1 -o '<<fne>>.xml' '<<f>>'"
+   :utils "plutil"))
+
 (defun dwim-shell-commands-macos-toggle-dark-mode ()
   "Toggle macOS dark mode."
   (interactive)
@@ -421,14 +429,6 @@ if [[ $((width%2)) -ne 0 ]] then
 fi
 ffmpeg -n -i '<<f>>' -vf \"scale=$width:-2\" '<<fne>>_x<<Scaling factor:0.5>>.<<e>>'"
    :utils "ffmpeg"))
-
-(defun dwim-shell-commands-bin-plist-to-xml ()
-  "Convert binary plist to xml."
-  (interactive)
-  (dwim-shell-command-on-marked-files
-   "Convert binary plist to xml"
-   "plutil -convert xml1 -o '<<fne>>.xml' '<<f>>'"
-   :utils "plutil"))
 
 (defun dwim-shell-commands-clipboard-to-qr ()
   "Generate a QR code from clipboard."
