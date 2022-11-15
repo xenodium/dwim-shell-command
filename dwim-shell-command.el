@@ -5,7 +5,7 @@
 ;; Author: Alvaro Ramirez
 ;; Package-Requires: ((emacs "28.1"))
 ;; URL: https://github.com/xenodium/dwim-shell-command
-;; Version: 0.38
+;; Version: 0.39
 
 ;; This package is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -46,6 +46,12 @@
 (defcustom dwim-shell-command-prompt
   "DWIM shell command (<<f>> <<fne>> <<e>> <<td>> <<*>> <<cb>> <<n>>): "
   "`dwim-shell-command' prompt.  Modify if shorter is preferred."
+  :type 'string
+  :group 'dwim-shell-command)
+
+(defcustom dwim-shell-command-default-command
+  " '<<f>>'"
+  "Set to nil if no default shell command wanted."
   :type 'string
   :group 'dwim-shell-command)
 
@@ -178,7 +184,7 @@ Prefix
 
   With PREFIX, execute command that number of times."
   (interactive "p")
-  (let ((script (read-shell-command dwim-shell-command-prompt)))
+  (let ((script (dwim-shell-command--read-shell-command)))
     (dwim-shell-command-on-marked-files
      dwim-shell-command-buffer-name script
      :repeat prefix
@@ -186,6 +192,15 @@ Prefix
      :shell-args dwim-shell-command-shell-args
      :silent-success (string-prefix-p " " script)
      :error-autofocus (not dwim-shell-command-prompt-on-error))))
+
+(defun dwim-shell-command--read-shell-command ()
+  "Read a shell command from the minibuffer, using `shell-command-history'."
+  (minibuffer-with-setup-hook
+      (lambda ()
+        (beginning-of-line)
+        (setq-local minibuffer-default-add-function
+                    #'minibuffer-default-add-shell-commands))
+    (read-from-minibuffer dwim-shell-command-prompt dwim-shell-command-default-command nil nil 'shell-command-history)))
 
 (cl-defun dwim-shell-command-on-marked-files (buffer-name script &key utils extensions shell-util shell-args shell-pipe post-process-template on-completion repeat silent-success no-progress error-autofocus monitor-directory focus-now join-separator)
   "Create DWIM utilities executing templated SCRIPT on given files.
