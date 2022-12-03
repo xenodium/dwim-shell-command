@@ -233,6 +233,22 @@ Optional argument ARGS as per `browse-url-default-browser'"
    "ffmpeg -i '<<f>>' -vcodec libwebp -filter:v fps=fps=10 -compression_level 3 -lossless 1 -loop 0 -preset default -an -vsync 0 '<<fne>>'.webp"
    :utils "ffmpeg"))
 
+(defun dwim-shell-commands-video-to-hevc-mkv ()
+  "Convert all marked videos to hevc mkv."
+  (interactive)
+  (dwim-shell-command-on-marked-files
+   "Convert video to h265 "
+   "REPO_DIR=/tmp/other_video_transcoding
+    if ! [ -d \"$REPO_DIR\" ]
+    then
+      git clone https://github.com/donmelton/other_video_transcoding.git $REPO_DIR
+    fi
+    pushd $REPO_DIR
+    git pull origin master || echo \"skipping repo update...\"
+    popd
+    ruby $REPO_DIR/bin/other-transcode --hevc '<<f>>'"
+   :utils '("git" "ffmpeg" "mkvtoolnix" "mpv")))
+
 (defun dwim-shell-commands-video-to-optimized-gif ()
   "Convert all marked videos to optimized gif(s)."
   (interactive)
@@ -330,6 +346,39 @@ Optional argument ARGS as per `browse-url-default-browser'"
        :utils "kill"
        :error-autofocus t
        :silent-success t))))
+
+(defun dwim-shell-commands-macos-toggle-bluetooth-device-connection ()
+  ""
+  (interactive)
+  (let* ((devices (seq-filter
+                   (lambda (line)
+                     ;; Keep lines like: af-8c-3b-b1-99-af - Device name
+                     (string-match-p "^[0-9a-f]\\{2\\}" line))
+                   (with-current-buffer (get-buffer-create "*BluetoothConnector*")
+                     (erase-buffer)
+                     ;; BluetoothConnector exits with 64 if no param is given.
+                     ;; Invoke with no params to get a list of devices.
+                     (unless (eq 64 (call-process "BluetoothConnector" nil (current-buffer)))
+                       (kill-buffer (current-buffer))
+                       (error (buffer-string)))
+                     (let ((lines (split-string (buffer-string) "\n")))
+                       (kill-buffer (current-buffer))
+                       lines))))
+         (candidates (mapcar (lambda (device)
+                               ;; key (device name) : value (address)
+                               (cons (nth 1 (split-string device " - "))
+                                     (nth 0 (split-string device " - "))))
+                             devices))
+         (selected-name (completing-read "Toggle connection: "
+                                         (seq-sort #'string-lessp candidates) nil t))
+         (address (map-elt candidates selected-name)))
+    (dwim-shell-command-on-marked-files
+     (format "Toggle %s" selected-name)
+     (format "BluetoothConnector %s --notify" address)
+     :utils "BluetoothConnector"
+     ;; :error-autofocus t
+     ;; :silent-success t
+     )))
 
 (defun dwim-shell-commands-macos-bin-plist-to-xml ()
   "Convert binary plist to xml."
