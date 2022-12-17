@@ -409,7 +409,7 @@ Optional argument ARGS as per `browse-url-default-browser'"
   "Resize marked image(s)."
   (interactive)
   (dwim-shell-command-on-marked-files
-   "Convert to gif"
+   "Resize image"
    (let ((factor (read-number "Resize scaling factor: " 0.5)))
      (format "convert -resize %%%d '<<f>>' '<<fne>>_x%.2f.<<e>>'"
              (* 100 factor) factor))
@@ -434,6 +434,14 @@ Optional argument ARGS as per `browse-url-default-browser'"
                                 ;; Get total frames count.
                                 (seq-first (process-lines "identify" "-format" "%n\n" file)))
                              skipping-every)) " "))
+
+(defun dwim-shell-commands-video-to-mp3 ()
+  "Drop audio from all marked videos."
+  (interactive)
+  (dwim-shell-command-on-marked-files
+   "Convert to mp3"
+   "ffmpeg -i '<<f>>' -vn -ab 128k -ar 44100 -y '<<fne>>.mp3'"
+   :utils "ffmpeg"))
 
 (defun dwim-shell-commands-drop-video-audio ()
   "Drop audio from all marked videos."
