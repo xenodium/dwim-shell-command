@@ -443,6 +443,24 @@ Optional argument ARGS as per `browse-url-default-browser'"
    "ffmpeg -i '<<f>>' -vn -ab 128k -ar 44100 -y '<<fne>>.mp3'"
    :utils "ffmpeg"))
 
+(defun dwim-shell-commands-video-trim-beginning ()
+  "Drop audio from all marked videos."
+  (interactive)
+  (dwim-shell-command-on-marked-files
+   "Trim beginning"
+   "ffmpeg -i '<<f>>' -y -ss <<Seconds:5>> -c:v copy -c:a copy '<<fne>>_trimmed.<<e>>'"
+   :silent-success t
+   :utils "ffmpeg"))
+
+(defun dwim-shell-commands-video-trim-end ()
+  "Drop audio from all marked videos."
+  (interactive)
+  (dwim-shell-command-on-marked-files
+   "Trim beginning"
+   "ffmpeg -sseof -<<Seconds:5>> -i '<<f>>' -y -c:v copy -c:a copy '<<fne>>_trimmed.<<e>>'"
+   :silent-success t
+   :utils "ffmpeg"))
+
 (defun dwim-shell-commands-drop-video-audio ()
   "Drop audio from all marked videos."
   (interactive)
