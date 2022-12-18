@@ -218,3 +218,7 @@ To give you an idea, here's what I got so far:
 - =dwim-shell-commands-video-to-gif=
 - =dwim-shell-commands-video-to-optimized-gif=
 - =dwim-shell-commands-video-to-webp=
+
+* Support this work
+
+👉 [[https://github.com/sponsors/xenodium][Support my work via GitHub Sponsors]]
