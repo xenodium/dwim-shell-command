@@ -526,7 +526,7 @@ ffmpeg -n -i '<<f>>' -vf \"scale=$width:-2\" '<<fne>>_x<<Scaling factor:0.5>>.<<
   "Make macOS Finder alias."
   (interactive)
   (let ((files (dwim-shell-command--files))
-        (target-dir (read-directory-name "Select target dir: " "/Applications")))
+        (target-dir (read-directory-name "Select target dir: " "/Applications" nil t)))
     (dwim-shell-command-on-marked-files
      "Make macOS alias"
      (format "osascript -e 'tell application \"Finder\" to make alias file to POSIX file \"<<f>>\" at POSIX file \"%s\"'"
