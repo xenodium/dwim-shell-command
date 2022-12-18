@@ -522,6 +522,24 @@ ffmpeg -n -i '<<f>>' -vf \"scale=$width:-2\" '<<fne>>_x<<Scaling factor:0.5>>.<<
    :no-progress t
    :focus-now t))
 
+(defun dwim-shell-commands-macos-make-finder-alias ()
+  "Make macOS Finder alias."
+  (interactive)
+  (let ((files (if (> (length (dwim-shell-command--files)) 1)
+                   (error "Must select only one file to alias")
+                 (dwim-shell-command--files)))
+        (target-dir (read-directory-name "Select target dir: " "/Applications")))
+    (dwim-shell-command-on-marked-files
+     "Make macOS alias"
+     (format "osascript -e 'tell application \"Finder\" to make alias file to POSIX file \"<<f>>\" at POSIX file \"%s\"'"
+             target-dir)
+     :utils "osascript"
+     :no-progress t
+     :silent-success t
+     :on-completion (lambda (buffer)
+                      (kill-buffer buffer)
+                      (dired-jump nil (file-name-concat target-dir (file-name-nondirectory (nth 0 files))))))))
+
 (defun dwim-shell-commands-macos-hardware-overview ()
   "View macOS hardware overview."
   (interactive)
