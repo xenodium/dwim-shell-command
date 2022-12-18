@@ -525,9 +525,7 @@ ffmpeg -n -i '<<f>>' -vf \"scale=$width:-2\" '<<fne>>_x<<Scaling factor:0.5>>.<<
 (defun dwim-shell-commands-macos-make-finder-alias ()
   "Make macOS Finder alias."
   (interactive)
-  (let ((files (if (> (length (dwim-shell-command--files)) 1)
-                   (error "Must select only one file to alias")
-                 (dwim-shell-command--files)))
+  (let ((files (dwim-shell-command--files))
         (target-dir (read-directory-name "Select target dir: " "/Applications")))
     (dwim-shell-command-on-marked-files
      "Make macOS alias"
