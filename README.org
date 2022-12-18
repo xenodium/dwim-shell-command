@@ -1,3 +1,5 @@
+[[https://github.com/sponsors/xenodium][Support my work via GitHub Sponsors]]
+
 * dwim-shell-command
 
 #+HTML: <img src="https://raw.githubusercontent.com/xenodium/dwim-shell-command/main/images/template.png" width="50%" />
