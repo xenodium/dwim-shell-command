@@ -833,12 +833,13 @@ all needed to finalize processing."
           (if on-completion
               (funcall on-completion (process-buffer process))
             (with-current-buffer calling-buffer
-              (when (equal major-mode 'dired-mode)
-                (when revert-buffer-function
-                  (funcall revert-buffer-function nil t))
-                ;; Region is not accurate if new files added. Wipe it.
-                (when mark-active
-                  (deactivate-mark)))
+              (if (equal major-mode 'dired-mode)
+                (progn (when revert-buffer-function
+                         (funcall revert-buffer-function nil t))
+                       ;; Region is not accurate if new files added. Wipe it.
+                       (when mark-active
+                         (deactivate-mark)))
+                (revert-buffer :ignore-auto :noconfirm))
               (setq oldest-new-file
                     (dwim-shell-command--last-modified-between
                      files-before
