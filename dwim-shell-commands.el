@@ -157,6 +157,22 @@ Optional argument ARGS as per `browse-url-default-browser'"
                                                    "\n")))
                       (kill-buffer buffer)))))
 
+(defun dwim-shell-commands-image-horizontal-flip ()
+  "Horizontally flip image(s)."
+  (interactive)
+  (dwim-shell-command-on-marked-files
+   "Image horizontal flip"
+   "convert -verbose -flop '<<f>>' '<<fne>>_h_flipped.<<e>>'"
+   :utils "convert"))
+
+(defun dwim-shell-commands-image-vertical-flip ()
+  "Horizontally flip image(s)."
+  (interactive)
+  (dwim-shell-command-on-marked-files
+   "Image vertical flip"
+   "convert -verbose -flip '<<f>>' '<<fne>>_v_flipped.<<e>>'"
+   :utils "convert"))
+
 (defun dwim-shell-commands-image-to-jpg ()
   "Convert all marked images to jpg(s)."
   (interactive)
