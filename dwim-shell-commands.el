@@ -810,6 +810,29 @@ ffmpeg -n -i '<<f>>' -vf \"scale=$width:-2\" '<<fne>>_x<<Scaling factor:0.5>>.<<
    "git clone <<cb>>"
    :utils "git"))
 
+(defun dwim-shell-commands-git-list-untracked-files ()
+  "List untracked git files in `default-directory'."
+  (interactive)
+  (dwim-shell-command-on-marked-files
+   "List untracked"
+   "git ls-files --others ."
+   :utils "git"
+   :focus-now t))
+
+(defun dwim-shell-commands-git-delete-untracked-files ()
+  "Delete untracked git files in `default-directory'."
+  (interactive)
+  (when (y-or-n-p (format "clean '%s'? \n\n%s\n...\n\n"
+                          default-directory
+                          (string-join
+                           (seq-take (process-lines "git" "ls-files" "--others" ".") 3)
+                           "\n")))
+    (dwim-shell-command-on-marked-files
+     "Clean untracked"
+     "git clean -f ."
+     :utils "git"
+     :silent-success t)))
+
 (defun dwim-shell-commands-external-ip ()
   "Copy external IP to kill ring."
   (interactive)
