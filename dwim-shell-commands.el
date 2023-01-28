@@ -790,14 +790,14 @@ ffmpeg -n -i '<<f>>' -vf \"scale=$width:-2\" '<<fne>>_x<<Scaling factor:0.5>>.<<
           "HTTP serve current dir"
           "python2 -m SimpleHTTPServer"
           :utils "python2"
-          :focus-now
+          :focus-now t
           :no-progress t))
         ((executable-find "python")
          (dwim-shell-command-on-marked-files
           "HTTP serve current dir"
           "python -m SimpleHTTPServer"
           :utils "python"
-          :focus-now
+          :focus-now t
           :no-progress t))
         (t
          (error "No python found"))))
