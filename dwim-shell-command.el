@@ -822,7 +822,8 @@ Use OVERRIDE to override `default-directory'."
 CALLING-BUFFER, FILES-BEFORE, PROCESS, PROGRESS-REPORTER,
 ERROR-AUTOFOCUS, ON-COMPLETION, SILENT-SUCCESS, and MONITOR-DIRECTORY are
 all needed to finalize processing."
-  (let ((oldest-new-file))
+  (let ((oldest-new-file)
+        (files-after))
     (when progress-reporter
       (progress-reporter-done progress-reporter))
     (if (= (process-exit-status process) 0)
@@ -834,18 +835,27 @@ all needed to finalize processing."
               (funcall on-completion (process-buffer process))
             (with-current-buffer calling-buffer
               (if (equal major-mode 'dired-mode)
-                (progn (when revert-buffer-function
-                         (funcall revert-buffer-function nil t))
-                       ;; Region is not accurate if new files added. Wipe it.
-                       (when mark-active
-                         (deactivate-mark)))
+                  (progn (when revert-buffer-function
+                           (funcall revert-buffer-function nil t))
+                         ;; Region is not accurate if new files added. Wipe it.
+                         (when mark-active
+                           (deactivate-mark)))
                 (revert-buffer :ignore-auto :noconfirm))
+              (setq files-after (dwim-shell-command--default-directory-files monitor-directory))
               (setq oldest-new-file
                     (dwim-shell-command--last-modified-between
                      files-before
-                     (dwim-shell-command--default-directory-files monitor-directory)))
-              (when oldest-new-file
-                (dired-jump nil oldest-new-file)))
+                     files-after))
+              ;; There's at least one new file. Show that.
+              (if oldest-new-file
+                  (dired-jump nil oldest-new-file)
+                ;; Files may have been deleted but harder to track.
+                ;; Open dired and refresh to show files are gone.
+                (unless (equal (length files-after)
+                               (length files-before))
+                  (dired monitor-directory)
+                  (when revert-buffer-function
+                    (funcall revert-buffer-function nil t)))))
             (unless (equal (process-buffer process)
                            (window-buffer (selected-window)))
               (if (or oldest-new-file silent-success)
