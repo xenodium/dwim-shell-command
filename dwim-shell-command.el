@@ -5,7 +5,7 @@
 ;; Author: Alvaro Ramirez
 ;; Package-Requires: ((emacs "28.1"))
 ;; URL: https://github.com/xenodium/dwim-shell-command
-;; Version: 0.42
+;; Version: 0.43
 
 ;; This package is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -393,14 +393,14 @@ This is implied when <<td>> appears in the script.
                        (when shell-command-switch
                          (list shell-command-switch))
                        '("-x" "-c")))
+  (when (and shell-args (stringp shell-args))
+    (setq shell-args (list shell-args)))
   ;; See if -x can be prepended.
   (when (and (not (seq-contains-p shell-args "-x"))
              (apply #'dwim-shell-command--program-test
                     (seq-concatenate
                      'list shell-util '("-x") shell-args (list "echo"))))
     (setq shell-args (seq-concatenate 'list '("-x") shell-args)))
-  (when (and shell-args (stringp shell-args))
-    (setq shell-args (list shell-args)))
   (when (stringp utils)
     (setq utils (list utils)))
   (when (or gen-temp-dir (string-match-p "\<\<td\>\>" script 0))
