@@ -717,6 +717,16 @@ ffmpeg -n -i '<<f>>' -vf \"scale=$width:-2\" '<<fne>>_x<<Scaling factor:0.5>>.<<
      :no-progress t
      :utils "open")))
 
+(defun dwim-shell-command-record-window ()
+  "Record a macOS window."
+  (interactive)
+  (dwim-shell-command-on-marked-files
+     "Start recording a macOS window."
+     "open -a 'Window Recorder.app'"
+     :silent-success t
+     :no-progress t
+     :utils "open"))
+
 (defun dwim-shell-commands-files-combined-size ()
   "Get files combined file size."
   (interactive)
