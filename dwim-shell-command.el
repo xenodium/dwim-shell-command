@@ -838,7 +838,7 @@ all needed to finalize processing."
                   (progn (when revert-buffer-function
                            (funcall revert-buffer-function nil t))
                          ;; Region is not accurate if new files added. Wipe it.
-                         (when mark-active
+                         (when (use-region-p)
                            (deactivate-mark)))
                 (revert-buffer :ignore-auto :noconfirm))
               (setq files-after (dwim-shell-command--default-directory-files monitor-directory))
@@ -919,7 +919,7 @@ all needed to finalize processing."
 
 (defun dwim-shell-command--files ()
   "Return buffer file (if available) or marked/region files for a `dired' buffer."
-  (cl-assert (not (and mark-active (let ((files (dired-get-marked-files nil nil nil t)))
+  (cl-assert (not (and (use-region-p) (let ((files (dired-get-marked-files nil nil nil t)))
                                      ;; Based on `dired-number-of-marked-files'.
                                      (cond ((null (cdr files))
                                             nil)
@@ -938,7 +938,7 @@ all needed to finalize processing."
 (defun dwim-shell-command--dired-paths-in-region ()
   "If `dired' buffer, return region files.  nil otherwise."
   (when (and (equal major-mode 'dired-mode)
-             mark-active)
+             (use-region-p))
     (let ((start (region-beginning))
           (end (region-end))
           (paths))
