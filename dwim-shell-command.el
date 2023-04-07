@@ -5,7 +5,7 @@
 ;; Author: Alvaro Ramirez
 ;; Package-Requires: ((emacs "28.1"))
 ;; URL: https://github.com/xenodium/dwim-shell-command
-;; Version: 0.43
+;; Version: 0.44
 
 ;; This package is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -927,7 +927,7 @@ all needed to finalize processing."
                                                  (eq (car files) t))
                                             t)
                                            (t
-                                            (not (seq-empty-p (length files))))))))
+                                            (not (seq-empty-p files)))))))
              nil "Region and marked files both active. Choose one only.")
   (if (buffer-file-name)
       (list (buffer-file-name))
