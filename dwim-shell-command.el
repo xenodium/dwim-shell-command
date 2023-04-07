@@ -840,7 +840,9 @@ all needed to finalize processing."
                          ;; Region is not accurate if new files added. Wipe it.
                          (when (use-region-p)
                            (deactivate-mark)))
-                (revert-buffer :ignore-auto :noconfirm))
+                (if (or buffer-auto-save-file-name
+                        buffer-file-name)
+                    (revert-buffer :ignore-auto :noconfirm)))
               (setq files-after (dwim-shell-command--default-directory-files monitor-directory))
               (setq oldest-new-file
                     (dwim-shell-command--last-modified-between
