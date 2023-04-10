@@ -735,6 +735,26 @@ ffmpeg -n -i '<<f>>' -vf \"scale=$width:-2\" '<<fne>>_x<<Scaling factor:0.5>>.<<
      :no-progress t
      :utils "open")))
 
+(defun dwim-shell-commands-macos-open-with-firefox ()
+  "Open file(s) with specific external app."
+  (interactive)
+  (dwim-shell-command-on-marked-files
+   "Open with Firefox"
+   "open -a Firefox '<<*>>'"
+   :silent-success t
+   :no-progress t
+   :utils "open"))
+
+(defun dwim-shell-commands-macos-open-with-safari ()
+  "Open file(s) with specific external app."
+  (interactive)
+  (dwim-shell-command-on-marked-files
+   "Open with Firefox"
+   "open -a Safari '<<*>>'"
+   :silent-success t
+   :no-progress t
+   :utils "open"))
+
 (defun dwim-shell-command-record-window ()
   "Record a macOS window."
   (interactive)
