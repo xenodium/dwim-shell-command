@@ -293,6 +293,24 @@ Optional argument ARGS as per `browse-url-default-browser'"
      :post-process-template (lambda (script file)
                               (string-replace "<<frames>>" (dwim-shell-commands--gifsicle-frames-every factor file) script)))))
 
+(defun dwim-shell-commands-clip-round-rect-gif ()
+  "Clip gif(s) with round rectangle."
+  (interactive)
+  (dwim-shell-command-on-marked-files
+   "Clip round rect gif(s)"
+   "width=$(ffprobe -v error -select_streams v:0 -show_entries stream=width -of default=noprint_wrappers=1:nokey=1 '<<f>>')
+    height=$(ffprobe -v error -select_streams v:0 -show_entries stream=height -of default=noprint_wrappers=1:nokey=1 '<<f>>')
+    convert -quiet -size \"${width}x${height}\" xc:none -fill black -draw \"roundRectangle 0,0,${width},${height} <<Width width:27>>,<<Width width:27>>\" '<<td>>/mask.png'
+    convert  '<<f>>' -coalesce -background black -alpha remove -alpha off '<<td>>/no_alpha.<<e>>'
+    # https://stackoverflow.com/a/66990135
+    convert '<<td>>/no_alpha.<<e>>' -quiet -coalesce -alpha extract null: \\( '<<td>>/mask.png' -alpha extract \\) -compose multiply -layers composite '<<td>>/alpha.gif'
+    convert '<<td>>/no_alpha.<<e>>' null: '<<td>>/alpha.gif' -quiet -alpha off -compose copy_opacity -layers composite '<<fne>>_rounded.<<e>>'
+    # Turn looping on.
+    mogrify -loop 0 '<<fne>>_rounded.<<e>>'
+    gifsicle -O3  '<<fne>>_rounded.<<e>>' --lossy=80 -o '<<fne>>_rounded.<<e>>'"
+   :extensions "gif"
+   :utils '("ffprobe" "convert")))
+
 (defun dwim-shell-commands-resize-gif ()
   "Resize marked gif(s)."
   (interactive)
