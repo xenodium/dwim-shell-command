@@ -373,7 +373,7 @@ Optional argument ARGS as per `browse-url-default-browser'"
                                (map-elt selection 'pid)
                                (map-elt selection 'user)
                                (map-elt selection 'comm))))
-    (when (y-or-n-p (format "Kill? %s" prompt-title))
+    (when (y-or-n-p (format "Kill %s?" prompt-title))
       (dwim-shell-command-on-marked-files
        (format "Kill %s" prompt-title)
        (format "kill -9 %d" (map-elt selection 'pid))
@@ -382,7 +382,7 @@ Optional argument ARGS as per `browse-url-default-browser'"
        :silent-success t))))
 
 (defun dwim-shell-commands-macos-toggle-bluetooth-device-connection ()
-  ""
+  "Toggle Bluetooth device connection."
   (interactive)
   (let* ((devices (seq-filter
                    (lambda (line)
@@ -879,7 +879,7 @@ ffmpeg -n -i '<<f>>' -vf \"scale=$width:-2\" '<<fne>>_x<<Scaling factor:0.5>>.<<
 (defun dwim-shell-commands-git-delete-untracked-files ()
   "Delete untracked git files in `default-directory'."
   (interactive)
-  (when (y-or-n-p (format "clean '%s'? \n\n%s\n...\n\n"
+  (when (y-or-n-p (format "Clean '%s'? \n\n%s\n...\n\n"
                           default-directory
                           (string-join
                            (seq-take (process-lines "git" "ls-files" "--others" ".") 3)
