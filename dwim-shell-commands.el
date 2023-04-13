@@ -701,7 +701,7 @@ ffmpeg -n -i '<<f>>' -vf \"scale=$width:-2\" '<<fne>>_x<<Scaling factor:0.5>>.<<
            (seq-mapcat (lambda (paths)
                          (directory-files-recursively
                           paths "\\.app$" t (lambda (path)
-                                             (not (string-suffix-p ".app" path)))))
+                                              (not (string-suffix-p ".app" path)))))
                        '("/Applications" "~/Applications" "/System/Applications")))))
 
 (defun dwim-shell-commands-macos-set-default-app ()
@@ -755,15 +755,59 @@ ffmpeg -n -i '<<f>>' -vf \"scale=$width:-2\" '<<fne>>_x<<Scaling factor:0.5>>.<<
    :no-progress t
    :utils "open"))
 
-(defun dwim-shell-command-record-window ()
-  "Record a macOS window."
+(defun dwim-shell-commands-macos-start-recording-window ()
+  "Select and start recording a macOS window."
   (interactive)
-  (dwim-shell-command-on-marked-files
+  ;; Silence echo to avoid unrelated messages making into animation.
+  (let ((window (dwim-shell-commands--macos-select-window))
+        (inhibit-message t))
+    (cl-letf (((symbol-function 'dwim-shell-command--message)
+               (lambda (fmt &rest args) nil)))
+      (dwim-shell-command-on-marked-files
+       "Start recording a macOS window."
+       (format "macosrec --record %s" window)
+       :silent-success t
+       :monitor-directory "~/Desktop"
+       :no-progress t
+       :utils "macosrec"))))
+
+(defun dwim-shell-commands--macos-select-window ()
+  "Return a list of macOS windows."
+  (if-let* ((line (completing-read
+                   "Select: "
+                   (process-lines "macosrec" "--list") nil t))
+            (window-number (string-to-number (seq-first (split-string line " "))))
+            (valid (> window-number 0)))
+      window-number
+    (user-error "No window found")))
+
+(defun dwim-shell-commands-macos-stop-recording-window ()
+  "Stop recording a macOS window."
+  (interactive)
+  (let ((inhibit-message t))
+    (cl-letf (((symbol-function 'dwim-shell-command--message)
+               (lambda (fmt &rest args) nil)))
+      (dwim-shell-command-on-marked-files
+       "Stop recording macOS window."
+       "macosrec --stop"
+       :silent-success t
+       :no-progress t
+       :error-autofocus t
+       :utils "macosrec"))))
+
+(defun dwim-shell-commands-macos-screenshot-window ()
+  "Select and screenshot macOS window."
+  (interactive)
+  ;; Silence echo to avoid unrelated messages making into screenshot.
+  (let ((window (dwim-shell-commands--macos-select-window))
+        (inhibit-message t))
+    (dwim-shell-command-on-marked-files
      "Start recording a macOS window."
-     "open -a 'Window Recorder.app'"
+     (format "macosrec --screenshot %s" window)
      :silent-success t
+     :monitor-directory "~/Desktop"
      :no-progress t
-     :utils "open"))
+     :utils "macosrec")))
 
 (defun dwim-shell-commands-files-combined-size ()
   "Get files combined file size."
