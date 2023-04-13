@@ -281,6 +281,14 @@ Optional argument ARGS as per `browse-url-default-browser'"
    "Unzip" "atool --extract --explain '<<f>>'"
    :utils "atool"))
 
+(defun dwim-shell-commands-optimize-gif ()
+  "Convert all marked videos to optimized gif(s)."
+  (interactive)
+  (dwim-shell-command-on-marked-files
+   "Convert to optimized gif"
+   "gifsicle -O3 '<<f>>' --lossy=80 -o '<<fne>>_optimized.gif'"
+   :utils '("ffmpeg" "gifsicle")))
+
 (defun dwim-shell-commands-speed-up-gif ()
   "Speeds up gif(s)."
   (interactive)
