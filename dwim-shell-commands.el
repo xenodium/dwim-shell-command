@@ -789,15 +789,15 @@ ffmpeg -n -i '<<f>>' -vf \"scale=$width:-2\" '<<fne>>_x<<Scaling factor:0.5>>.<<
       window-number
     (user-error "No window found")))
 
-(defun dwim-shell-commands-macos-stop-recording-window ()
+(defun dwim-shell-commands-macos-end-recording-window ()
   "Stop recording a macOS window."
   (interactive)
   (let ((inhibit-message t))
     (cl-letf (((symbol-function 'dwim-shell-command--message)
                (lambda (fmt &rest args) nil)))
       (dwim-shell-command-on-marked-files
-       "Stop recording macOS window."
-       "macosrec --stop"
+       "End recording macOS window."
+       "macosrec --end"
        :silent-success t
        :no-progress t
        :error-autofocus t
