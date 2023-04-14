@@ -1,11 +1,11 @@
 ;;; dwim-shell-command.el --- Shell commands with DWIM behaviour -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2022 Alvaro Ramirez
+;; Copyright (C) 2022 Alvaro Ramirez https://xenodium.com
 
 ;; Author: Alvaro Ramirez
 ;; Package-Requires: ((emacs "28.1"))
 ;; URL: https://github.com/xenodium/dwim-shell-command
-;; Version: 0.44
+;; Version: 0.43
 
 ;; This package is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -444,7 +444,9 @@ This is implied when <<td>> appears in the script.
                 files)))
     (setq script (string-trim script))
     (with-current-buffer proc-buffer
-      (shell-mode)
+      (let ((inhibit-message t))
+      ;; Silence noise of entering shell-mode.
+        (shell-mode))
       (setq default-directory default-directory)
       (shell-command-save-pos-or-erase)
       (view-mode +1)
