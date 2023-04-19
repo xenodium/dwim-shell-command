@@ -5,7 +5,7 @@
 ;; Author: Alvaro Ramirez
 ;; Package-Requires: ((emacs "28.1"))
 ;; URL: https://github.com/xenodium/dwim-shell-command
-;; Version: 0.43
+;; Version: 0.44
 
 ;; This package is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -834,7 +834,7 @@ all needed to finalize processing."
           (with-current-buffer (process-buffer process)
             (rename-buffer (generate-new-buffer-name (funcall dwim-shell-command-done-buffer-name (process-name process)))))
           (if on-completion
-              (funcall on-completion (process-buffer process))
+              (funcall on-completion (process-buffer process) process)
             (with-current-buffer calling-buffer
               (if (equal major-mode 'dired-mode)
                   (progn (when revert-buffer-function
@@ -866,23 +866,25 @@ all needed to finalize processing."
                   (kill-buffer (process-buffer process))
                 (unless silent-success
                   (switch-to-buffer (process-buffer process)))))))
-      (if (and (buffer-name (process-buffer process))
-               (or error-autofocus
-                   ;; Buffer already selected. Don't ask.
-                   (equal (process-buffer process)
-                          (window-buffer (selected-window)))
-                   (ignore-error quit
-                     (y-or-n-p (format "%s error, see output? "
-                                       (buffer-name (process-buffer process)))))))
-          (progn
-            (with-current-buffer (process-buffer process)
-              (rename-buffer (generate-new-buffer-name (funcall dwim-shell-command-error-buffer-name (process-name process)))))
-            (when (or error-autofocus
-                      (equal (process-buffer process)
-                             (window-buffer (selected-window))))
-              (dwim-shell-command--message (funcall dwim-shell-command-error-buffer-name (process-name process))))
-            (switch-to-buffer (process-buffer process)))
-        (kill-buffer (process-buffer process))))
+      (if on-completion
+          (funcall on-completion (process-buffer process) process)
+        (if (and (buffer-name (process-buffer process))
+                 (or error-autofocus
+                     ;; Buffer already selected. Don't ask.
+                     (equal (process-buffer process)
+                            (window-buffer (selected-window)))
+                     (ignore-error quit
+                       (y-or-n-p (format "%s error, see output? "
+                                         (buffer-name (process-buffer process)))))))
+            (progn
+              (with-current-buffer (process-buffer process)
+                (rename-buffer (generate-new-buffer-name (funcall dwim-shell-command-error-buffer-name (process-name process)))))
+              (when (or error-autofocus
+                        (equal (process-buffer process)
+                               (window-buffer (selected-window))))
+                (dwim-shell-command--message (funcall dwim-shell-command-error-buffer-name (process-name process))))
+              (switch-to-buffer (process-buffer process)))
+          (kill-buffer (process-buffer process)))))
     (setq dwim-shell-command--commands
           (map-delete dwim-shell-command--commands (process-name process)))))
 

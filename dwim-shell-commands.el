@@ -145,7 +145,7 @@ Optional argument ARGS as per `browse-url-default-browser'"
    :utils '("exiftool" "curl")
    :silent-success t
    :error-autofocus t
-   :on-completion (lambda (buffer)
+   :on-completion (lambda (buffer _process)
                     (with-current-buffer buffer
                       (goto-char (point-min))
                       (let ((matches '()))
@@ -555,7 +555,7 @@ ffmpeg -n -i '<<f>>' -vf \"scale=$width:-2\" '<<fne>>_x<<Scaling factor:0.5>>.<<
      "Generate a QR code from clipboard"
      (format "qrencode -s10 -o %s %s" temp-file (shell-quote-argument (current-kill 0)))
      :utils "qrencode"
-     :on-completion (lambda (buffer)
+     :on-completion (lambda (buffer _process)
                       (kill-buffer buffer)
                       (switch-to-buffer (find-file-noselect temp-file t))))))
 
@@ -594,7 +594,7 @@ ffmpeg -n -i '<<f>>' -vf \"scale=$width:-2\" '<<fne>>_x<<Scaling factor:0.5>>.<<
      :utils "osascript"
      :no-progress t
      :silent-success t
-     :on-completion (lambda (buffer)
+     :on-completion (lambda (buffer _process)
                       (kill-buffer buffer)
                       (dired-jump nil (file-name-concat target-dir (file-name-nondirectory (nth 0 files))))))))
 
@@ -824,7 +824,7 @@ ffmpeg -n -i '<<f>>' -vf \"scale=$width:-2\" '<<fne>>_x<<Scaling factor:0.5>>.<<
    "Get files combined file size"
    "du -csh '<<*>>'"
    :utils "du"
-   :on-completion (lambda (buffer)
+   :on-completion (lambda (buffer _process)
                     (with-current-buffer buffer
                       (message "Total size: %s"
                                (progn
@@ -871,7 +871,7 @@ ffmpeg -n -i '<<f>>' -vf \"scale=$width:-2\" '<<fne>>_x<<Scaling factor:0.5>>.<<
        (format "Clone %s" (file-name-base url))
        (format "git clone %s" url)
        :utils "git"
-       :on-completion (lambda (buffer)
+       :on-completion (lambda (buffer _process)
                         (kill-buffer buffer)
                         (dired project-dir))))))
 
