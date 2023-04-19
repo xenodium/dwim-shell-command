@@ -767,26 +767,53 @@ ffmpeg -n -i '<<f>>' -vf \"scale=$width:-2\" '<<fne>>_x<<Scaling factor:0.5>>.<<
   "Select and start recording a macOS window."
   (interactive)
   ;; Silence echo to avoid unrelated messages making into animation.
-  (let ((window (dwim-shell-commands--macos-select-window))
-        (inhibit-message t))
+  (let* ((window (dwim-shell-commands--macos-select-window))
+         (path (dwim-shell-commands--generate-path "~/Desktop" (car window) ".gif"))
+         (optimized-path (concat (file-name-sans-extension path) "-optimized.gif"))
+         (inhibit-message t))
     (cl-letf (((symbol-function 'dwim-shell-command--message)
                (lambda (fmt &rest args) nil)))
       (dwim-shell-command-on-marked-files
        "Start recording a macOS window."
-       (format "macosrec --record %s" window)
+       (format "macosrec --record '%s' --output '%s' && gifsicle -O3 '%s' --lossy=80 -o '%s'"
+               (cdr window) path path optimized-path)
        :silent-success t
        :monitor-directory "~/Desktop"
        :no-progress t
-       :utils "macosrec"))))
+       :utils "macosrec"
+       :on-completion
+       (lambda (buffer process)
+         (message "%s => %d" (buffer-name buffer)
+                  (process-exit-status process))
+         (if (= (process-exit-status process) 0)
+             (progn
+               "Saved recording"
+               (dired-jump nil optimized-path)
+               (kill-buffer buffer))
+           (with-current-buffer buffer
+             (goto-char (point-min))
+             (if (search-forward "Aborted" nil t)
+                 (progn
+                   (message "Aborted recording")
+                   (kill-buffer buffer))
+               (switch-to-buffer buffer)))))))))
+
+(defun dwim-shell-commands--generate-path (dir name ext)
+  "Generate a timestamped path with DIR, NAME, and EXT."
+  (concat (file-name-as-directory (expand-file-name dir))
+          (format-time-string "%Y-%m-%d-%H:%M:%S-")
+          name ext))
 
 (defun dwim-shell-commands--macos-select-window ()
   "Return a list of macOS windows."
   (if-let* ((line (completing-read
                    "Select: "
                    (process-lines "macosrec" "--list") nil t))
-            (window-number (string-to-number (seq-first (split-string line " "))))
+            (window-info (split-string line " "))
+            (window-number (string-to-number (nth 0 window-info)))
+            (window-app (nth 1 window-info))
             (valid (> window-number 0)))
-      window-number
+      (cons window-app window-number)
     (user-error "No window found")))
 
 (defun dwim-shell-commands-macos-end-recording-window ()
@@ -797,10 +824,23 @@ ffmpeg -n -i '<<f>>' -vf \"scale=$width:-2\" '<<fne>>_x<<Scaling factor:0.5>>.<<
                (lambda (fmt &rest args) nil)))
       (dwim-shell-command-on-marked-files
        "End recording macOS window."
-       "macosrec --end"
+       "macosrec --save"
        :silent-success t
        :no-progress t
        :error-autofocus t
+       :utils "macosrec"))))
+
+(defun dwim-shell-commands-macos-abort-recording-window ()
+  "Stop recording a macOS window."
+  (interactive)
+  (let ((inhibit-message t))
+    (cl-letf (((symbol-function 'dwim-shell-command--message)
+               (lambda (fmt &rest args) nil)))
+      (dwim-shell-command-on-marked-files
+       "Abort recording macOS window."
+       "macosrec --abort"
+       :silent-success t
+       :no-progress t
        :utils "macosrec"))))
 
 (defun dwim-shell-commands-macos-screenshot-window ()
@@ -811,7 +851,7 @@ ffmpeg -n -i '<<f>>' -vf \"scale=$width:-2\" '<<fne>>_x<<Scaling factor:0.5>>.<<
         (inhibit-message t))
     (dwim-shell-command-on-marked-files
      "Start recording a macOS window."
-     (format "macosrec --screenshot %s" window)
+     (format "macosrec --screenshot %s" (cdr window))
      :silent-success t
      :monitor-directory "~/Desktop"
      :no-progress t
