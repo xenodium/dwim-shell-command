@@ -766,29 +766,37 @@ ffmpeg -n -i '<<f>>' -vf \"scale=$width:-2\" '<<fne>>_x<<Scaling factor:0.5>>.<<
 (defun dwim-shell-commands-macos-start-recording-window ()
   "Select and start recording a macOS window."
   (interactive)
-  ;; Silence echo to avoid unrelated messages making into animation.
   (let* ((window (dwim-shell-commands--macos-select-window))
-         (path (dwim-shell-commands--generate-path "~/Desktop" (car window) ".gif"))
-         (optimized-path (concat (file-name-sans-extension path) "-optimized.gif"))
+         (path (dwim-shell-commands--generate-path "~/Desktop" (car window) ".mov"))
+         (buffer-file-name path) ;; override so <<f>> picks it up
          (inhibit-message t))
+    ;; Silence echo to avoid unrelated messages making into animation.
     (cl-letf (((symbol-function 'dwim-shell-command--message)
                (lambda (fmt &rest args) nil)))
       (dwim-shell-command-on-marked-files
        "Start recording a macOS window."
-       (format "macosrec --record '%s' --output '%s' && gifsicle -O3 '%s' --lossy=80 -o '%s'"
-               (cdr window) path path optimized-path)
+       (format
+        "# record .mov
+         macosrec --record '%s' --mov --output '<<f>>'
+         # speed .mov up x1.5
+         ffmpeg -i '<<f>>' -an -filter:v 'setpts=1.5*PTS' '<<fne>>_x1.5.<<e>>'
+         # convert to gif x1.5
+         ffmpeg -loglevel quiet -stats -y -i '<<fne>>_x1.5.<<e>>' -pix_fmt rgb24 -r 15 '<<fne>>_x1.5.gif'
+         # speed .mov up x2
+         ffmpeg -i '<<f>>' -an -filter:v 'setpts=2*PTS' '<<fne>>_x2.<<e>>'
+         # convert to gif x2
+         ffmpeg -loglevel quiet -stats -y -i '<<fne>>_x2.<<e>>' -pix_fmt rgb24 -r 15 '<<fne>>_x2.gif'"
+        (cdr window))
        :silent-success t
        :monitor-directory "~/Desktop"
        :no-progress t
-       :utils "macosrec"
+       :utils '("ffmpeg" "macosrec")
        :on-completion
        (lambda (buffer process)
-         (message "%s => %d" (buffer-name buffer)
-                  (process-exit-status process))
          (if (= (process-exit-status process) 0)
              (progn
                "Saved recording"
-               (dired-jump nil optimized-path)
+               (dired-jump nil path)
                (kill-buffer buffer))
            (with-current-buffer buffer
              (goto-char (point-min))
