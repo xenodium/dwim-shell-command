@@ -1074,6 +1074,37 @@ gpg: decryption failed: No pinentry"
    :utils "gpgconf"
    :silent-success t))
 
+;; Based on
+;; https://apps.bram85.nl/git/bram/gists/src/commit/31ac3363da925daafa2420b7f96c67612ca28241/gists/dwim-0x0-upload.el
+(defun dwim-shell-commands-upload-to-0x0 ()
+  "Upload the marked files to 0x0.st"
+  (interactive)
+  (dwim-shell-command-on-marked-files
+   "0x0 upload"
+   "curl -Ffile=@<<f>> -Fsecret= https://0x0.st"
+   :utils "curl"
+   :post-process-template
+   ;; Insert the single quotes at the appropriate place according to
+   ;; 0x0.st example online:
+   ;; curl -F'file=@yourfile.png' -Fsecret= https://0x0.st
+   ;;
+   ;; The placement of these single quotes confuse the escaping
+   ;; mechanisms of dwim-shell-command, as it considers @ as the
+   ;; opening 'quote' as it appears right in front of <<f>>.
+   (lambda (template path)
+     (string-replace "-Ffile" "-F'file"
+                     (string-replace path (concat path "'") template)))
+   :on-completion
+   (lambda (buffer process)
+     (if (= (process-exit-status process) 0)
+         (with-current-buffer buffer
+           (let ((url (car (last (split-string (string-trim (buffer-string)) "\n")))))
+             (eww url)
+             (kill-new url)
+             (message "Copied: %s" (current-kill 0)))
+           (kill-buffer buffer))
+       (switch-to-buffer buffer)))))
+
 (provide 'dwim-shell-commands)
 
 ;;; dwim-shell-commands.el ends here
