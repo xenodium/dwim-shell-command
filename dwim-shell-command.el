@@ -811,7 +811,9 @@ Use OVERRIDE to override `default-directory'."
   (when-let ((default-directory (or override default-directory)))
     (seq-map (lambda (filename)
                (file-name-concat default-directory filename))
-             (process-lines "ls" "-1"))))
+             (cl-remove-if
+              (lambda (e) (member e '("." "..")))
+              (directory-files default-directory)))))
 
 (defun dwim-shell-command--last-modified-between (before after)
   "Compare files in BEFORE and AFTER and return oldest file in diff."
