@@ -598,13 +598,13 @@ ffmpeg -n -i '<<f>>' -vf \"scale=$width:-2\" '<<fne>>_x<<Scaling factor:0.5>>.<<
                       (kill-buffer buffer)
                       (dired-jump nil (file-name-concat target-dir (file-name-nondirectory (nth 0 files))))))))
 
-(defun dwim-shell-commands-macos-hardware-overview ()
-  "View macOS hardware overview."
+(defun dwim-shell-commands-macos-version-and-hardware-overview-info ()
+  "View macOS version and hardware overview info."
   (interactive)
   (dwim-shell-command-on-marked-files
    "macOS hardware overview"
-   "system_profiler SPHardwareDataType"
-   :utils "system_profiler"))
+   "sw_vers; system_profiler SPHardwareDataType"
+   :utils '("sw_vers" "system_profiler")))
 
 (defun dwim-shell-commands-macos-reveal-in-finder ()
   "Reveal selected files in macOS Finder."
