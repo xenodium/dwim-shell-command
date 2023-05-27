@@ -96,11 +96,11 @@ Optional argument ARGS as per `browse-url-default-browser'"
 (defun dwim-shell-commands-image-clear-exif-metadata ()
   "Clear EXIF metadata in image(s)."
   (interactive)
-  ((dwim-shell-command-on-marked-files
+  (dwim-shell-command-on-marked-files
    "View EXIF"
    "cp '<<f>>' '<<fne>>_cleared.<<e>>'
     exiftool -all:all= -overwrite_original '<<fne>>_cleared.<<e>>'"
-   :utils "exiftool")))
+   :utils "exiftool"))
 
 (defun dwim-shell-commands-image-exif-metadata ()
   "View EXIF metadata in image(s)."
