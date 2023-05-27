@@ -149,7 +149,7 @@ Because of templates, command history becomes automatically reusable in other co
 
 * Install
 
-=dwim-shell-command= is available on [[https://melpa.org/#/company-org-block][MELPA]].
+=dwim-shell-command= is available on [[https://melpa.org/#/dwim-shell-command][MELPA]].
 
 [[https://melpa.org/#/dwim-shell-command][file:https://melpa.org/packages/dwim-shell-command.svg]]
 
