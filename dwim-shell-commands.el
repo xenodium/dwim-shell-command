@@ -101,6 +101,14 @@ Optional argument ARGS as per `browse-url-default-browser'"
    "exiftool '<<f>>'"
    :utils "exiftool"))
 
+(defun dwim-shell-commands-ocr-text-from-image ()
+  "Extract text from image via tesseract."
+  (interactive)
+  (dwim-shell-command-on-marked-files
+   "Extract text from image via tesseract."
+   "tesseract '<<f>>' -"
+   :utils "tesseract"))
+
 (defun dwim-shell-commands-image-browse-location ()
   "Open image(s) location in browser."
   (interactive)
