@@ -234,6 +234,28 @@ Optional argument ARGS as per `browse-url-default-browser'"
             :default "<<joined.pdf(u)>>"))
    :utils "convert"))
 
+(defun dwim-shell-commands-join-images-horizontally ()
+  "Join all marked images horizontally as a single image."
+  (interactive)
+  (dwim-shell-command-on-marked-files
+   "Join as pdf"
+   (format "convert -verbose '<<*>>' +append '%s'"
+           (dwim-shell-command-read-file-name
+            "Join as pdf named (default \"joined.png\"): "
+            :default "<<joined.png(u)>>"))
+   :utils "convert"))
+
+(defun dwim-shell-commands-join-images-vertically ()
+  "Join all marked images vertically as a single image."
+  (interactive)
+  (dwim-shell-command-on-marked-files
+   "Join as pdf"
+   (format "convert -verbose '<<*>>' -append '%s'"
+           (dwim-shell-command-read-file-name
+            "Join as pdf named (default \"joined.png\"): "
+            :default "<<joined.png(u)>>"))
+   :utils "convert"))
+
 (defun dwim-shell-commands-image-to-grayscale ()
   "Convert all marked images to grayscale."
   (interactive)
