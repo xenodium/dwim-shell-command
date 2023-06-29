@@ -5,7 +5,7 @@
 ;; Author: Alvaro Ramirez
 ;; Package-Requires: ((emacs "28.1"))
 ;; URL: https://github.com/xenodium/dwim-shell-command
-;; Version: 0.46
+;; Version: 0.47
 
 ;; This package is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -931,6 +931,15 @@ all needed to finalize processing."
               (reporter (dwim-shell-command--command-reporter exec)))
     (progress-reporter-update reporter))
   (comint-output-filter process output))
+
+(defun dwim-shell-command--file-extensions ()
+  "Return buffer file extension or marked/region extensions for a `dired' buffer."
+  (seq-uniq
+   (seq-map
+    #'file-name-extension
+    (seq-filter
+     #'file-name-extension
+     (dwim-shell-command--files)))))
 
 (defun dwim-shell-command--files ()
   "Return buffer file (if available) or marked/region files for a `dired' buffer."

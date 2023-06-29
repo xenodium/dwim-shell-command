@@ -227,34 +227,38 @@ Optional argument ARGS as per `browse-url-default-browser'"
   (interactive)
   (dwim-shell-command-on-marked-files
    "Join as pdf"
-   (format "convert -verbose '<<*>>' '%s'"
+   (format "convert -verbose '<<*>>' '<<%s(u)>>'"
            (dwim-shell-command-read-file-name
             "Join as pdf named (default \"joined.pdf\"): "
             :extension "pdf"
-            :default "<<joined.pdf(u)>>"))
+            :default "joined.pdf"))
    :utils "convert"))
 
 (defun dwim-shell-commands-join-images-horizontally ()
   "Join all marked images horizontally as a single image."
   (interactive)
-  (dwim-shell-command-on-marked-files
-   "Join as pdf"
-   (format "convert -verbose '<<*>>' +append '%s'"
-           (dwim-shell-command-read-file-name
-            "Join as pdf named (default \"joined.png\"): "
-            :default "<<joined.png(u)>>"))
-   :utils "convert"))
+  (let ((filename (format "joined.%s"
+                          (or (seq-first (dwim-shell-command--file-extensions)) "png"))))
+    (dwim-shell-command-on-marked-files
+     "Join images horizontally"
+     (format "convert -verbose '<<*>>' +append '<<%s(u)>>'"
+             (dwim-shell-command-read-file-name
+              (format "Join as image named (default \"%s\"): " filename)
+              :default filename))
+     :utils "convert")))
 
 (defun dwim-shell-commands-join-images-vertically ()
   "Join all marked images vertically as a single image."
   (interactive)
-  (dwim-shell-command-on-marked-files
-   "Join as pdf"
-   (format "convert -verbose '<<*>>' -append '%s'"
-           (dwim-shell-command-read-file-name
-            "Join as pdf named (default \"joined.png\"): "
-            :default "<<joined.png(u)>>"))
-   :utils "convert"))
+  (let ((filename (format "joined.%s"
+                          (or (seq-first (dwim-shell-command--file-extensions)) "png"))))
+    (dwim-shell-command-on-marked-files
+     "Join images vertically"
+     (format "convert -verbose '<<*>>' -append '<<%s(u)>>'"
+             (dwim-shell-command-read-file-name
+              (format "Join as image named (default \"%s\"): " filename)
+              :default filename))
+     :utils "convert")))
 
 (defun dwim-shell-commands-image-to-grayscale ()
   "Convert all marked images to grayscale."
