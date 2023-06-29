@@ -1040,7 +1040,7 @@ ffmpeg -n -i '<<f>>' -vf \"scale=$width:-2\" '<<fne>>_x<<Scaling factor:0.5>>.<<
     (kill-new ip)
     (message "Copied %s" ip)))
 
-(defun dwim-shell-commands-install-iphone-device-ipa ()
+(defun dwim-shell-commands-macos-install-iphone-device-ipa ()
   "Install iPhone device .ipa.
 Needs ideviceinstaller and libmobiledevice installed."
   (interactive)
