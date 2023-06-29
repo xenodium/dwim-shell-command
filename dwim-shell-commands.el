@@ -732,7 +732,7 @@ ffmpeg -n -i '<<f>>' -vf \"scale=$width:-2\" '<<fne>>_x<<Scaling factor:0.5>>.<<
      :utils "swift")))
 
 (defun dwim-shell-commands-macos-toggle-display-rotation ()
-  "View macOS hardware overview."
+  "Rotate display."
   (interactive)
   ;; #  Display_ID    Resolution  ____Display_Bounds____  Rotation
   ;; 2  0x2b347692    1440x2560      0     0  1440  2560    270    [main]
