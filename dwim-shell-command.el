@@ -5,7 +5,7 @@
 ;; Author: Alvaro Ramirez
 ;; Package-Requires: ((emacs "28.1"))
 ;; URL: https://github.com/xenodium/dwim-shell-command
-;; Version: 0.47
+;; Version: 0.48
 
 ;; This package is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -764,7 +764,18 @@ REPLACEMENTS is a cons list of literals to replace with values."
         (setq template (replace-regexp-in-string "\\([^ ]\\)\\(\<\<f\>\>\\)\\([^ ]\\)"
                                                  (string-replace unescaped-quote escaped-quote file)
                                                  template nil nil 2))
-      (setq template (replace-regexp-in-string "\\(\<\<f\>\>\\)" file template nil nil 1))))
+      (setq template (replace-regexp-in-string "\\(\<\<f\>\>\\)" file template nil nil 1)))
+
+    ;; "<<f(u)>>" with "/path/file.jpg" -> "/path/file(1).jpg"
+    (if-let* ((quoting (dwim-shell-command--escaped-quote-around "\<\<f(u)\>\>" template))
+              (unescaped-quote (nth 0 quoting))
+              (escaped-quote (nth 1 quoting)))
+        (setq template (replace-regexp-in-string "\\([^ ]\\)\\(\<\<f\(u)>\>\\)\\([^ ]\\)"
+                                                 (string-replace unescaped-quote escaped-quote
+                                                                 (dwim-shell-command--unique-new-file-path file))
+                                                 template nil nil 2))
+      (setq template (replace-regexp-in-string "\\(\<\<f(u)\>\>\\)"
+                                               (dwim-shell-command--unique-new-file-path file) template nil nil 1))))
 
   ;; "<<some.txt(u)>>" -> some.txt (if unique)
   ;;                   -> some(1).txt (if it exist)
