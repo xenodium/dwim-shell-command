@@ -1058,6 +1058,14 @@ Needs ideviceinstaller and libmobiledevice installed."
      (file-name-concat "~/Downloads" (file-name-nondirectory file)))
    :monitor-directory "~/Downloads"))
 
+(defun dwim-shell-commands-duplicate ()
+  "Duplicate file."
+  (interactive)
+  (dwim-shell-command-on-marked-files
+   "Duplicate file(s)."
+   "cp -R '<<f>>' '<<f(u)>>'"
+   :utils "cp"))
+
 (defun dwim-shell-commands-rename-all ()
   "Rename all marked file(s)."
   (interactive)
