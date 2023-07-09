@@ -44,7 +44,7 @@
 (require 'view)
 
 (defcustom dwim-shell-command-prompt
-  "DWIM shell command (<<f>> <<fne>> <<e>> <<td>> <<*>> <<cb>> <<n>>): "
+  "DWIM shell command (<<f>> <<fne>> <<e>>): "
   "`dwim-shell-command' prompt.  Modify if shorter is preferred."
   :type 'string
   :group 'dwim-shell-command)

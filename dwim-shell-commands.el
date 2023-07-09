@@ -329,7 +329,7 @@ Optional argument ARGS as per `browse-url-default-browser'"
   (interactive)
   (dwim-shell-command-on-marked-files
    "Convert to optimized gif"
-   "gifsicle -O3 '<<f>>' --lossy=80 -o '<<fne>>_optimized.gif'"
+   "gifsicle -O3 '<<f>>' --lossy=90 -o '<<fne>>_optimized.gif'"
    :utils '("ffmpeg" "gifsicle")))
 
 (defun dwim-shell-commands-speed-up-gif ()
@@ -810,7 +810,7 @@ ffmpeg -n -i '<<f>>' -vf \"scale=$width:-2\" '<<fne>>_x<<Scaling factor:0.5>>.<<
   "Select and start recording a macOS window."
   (interactive)
   (let* ((window (dwim-shell-commands--macos-select-window))
-         (path (dwim-shell-commands--generate-path "~/Desktop" (car window) ".mov"))
+         (path (dwim-shell-commands--generate-path "~/Desktop" (car window) ".gif"))
          (buffer-file-name path) ;; override so <<f>> picks it up
          (inhibit-message t))
     ;; Silence echo to avoid unrelated messages making into animation.
@@ -819,16 +819,7 @@ ffmpeg -n -i '<<f>>' -vf \"scale=$width:-2\" '<<fne>>_x<<Scaling factor:0.5>>.<<
       (dwim-shell-command-on-marked-files
        "Start recording a macOS window."
        (format
-        "# record .mov
-         macosrec --record '%s' --mov --output '<<f>>'
-         # speed .mov up x1.5
-         ffmpeg -i '<<f>>' -an -filter:v 'setpts=1.5*PTS' '<<fne>>_x1.5.<<e>>'
-         # convert to gif x1.5
-         ffmpeg -loglevel quiet -stats -y -i '<<fne>>_x1.5.<<e>>' -pix_fmt rgb24 -r 15 '<<fne>>_x1.5.gif'
-         # speed .mov up x2
-         ffmpeg -i '<<f>>' -an -filter:v 'setpts=2*PTS' '<<fne>>_x2.<<e>>'
-         # convert to gif x2
-         ffmpeg -loglevel quiet -stats -y -i '<<fne>>_x2.<<e>>' -pix_fmt rgb24 -r 15 '<<fne>>_x2.gif'"
+        "macosrec --record '%s' --gif --output '<<f>>'"
         (cdr window))
        :silent-success t
        :monitor-directory "~/Desktop"

@@ -23,7 +23,7 @@ Use =dwim-shell-command-on-marked-files= to easily integrate command-line utilit
     (interactive)
     (dwim-shell-command-on-marked-files
      "Convert to gif"
-     "ffmpeg -loglevel quiet -stats -y -i <<f>> -pix_fmt rgb24 -r 15 <<fne>>.gif"
+     "ffmpeg -loglevel quiet -stats -y -i '<<f>>' -pix_fmt rgb24 -r 15 '<<fne>>.gif'"
      :utils "ffmpeg"))
 #+end_src
 
@@ -33,7 +33,7 @@ Use =dwim-shell-command-on-marked-files= to easily integrate command-line utilit
 
 If visiting a [[https://www.gnu.org/software/emacs/manual/html_node/emacs/Dired.html][dired]] buffer, draw the marked file(s).
 
-#+HTML: <img src="https://raw.githubusercontent.com/xenodium/dwim-shell-command/main/images/diredmark.webp" width="75%" />
+#+HTML: <img src="https://raw.githubusercontent.com/xenodium/dwim-shell-command/main/images/diredmark.gif" width="75%" />
 
 If visiting any other buffer with an associated file, use that.
 
@@ -88,7 +88,7 @@ If no new files were created, automatically switch focus to the process buffer a
 
 Note: You can prevent this automatic focus by prepending your command with whitespace.
 
-  " convert <<f>> <<fne>>.jpg"
+  " convert '<<f>>' '<<fne>>.jpg'"
 
 If the shell command caused any errors, offer to focus the process buffer and display its output.
 
@@ -106,7 +106,7 @@ All gifs in this README were created via M-x =dwim-shell-command-convert-to-gif=
     (interactive)
     (dwim-shell-command-on-marked-files
      "Convert to gif"
-     "ffmpeg -loglevel quiet -stats -y -i <<f>> -pix_fmt rgb24 -r 15 <<fne>>.gif"
+     "ffmpeg -loglevel quiet -stats -y -i '<<f>>' -pix_fmt rgb24 -r 15 '<<fne>>.gif'"
      :utils "ffmpeg"))
 #+end_src
 
@@ -182,7 +182,7 @@ Alternatively, can also install via [[https://github.com/jwiegley/use-package][u
       (interactive)
       (dwim-shell-command-on-marked-files
        "Convert to gif"
-       "ffmpeg -loglevel quiet -stats -y -i <<f>> -pix_fmt rgb24 -r 15 <<fne>>.gif"
+       "ffmpeg -loglevel quiet -stats -y -i '<<f>>' -pix_fmt rgb24 -r 15 '<<fne>>.gif'"
        :utils "ffmpeg")))
 #+end_src
 
