@@ -107,7 +107,7 @@ Optional argument ARGS as per `browse-url-default-browser'"
   (interactive)
   (dwim-shell-command-on-marked-files
    "Scan code"
-   "zbarimg '<<f>>'"
+   "zbarimg --quiet '<<f>>'"
    :utils "zbarimg"))
 
 (defun dwim-shell-commands-image-exif-metadata ()
