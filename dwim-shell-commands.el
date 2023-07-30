@@ -948,7 +948,8 @@ ffmpeg -n -i '<<f>>' -vf \"scale=$width:-2\" '<<fne>>_x<<Scaling factor:0.5>>.<<
 (defun dwim-shell-commands-git-clone-clipboard-url-to-downloads ()
   "Clone git URL in clipboard to \"~/Downloads/\"."
   (interactive)
-  (cl-assert (string-match-p "^\\(http\\|https\\|ssh\\)://" (current-kill 0)) nil "No URL in clipboard")
+  (cl-assert (or (string-match-p "^\\(http\\|https\\|ssh\\)://" (current-kill 0))
+                 (string-match-p "^git@" (current-kill 0))) nil "No URL in clipboard")
   (let* ((url (current-kill 0))
          (download-dir (expand-file-name "~/Downloads/"))
          (project-dir (concat download-dir (file-name-base url)))
