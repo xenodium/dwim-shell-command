@@ -102,6 +102,14 @@ Optional argument ARGS as per `browse-url-default-browser'"
     exiftool -all:all= -overwrite_original '<<fne>>_cleared.<<e>>'"
    :utils "exiftool"))
 
+(defun dwim-shell-commands-image-scan-code ()
+  "Scan any code from image(s)."
+  (interactive)
+  (dwim-shell-command-on-marked-files
+   "Scan code"
+   "zbarimg '<<f>>'"
+   :utils "zbarimg"))
+
 (defun dwim-shell-commands-image-exif-metadata ()
   "View EXIF metadata in image(s)."
   (interactive)
