@@ -284,6 +284,14 @@ Optional argument ARGS as per `browse-url-default-browser'"
    "convert -verbose -auto-orient '<<f>>' '<<fne>>_reoriented.<<e>>'"
    :utils "convert"))
 
+(defun dwim-shell-commands-gif-to-video ()
+  "Convert all marked gif(s) to video(s)."
+  (interactive)
+  (dwim-shell-command-on-marked-files
+   "Convert to gif"
+   "ffmpeg -i '<<f>>' -movflags faststart -pix_fmt yuv420p -vf 'scale=trunc(iw/2)*2:trunc(ih/2)*2' '<<fne>>.mp4'"
+   :utils "ffmpeg"))
+
 (defun dwim-shell-commands-video-to-gif ()
   "Convert all marked videos to gif(s)."
   (interactive)
