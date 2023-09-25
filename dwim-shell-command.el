@@ -5,7 +5,7 @@
 ;; Author: Alvaro Ramirez
 ;; Package-Requires: ((emacs "28.1"))
 ;; URL: https://github.com/xenodium/dwim-shell-command
-;; Version: 0.51
+;; Version: 0.52
 
 ;; This package is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -862,9 +862,11 @@ all needed to finalize processing."
                          ;; Region is not accurate if new files added. Wipe it.
                          (when (use-region-p)
                            (deactivate-mark)))
-                (if (or buffer-auto-save-file-name
-                        buffer-file-name)
-                    (revert-buffer :ignore-auto :noconfirm)))
+                (when (and (or buffer-auto-save-file-name
+                               buffer-file-name)
+                           (not (verify-visited-file-modtime)))
+                  ;; Already visiting a file. Revert if modified by command.
+                  (revert-buffer :ignore-auto :noconfirm)))
               (setq files-after (dwim-shell-command--default-directory-files monitor-directory))
               (setq oldest-new-file
                     (dwim-shell-command--last-modified-between
