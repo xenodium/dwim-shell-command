@@ -292,6 +292,18 @@ Optional argument ARGS as per `browse-url-default-browser'"
    "ffmpeg -i '<<f>>' -movflags faststart -pix_fmt yuv420p -vf 'scale=trunc(iw/2)*2:trunc(ih/2)*2' '<<fne>>.mp4'"
    :utils "ffmpeg"))
 
+(defun dwim-shell-commands-macos-convert-to-mp4 ()
+  "Convert to mov to mp4"
+  (interactive)
+  (dwim-shell-command-on-marked-files
+   "Convert to mov to mp4"
+   ;; "ffmpeg -loglevel quiet -stats -y -i <<f>>.mov -vcodec h264 -acodec copy <<fne>>.mp4"
+   ;; Found the encoder via ffmpeg -encoders | grep videotoolbox,
+   ;; source https://www.reddit.com/r/ffmpeg/comments/14pqeex/getting_0_gpu_utilization_with_apple_silicons/
+   "ffmpeg -i '<<f>>' -map_metadata 0 \
+     -c:v hevc_videotoolbox -q:v 35 -preset fast -c:a aac -b:a 128k -tag:v hvc1 '<<fne>>'.mp4"
+   :utils "ffmpeg"))
+
 (defun dwim-shell-commands-video-to-gif ()
   "Convert all marked videos to gif(s)."
   (interactive)
