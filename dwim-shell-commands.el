@@ -995,6 +995,14 @@ ffmpeg -n -i '<<f>>' -vf \"scale=$width:-2\" '<<fne>>_x<<Scaling factor:0.5>>.<<
    :utils '("sips" "iconutil")
    :extensions "png"))
 
+(defun dwim-shell-commands-image-trim-borders ()
+  "Trim image(s) border (useful for video screenshots)."
+  (interactive)
+  (dwim-shell-command-on-marked-files
+   "Trim image border"
+   "magick convert -fuzz 3% -define trim:percent-background=0% -trim +repage '<<f>>' '<<fne>>_trimmed.<<e>>'"
+   :utils "magick"))
+
 (defun dwim-shell-commands-git-clone-clipboard-url-to-downloads ()
   "Clone git URL in clipboard to \"~/Downloads/\"."
   (interactive)
