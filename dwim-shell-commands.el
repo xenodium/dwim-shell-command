@@ -801,6 +801,22 @@ ffmpeg -n -i '<<f>>' -vf \"scale=$width:-2\" '<<fne>>_x<<Scaling factor:0.5>>.<<
      (format "fb-rotate -d 1 -r %s" (if (equal current-rotation "270") "0" "270"))
      :utils "fb-rotate")))
 
+(defun dwim-shell-commands-make-swift-package-library ()
+  "Rotate display."
+  (interactive)
+  (dwim-shell-command-on-marked-files
+   "Create a swift package library"
+   "swift package init --type library"
+   :utils "swift"))
+
+(defun dwim-shell-commands-make-swift-package-executable ()
+  "Rotate display."
+  (interactive)
+  (dwim-shell-command-on-marked-files
+   "Create a swift package executable"
+   "swift package init --type executable"
+   :utils "swift"))
+
 (defun dwim-shell-commands--macos-apps ()
   "Return alist of macOS apps (\"Emacs\" . \"/Applications/Emacs.app\")."
   (mapcar (lambda (path)
