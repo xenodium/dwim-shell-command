@@ -802,7 +802,7 @@ ffmpeg -n -i '<<f>>' -vf \"scale=$width:-2\" '<<fne>>_x<<Scaling factor:0.5>>.<<
      :utils "fb-rotate")))
 
 (defun dwim-shell-commands-make-swift-package-library ()
-  "Rotate display."
+  "Create a swift package library"
   (interactive)
   (dwim-shell-command-on-marked-files
    "Create a swift package library"
@@ -810,7 +810,7 @@ ffmpeg -n -i '<<f>>' -vf \"scale=$width:-2\" '<<fne>>_x<<Scaling factor:0.5>>.<<
    :utils "swift"))
 
 (defun dwim-shell-commands-make-swift-package-executable ()
-  "Rotate display."
+  "Create a swift package executable"
   (interactive)
   (dwim-shell-command-on-marked-files
    "Create a swift package executable"
