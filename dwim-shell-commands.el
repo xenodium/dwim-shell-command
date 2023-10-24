@@ -666,8 +666,12 @@ ffmpeg -n -i '<<f>>' -vf \"scale=$width:-2\" '<<fne>>_x<<Scaling factor:0.5>>.<<
   (dwim-shell-command-on-marked-files
    "Open externally"
    (if (eq system-type 'darwin)
-       "open '<<f>>'"
+       (if (derived-mode-p 'prog-mode)
+           (format "xed --line %d '<<f>>'"
+                   (line-number-at-pos (point)))
+         "open '<<f>>'")
      "xdg-open '<<f>>'")
+   :shell-args '("-x" "-c")
    :silent-success t
    :utils (if (eq system-type 'darwin)
               "open"
