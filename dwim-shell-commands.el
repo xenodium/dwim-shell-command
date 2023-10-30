@@ -460,6 +460,23 @@ Optional argument ARGS as per `browse-url-default-browser'"
        :error-autofocus t
        :silent-success t))))
 
+(defun dwim-shell-commands-macos-add-to-photos ()
+  "Add to Photos.app."
+  (interactive)
+  (dwim-shell-command-on-marked-files
+   "Add to Photos.app"
+   "osascript <<EOF
+  tell application \"Photos\"
+    import POSIX file \"<<f>>\"
+  end tell
+EOF"
+   :silent-success t
+   :utils "osascript"
+   :on-completion (lambda (buffer process)
+                    (if-let ((success (= (process-exit-status process) 0)))
+                        (start-process "Open Photos" nil "open" "-a" "Photos")
+                      (switch-to-buffer buffer)))))
+
 (defun dwim-shell-commands-macos-toggle-bluetooth-device-connection ()
   "Toggle Bluetooth device connection."
   (interactive)
