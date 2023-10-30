@@ -474,7 +474,9 @@ EOF"
    :utils "osascript"
    :on-completion (lambda (buffer process)
                     (if-let ((success (= (process-exit-status process) 0)))
-                        (start-process "Open Photos" nil "open" "-a" "Photos")
+                        (progn
+                          (kill-buffer buffer)
+                          (start-process "Open Photos" nil "open" "-a" "Photos"))
                       (switch-to-buffer buffer)))))
 
 (defun dwim-shell-commands-macos-toggle-bluetooth-device-connection ()
