@@ -652,32 +652,21 @@ ffmpeg -n -i '<<f>>' -vf \"scale=$width:-2\" '<<fne>>_x<<Scaling factor:0.5>>.<<
 (defun dwim-shell-commands-sha-256-hash-file-at-clipboard-url ()
   "Download file at clipboard URL and generate SHA-256 hash."
   (interactive)
-  (let ((url (current-kill 0)))
-    (unless (string-match-p "^http[s]?://" url)
-      (user-error "No URL in clipboard"))
-    (dwim-shell-command-on-marked-files
-     "Generate SHA-256 hash from clipboard URL."
-     (format
-      "temp_file=$(mktemp)
-       function cleanup {
-         rm -f $temp_file
-       }
-       trap cleanup EXIT
-       curl --no-progress-meter --location --fail --output $temp_file %s || exit 1
-       shasum -a 256 $temp_file | awk '{print $1}'"
-      (shell-quote-argument url))
-     :utils '("curl" "shasum")
-     :on-completion
-     (lambda (buffer process)
-       (if-let ((success (= (process-exit-status process) 0))
-                (hash (with-current-buffer buffer
-                        (string-trim (buffer-string)))))
-           (progn
-             (kill-buffer buffer)
-             (kill-new hash)
-             (message "Copied %s to clipboard"
-                      (propertize hash 'face 'font-lock-string-face)))
-         (switch-to-buffer buffer))))))
+  (dwim-shell-command-on-marked-files
+   "Generate SHA-256 hash from clipboard URL."
+   "curl -s '<<cb>>' | sha256sum - | cut -d ' ' -f1"
+   :utils '("curl" "sha256sum")
+   :on-completion
+   (lambda (buffer process)
+     (if-let ((success (= (process-exit-status process) 0))
+              (hash (with-current-buffer buffer
+                      (string-trim (buffer-string)))))
+         (progn
+           (kill-buffer buffer)
+           (kill-new hash)
+           (message "Copied %s to clipboard"
+                    (propertize hash 'face 'font-lock-string-face)))
+       (switch-to-buffer buffer)))))
 
 (defun dwim-shell-commands-open-externally ()
   "Open file(s) externally."
