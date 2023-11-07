@@ -652,6 +652,8 @@ ffmpeg -n -i '<<f>>' -vf \"scale=$width:-2\" '<<fne>>_x<<Scaling factor:0.5>>.<<
 (defun dwim-shell-commands-sha-256-hash-file-at-clipboard-url ()
   "Download file at clipboard URL and generate SHA-256 hash."
   (interactive)
+  (unless (string-match-p "^http[s]?://" (current-kill 0))
+    (user-error "No URL in clipboard"))
   (dwim-shell-command-on-marked-files
    "Generate SHA-256 hash from clipboard URL."
    "curl -s '<<cb>>' | sha256sum - | cut -d ' ' -f1"
