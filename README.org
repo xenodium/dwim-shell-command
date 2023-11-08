@@ -198,7 +198,7 @@ I'm including an optional package ([[https://github.com/xenodium/dwim-shell-comm
   (require 'dwim-shell-commands)
 #+end_src
 
-Note: =dwim-shell-command(s)= gives you all commands, while =dwim-shell-command= provides only the building blocks.
+Note: =dwim-shell-command(s).el= gives you all commands, while =dwim-shell-command.el= provides only the building blocks.
 
 Here are all the commands I've added so far...
 
