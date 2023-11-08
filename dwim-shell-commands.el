@@ -352,6 +352,21 @@ Optional argument ARGS as per `browse-url-default-browser'"
    "Unzip" "atool --extract --explain '<<f>>'"
    :utils "atool"))
 
+(defun dwim-shell-commands-zip ()
+  "Zip all marked files into archive.zip."
+  (interactive)
+  (dwim-shell-command-on-marked-files
+   "Zip" "zip -r '<<archive.zip(u)>>' '<<*>>'"
+   :utils "zip"))
+
+(defun dwim-shell-commands-zip-password-protect ()
+  "Protect/encrypt zip file(s) with password."
+  (interactive)
+  (dwim-shell-command-on-marked-files
+   "Add zip password" "zipcloak --output-file '<<fne>>_protected.<<e>>' '<<f>>'"
+   :extensions "zip"
+   :utils "zipcloak"))
+
 (defun dwim-shell-commands-optimize-gif ()
   "Convert all marked videos to optimized gif(s)."
   (interactive)
@@ -552,7 +567,7 @@ EOF"
   (interactive)
   (dwim-shell-command-on-marked-files
    "Password protect pdf"
-   (format "qpdf --verbose --encrypt '%s' '%s' 256 -- '<<f>>' '<<fne>>_enc.<<e>>'"
+   (format "qpdf --verbose --encrypt '%s' '%s' 256 -- '<<f>>' '<<fne>>_protected.<<e>>'"
            (read-passwd "user-password: ")
            (read-passwd "owner-password: "))
    :utils "qpdf"
