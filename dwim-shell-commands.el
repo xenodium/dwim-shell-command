@@ -763,8 +763,13 @@ ffmpeg -n -i '<<f>>' -vf \"scale=$width:-2\" '<<fne>>_x<<Scaling factor:0.5>>.<<
                                                 (format "URL(fileURLWithPath: \"%s\")" file))
                                               (dwim-shell-command--files))
                                       ", ")))
-         (services (split-string (string-trim (shell-command-to-string (format "echo '%s' | swift -" source)))
-                                 "\n")))
+         (services (split-string
+                    (string-trim
+                     ;; Remove anything that doesn't start with alpha characters
+                     ;; There may be compilation warnings.
+                     (replace-regexp-in-string "^[^[:alpha:]].*\n" ""
+                                               (shell-command-to-string (format "echo '%s' | swift -" source))))
+                    "\n")))
     (when (seq-empty-p services)
       (error "No sharing services available"))
     services))
