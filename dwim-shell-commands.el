@@ -356,7 +356,9 @@ Optional argument ARGS as per `browse-url-default-browser'"
   "Zip all marked files into archive.zip."
   (interactive)
   (dwim-shell-command-on-marked-files
-   "Zip" "zip -r '<<archive.zip(u)>>' '<<*>>'"
+   "Zip" (if (eq 1 (seq-length (dwim-shell-command--files)))
+             "zip -r '<<fne>>.<<e>>' '<<f>>'"
+           "zip -r '<<archive.zip(u)>>' '<<*>>'")
    :utils "zip"))
 
 (defun dwim-shell-commands-zip-password-protect ()
