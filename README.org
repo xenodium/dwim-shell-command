@@ -2,7 +2,7 @@
 
 Build your own Swiss army command line Emacs toolkit and easily apply commands to either current file or dired files.
 
-If you don't want to build your own toolking, you can just [[Install my Swiss army command line toolkit][install mine]] (nearing 100 commands).
+If you don't fancy building your own toolking, you can [[#my-toolkit][install mine]] (nearing 100 commands).
 
 * dwim-shell-command
 
@@ -191,6 +191,9 @@ Alternatively, can also install via [[https://github.com/jwiegley/use-package][u
 #+end_src
 
 * Install my Swiss army command line toolkit
+:PROPERTIES:
+:CUSTOM_ID: my-toolkit
+:END:
 
 I'm including an optional package ([[https://github.com/xenodium/dwim-shell-command/blob/main/dwim-shell-commands.el][dwim-shell-commands.el]]), with all the command line utilities I've brought in via =dwim-shell-command-on-marked-files=. Feel free to optionally load it via:
 
