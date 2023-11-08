@@ -2,7 +2,7 @@
 
 Build your own Swiss army command line Emacs toolkit and easily apply commands to either current file or dired files.
 
-If you don't want to build your own toolking, you can just [[Install my Swiss army command line toolkit][install mine]], nearing 100 commands.
+If you don't want to build your own toolking, you can just [[Install my Swiss army command line toolkit][install mine]] (nearing 100 commands).
 
 * dwim-shell-command
 
