@@ -285,7 +285,7 @@ Here are all the commands I've added so far...
 | dwim-shell-commands-pass-git-pull                             | Pass git pull.                                            |
 | dwim-shell-commands-pdf-password-protect                      | Speeds up gif(s).                                         |
 | dwim-shell-commands-pdf-to-txt                                | Convert pdf to txt.                                       |
-| dwim-shell-commands-ping-google                               | Ping duckduckgo.com.                                      |
+| dwim-shell-commands-ping-google                               | Ping google.com.                                          |
 | dwim-shell-commands-rename-all                                | Rename all marked file(s).                                |
 | dwim-shell-commands-reorient-image                            | Reorient images.                                          |
 | dwim-shell-commands-resize-gif                                | Resize marked gif(s).                                     |

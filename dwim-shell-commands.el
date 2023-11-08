@@ -617,7 +617,7 @@ EOF"
    :utils "ffmpeg"))
 
 (defun dwim-shell-commands-ping-google ()
-  "Ping duckduckgo.com."
+  "Ping google.com."
   (interactive)
   (dwim-shell-command-on-marked-files
    "Ping google.com"
