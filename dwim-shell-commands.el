@@ -103,7 +103,7 @@ Optional argument ARGS as per `browse-url-default-browser'"
    :utils "exiftool"))
 
 (defun dwim-shell-commands-image-scan-code ()
-  "Scan any code from image(s)."
+  "Scan any code (ie. qr, bar, etc) from image(s)."
   (interactive)
   (dwim-shell-command-on-marked-files
    "Scan code"
@@ -126,8 +126,8 @@ Optional argument ARGS as per `browse-url-default-browser'"
    "tesseract '<<f>>' -"
    :utils "tesseract"))
 
-(defun dwim-shell-commands-image-browse-location ()
-  "Open image(s) location in browser."
+(defun dwim-shell-commands-image-view-location-in-map ()
+  "Open image(s) location in map/browser."
   (interactive)
   (dwim-shell-command-on-marked-files
    "Browse location"
@@ -563,13 +563,14 @@ EOF"
    :utils "convert"))
 
 (defun dwim-shell-commands-pdf-password-protect ()
-  "Speeds up gif(s)."
+  "Add a password to pdf(s)."
   (interactive)
   (dwim-shell-command-on-marked-files
    "Password protect pdf"
    (format "qpdf --verbose --encrypt '%s' '%s' 256 -- '<<f>>' '<<fne>>_protected.<<e>>'"
            (read-passwd "user-password: ")
            (read-passwd "owner-password: "))
+   :extensions pdf
    :utils "qpdf"
    :extensions "pdf"))
 
@@ -890,20 +891,20 @@ ffmpeg -n -i '<<f>>' -vf \"scale=$width:-2\" '<<fne>>_x<<Scaling factor:0.5>>.<<
      :utils "open")))
 
 (defun dwim-shell-commands-macos-open-with-firefox ()
-  "Open file(s) with specific external app."
+  "Open file(s) in Firefox."
   (interactive)
   (dwim-shell-command-on-marked-files
-   "Open with Firefox"
+   "Open in Firefox"
    "open -a Firefox '<<*>>'"
    :silent-success t
    :no-progress t
    :utils "open"))
 
 (defun dwim-shell-commands-macos-open-with-safari ()
-  "Open file(s) with specific external app."
+  "Open file(s) in Safari."
   (interactive)
   (dwim-shell-command-on-marked-files
-   "Open with Firefox"
+   "Open in Safari"
    "open -a Safari '<<*>>'"
    :silent-success t
    :no-progress t
