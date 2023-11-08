@@ -5,7 +5,7 @@
 ;; Author: Alvaro Ramirez
 ;; Package-Requires: ((emacs "28.1"))
 ;; URL: https://github.com/xenodium/dwim-shell-command
-;; Version: 0.58
+;; Version: 0.59
 
 ;; This package is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -64,6 +64,11 @@
 (defcustom dwim-shell-command-prompt-on-error nil
   "If t, prompt user to focus buffer on process error.
 Otherwise, automatically focus buffer on process error."
+  :type 'boolean
+  :group 'dwim-shell-command)
+
+(defcustom dwim-shell-command-use-absolute-paths nil
+  "If t, generate absolute paths in templates.  Relative otherwise."
   :type 'boolean
   :group 'dwim-shell-command)
 
@@ -613,7 +618,9 @@ JOIN-SEPARATOR is used to join files from <<*>>."
              (dwim-shell-command--contains-multi-file-ref template)
              (dwim-shell-command--contains-single-file-ref template))
   (setq files (seq-map (lambda (file)
-                         (expand-file-name file))
+                         (if dwim-shell-command-use-absolute-paths
+                             (expand-file-name file)
+                           (file-relative-name (expand-file-name file) default-directory)))
                        files))
 
   (mapc (lambda (replacement)
@@ -732,7 +739,9 @@ REPLACEMENTS is a cons list of literals to replace with values."
         replacements)
 
   (when file
-    (setq file (expand-file-name file))
+    (setq file (if dwim-shell-command-use-absolute-paths
+                   (expand-file-name file)
+                 (file-relative-name (expand-file-name file) default-directory)))
     ;; "<<fne>>" with "/path/tmp.txt" -> "/path/tmp"
     (if-let* ((quoting (dwim-shell-command--escaped-quote-around "\<\<fne\>\>" template t))
               (unescaped-quote (nth 0 quoting))
