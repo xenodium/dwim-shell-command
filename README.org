@@ -194,30 +194,119 @@ I'm including an optional package ([[https://github.com/xenodium/dwim-shell-comm
   (require 'dwim-shell-commands)
 #+end_src
 
-To give you an idea, here's what I got so far:
+Here are all the commands I've added so far...
 
-- =dwim-shell-commands-audio-to-mp3=
-- =dwim-shell-commands-bin-plist-to-xml=
-- =dwim-shell-commands-clipboard-to-qr=
-- =dwim-shell-commands-drop-video-audio=
-- =dwim-shell-commands-files-combined-size=
-- =dwim-shell-commands-git-clone-clipboard-url=
-- =dwim-shell-commands-git-clone-clipboard-url-to-downloads=
-- =dwim-shell-commands-image-to-grayscale=
-- =dwim-shell-commands-image-to-icns=
-- =dwim-shell-commands-image-to-jpg=
-- =dwim-shell-commands-image-to-png=
-- =dwim-shell-commands-pdf-password-protect=
-- =dwim-shell-commands-reorient-image=
-- =dwim-shell-commands-resize-gif=
-- =dwim-shell-commands-resize-image=
-- =dwim-shell-commands-resize-video=
-- =dwim-shell-commands-speed-up-gif=
-- =dwim-shell-commands-speed-up-video=
-- =dwim-shell-commands-unzip=
-- =dwim-shell-commands-video-to-gif=
-- =dwim-shell-commands-video-to-optimized-gif=
-- =dwim-shell-commands-video-to-webp=
+#+BEGIN_SRC emacs-lisp :results table :colnames '("Command" "Description") :exports results
+  (let ((rows))
+    (mapatoms
+     (lambda (symbol)
+       (when (and (string-match "^dwim-shell-commands"
+                                (symbol-name symbol))
+                  (commandp symbol))
+         (push `(,(symbol-name symbol)
+                 ,(car
+                   (split-string
+                    (or (documentation symbol t) "")
+                    "\n")))
+               rows))))
+    (seq-sort (lambda (row1 row2)
+                (string-greaterp (seq-elt row2 0) (seq-elt row1 0)))
+              rows))
+#+END_SRC
+
+#+RESULTS:
+| Command                                                       | Description                                               |
+|---------------------------------------------------------------+-----------------------------------------------------------|
+| dwim-shell-commands-audio-to-mp3                              | Convert all marked audio to mp3(s).                       |
+| dwim-shell-commands-clip-round-rect-gif                       | Clip gif(s) with round rectangle.                         |
+| dwim-shell-commands-clipboard-to-qr                           | Generate a QR code from clipboard.                        |
+| dwim-shell-commands-copy-to-desktop                           | Copy file to ~/Desktop.                                   |
+| dwim-shell-commands-copy-to-downloads                         | Copy file to ~/Downloads.                                 |
+| dwim-shell-commands-docx-to-pdf                               | Convert docx(s) to pdf (via latex).                       |
+| dwim-shell-commands-download-clipboard-stream-url             | Download clipboard URL.                                   |
+| dwim-shell-commands-drop-video-audio                          | Drop audio from all marked videos.                        |
+| dwim-shell-commands-duplicate                                 | Duplicate file.                                           |
+| dwim-shell-commands-epub-to-org                               | Convert epub(s) to org.                                   |
+| dwim-shell-commands-external-ip                               | Copy external IP to kill ring.                            |
+| dwim-shell-commands-files-combined-size                       | Get files combined file size.                             |
+| dwim-shell-commands-gif-to-video                              | Convert all marked gif(s) to video(s).                    |
+| dwim-shell-commands-git-clone-clipboard-url                   | Clone git URL in clipboard to `default-directory'.        |
+| dwim-shell-commands-git-clone-clipboard-url-to-downloads      | Clone git URL in clipboard to "~/Downloads/".             |
+| dwim-shell-commands-git-delete-untracked-files                | Delete untracked git files in `default-directory'.        |
+| dwim-shell-commands-git-list-untracked-files                  | List untracked git files in `default-directory'.          |
+| dwim-shell-commands-git-set-author-name-and-email-credentials | Set my name and email at git repo in `default-directory'. |
+| dwim-shell-commands-http-serve-dir                            | HTTP serve current directory.                             |
+| dwim-shell-commands-image-browse-location                     | Open image(s) location in browser.                        |
+| dwim-shell-commands-image-clear-exif-metadata                 | Clear EXIF metadata in image(s).                          |
+| dwim-shell-commands-image-exif-metadata                       | View EXIF metadata in image(s).                           |
+| dwim-shell-commands-image-horizontal-flip                     | Horizontally flip image(s).                               |
+| dwim-shell-commands-image-reverse-geocode-location            | Reverse geocode image(s) location.                        |
+| dwim-shell-commands-image-scan-code                           | Scan any code from image(s).                              |
+| dwim-shell-commands-image-to-grayscale                        | Convert all marked images to grayscale.                   |
+| dwim-shell-commands-image-to-icns                             | Convert png to icns icon.                                 |
+| dwim-shell-commands-image-to-jpg                              | Convert all marked images to jpg(s).                      |
+| dwim-shell-commands-image-to-png                              | Convert all marked images to png(s).                      |
+| dwim-shell-commands-image-trim-borders                        | Trim image(s) border (useful for video screenshots).      |
+| dwim-shell-commands-image-vertical-flip                       | Horizontally flip image(s).                               |
+| dwim-shell-commands-join-as-pdf                               | Join all marked images as a single pdf.                   |
+| dwim-shell-commands-join-images-horizontally                  | Join all marked images horizontally as a single image.    |
+| dwim-shell-commands-join-images-vertically                    | Join all marked images vertically as a single image.      |
+| dwim-shell-commands-kill-gpg-agent                            | Kill (thus restart) gpg agent.                            |
+| dwim-shell-commands-kill-process                              | Select and kill process.                                  |
+| dwim-shell-commands-macos-abort-recording-window              | Stop recording a macOS window.                            |
+| dwim-shell-commands-macos-add-to-photos                       | Add to Photos.app.                                        |
+| dwim-shell-commands-macos-bin-plist-to-xml                    | Convert binary plist to xml.                              |
+| dwim-shell-commands-macos-caffeinate                          | Invoke caffeinate to prevent mac from sleeping.           |
+| dwim-shell-commands-macos-convert-to-mp4                      | Convert to mov to mp4                                     |
+| dwim-shell-commands-macos-end-recording-window                | Stop recording a macOS window.                            |
+| dwim-shell-commands-macos-install-iphone-device-ipa           | Install iPhone device .ipa.                               |
+| dwim-shell-commands-macos-make-finder-alias                   | Make macOS Finder alias.                                  |
+| dwim-shell-commands-macos-open-with                           | Open file(s) with specific external app.                  |
+| dwim-shell-commands-macos-open-with-firefox                   | Open file(s) with specific external app.                  |
+| dwim-shell-commands-macos-open-with-safari                    | Open file(s) with specific external app.                  |
+| dwim-shell-commands-macos-reveal-in-finder                    | Reveal selected files in macOS Finder.                    |
+| dwim-shell-commands-macos-screenshot-window                   | Select and screenshot macOS window.                       |
+| dwim-shell-commands-macos-set-default-app                     | Set default app for file(s).                              |
+| dwim-shell-commands-macos-share                               | Share selected files from macOS.                          |
+| dwim-shell-commands-macos-start-recording-window              | Select and start recording a macOS window.                |
+| dwim-shell-commands-macos-toggle-bluetooth-device-connection  | Toggle Bluetooth device connection.                       |
+| dwim-shell-commands-macos-toggle-dark-mode                    | Toggle macOS dark mode.                                   |
+| dwim-shell-commands-macos-toggle-display-rotation             | Rotate display.                                           |
+| dwim-shell-commands-macos-version-and-hardware-overview-info  | View macOS version and hardware overview info.            |
+| dwim-shell-commands-make-swift-package-executable             | Create a swift package executable                         |
+| dwim-shell-commands-make-swift-package-library                | Create a swift package library                            |
+| dwim-shell-commands-make-transparent-png                      | Create a transparent png.                                 |
+| dwim-shell-commands-move-to-desktop                           | Move file to ~/Desktop.                                   |
+| dwim-shell-commands-move-to-downloads                         | Move file to ~/Downloads.                                 |
+| dwim-shell-commands-ocr-text-from-image                       | Extract text from image via tesseract.                    |
+| dwim-shell-commands-open-clipboard-url                        | Open clipboard URL.  Offer to stream if possible.         |
+| dwim-shell-commands-open-externally                           | Open file(s) externally.                                  |
+| dwim-shell-commands-optimize-gif                              | Convert all marked videos to optimized gif(s).            |
+| dwim-shell-commands-pass-git-pull                             | Pass git pull.                                            |
+| dwim-shell-commands-pdf-password-protect                      | Speeds up gif(s).                                         |
+| dwim-shell-commands-pdf-to-txt                                | Convert pdf to txt.                                       |
+| dwim-shell-commands-ping-google                               | Ping duckduckgo.com.                                      |
+| dwim-shell-commands-rename-all                                | Rename all marked file(s).                                |
+| dwim-shell-commands-reorient-image                            | Reorient images.                                          |
+| dwim-shell-commands-resize-gif                                | Resize marked gif(s).                                     |
+| dwim-shell-commands-resize-image                              | Resize marked image(s).                                   |
+| dwim-shell-commands-resize-video                              | Resize marked images.                                     |
+| dwim-shell-commands-sha-256-hash-file-at-clipboard-url        | Download file at clipboard URL and generate SHA-256 hash. |
+| dwim-shell-commands-speed-up-gif                              | Speeds up gif(s).                                         |
+| dwim-shell-commands-speed-up-video                            | Speed up video(s).                                        |
+| dwim-shell-commands-stream-clipboard-url                      | Stream clipboard URL using mpv.                           |
+| dwim-shell-commands-svg-to-png                                | Convert all marked svg(s) to png(s).                      |
+| dwim-shell-commands-unzip                                     | Unzip all marked archives (of any kind) using `atool'.    |
+| dwim-shell-commands-upload-to-0x0                             | Upload the marked files to 0x0.st                         |
+| dwim-shell-commands-video-to-gif                              | Convert all marked videos to gif(s).                      |
+| dwim-shell-commands-video-to-hevc-mkv                         | Convert all marked videos to hevc mkv.                    |
+| dwim-shell-commands-video-to-mp3                              | Drop audio from all marked videos.                        |
+| dwim-shell-commands-video-to-optimized-gif                    | Convert all marked videos to optimized gif(s).            |
+| dwim-shell-commands-video-to-webp                             | Convert all marked videos to webp(s).                     |
+| dwim-shell-commands-video-trim-beginning                      | Drop audio from all marked videos.                        |
+| dwim-shell-commands-video-trim-end                            | Drop audio from all marked videos.                        |
+| dwim-shell-commands-zip                                       | Zip all marked files into archive.zip                     |
+| dwim-shell-commands-zip-password-protect                      | Protect/encrypt zip file(s) with password.                |
 
 * Evaluating elisp functions
 
