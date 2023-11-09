@@ -321,6 +321,7 @@ Here are all the commands I've added so far...
 | dwim-shell-commands-image-trim-borders                       | Trim image(s) border (useful for video screenshots).      |
 | dwim-shell-commands-image-vertical-flip                      | Horizontally flip image(s).                               |
 | dwim-shell-commands-image-view-location-in-map               | Open image(s) location in map/browser.                    |
+| dwim-shell-commands-image-view-location-in-openstreetmap     | Open image(s) location in map/browser.                    |
 | dwim-shell-commands-join-as-pdf                              | Join all marked images as a single pdf.                   |
 | dwim-shell-commands-join-images-horizontally                 | Join all marked images horizontally as a single image.    |
 | dwim-shell-commands-join-images-vertically                   | Join all marked images vertically as a single image.      |

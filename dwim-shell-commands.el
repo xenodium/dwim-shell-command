@@ -126,7 +126,7 @@ Optional argument ARGS as per `browse-url-default-browser'"
    "tesseract '<<f>>' -"
    :utils "tesseract"))
 
-(defun dwim-shell-commands-image-view-location-in-map ()
+(defun dwim-shell-commands-image-view-location-in-openstreetmap ()
   "Open image(s) location in map/browser."
   (interactive)
   (dwim-shell-command-on-marked-files
