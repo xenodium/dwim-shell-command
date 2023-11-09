@@ -22,15 +22,9 @@ Can be applied as:
 
 This makes wrapping one-liners a breeze, so let's do some more...
 
-#+begin_src emacs-lisp :lexical no
-  (defun my/dwim-shell-command-convert-audio-to-mp3 ()
-    "Convert all marked audio to mp3(s)."
-    (interactive)
-    (dwim-shell-command-on-marked-files
-     "Convert to mp3"
-     "ffmpeg -stats -n -i '<<f>>' -acodec libmp3lame '<<fne>>.mp3'"
-     :utils "ffmpeg"))
+** One-liners
 
+#+begin_src emacs-lisp :lexical no
   (defun my/dwim-shell-command-convert-image-to-jpg ()
     "Convert all marked images to jpg(s)."
     (interactive)
@@ -39,14 +33,93 @@ This makes wrapping one-liners a breeze, so let's do some more...
      "convert -verbose '<<f>>' '<<fne>>.jpg'"
      :utils "convert"))
 
-  (defun my/dwim-shell-command-drop-video-audio ()
-    "Drop audio from all marked videos."
+  (defun my/dwim-shell-command-convert-audio-to-mp3 ()
+    "Convert all marked audio to mp3(s)."
     (interactive)
     (dwim-shell-command-on-marked-files
-     "Drop audio" "ffmpeg -i '<<f>>' -c copy -an '<<fne>>_no_audio.<<e>>'"
+     "Convert to mp3"
+     "ffmpeg -stats -n -i '<<f>>' -acodec libmp3lame '<<fne>>.mp3'"
      :utils "ffmpeg"))
+
+  (defun dwim-shell-commands-http-serve-dir ()
+    "HTTP serve current directory."
+    (interactive)
+    (dwim-shell-command-on-marked-files
+     "HTTP serve current dir"
+     "python3 -m http.server"
+     :utils "python3"
+     :focus-now t
+     :no-progress t))
 #+end_src
 
+** Multi-line scripts
+
+#+begin_src emacs-lisp :lexical no
+  (defun dwim-shell-commands-image-view-location-in-openstreetmap ()
+    "Open image(s) location in map/browser."
+    (interactive)
+    (dwim-shell-command-on-marked-files
+     "Browse location"
+     "lat=\"$(exiftool -csv -n -gpslatitude -gpslongitude '<<f>>' | tail -n 1 | cut -s -d',' -f2-2)\"
+          if [ -z \"$lat\" ]; then
+            echo \"no latitude\"
+            exit 1
+          fi
+          lon=\"$(exiftool -csv -n -gpslatitude -gpslongitude '<<f>>' | tail -n 1 | cut -s -d',' -f3-3)\"
+          if [ -z \"$lon\" ]; then
+            echo \"no longitude\"
+            exit 1
+          fi
+          if [[ $OSTYPE == darwin* ]]; then
+            open \"http://www.openstreetmap.org/?mlat=${lat}&mlon=${lon}&layers=C\"
+          else
+            xdg-open \"http://www.openstreetmap.org/?mlat=${lat}&mlon=${lon}&layers=C\"
+          fi"
+     :utils "exiftool"
+     :error-autofocus t
+     :silent-success t))
+#+end_src
+
+** Pick your language
+
+#+begin_src emacs-lisp :lexical no
+  (defun dwim-shell-command-csv-to-json-via-python ()
+    "Convert csv file to json (via Python)."
+    (interactive)
+    (dwim-shell-command-on-marked-files
+     "Convert csv file to json (via Python)."
+     "
+      import csv
+      import json
+      text = json.dumps({ \"values\": list(csv.reader(open('<<f>>')))})
+      fpath = '<<fne>>.json'
+      with open(fpath , 'w') as f:
+        f.write(text)"
+     :shell-util "python"
+     :shell-args "-c"))
+
+  (defun dwim-shell-command-csv-to-json-via-swift ()
+    "Convert csv file to json (via Swift)."
+    (interactive)
+    (dwim-shell-command-on-marked-files
+     "Convert csv file to json (via Swift)."
+     "
+          import Foundation
+          import TabularData
+          let filePath = \"<<f>>\"
+          print(\"reading \\(filePath)\")
+          let content = try String(contentsOfFile: filePath).trimmingCharacters(in: .whitespacesAndNewlines)
+          let parsedCSV = content.components(separatedBy: CSVWritingOptions().newline).map{
+            $0.components(separatedBy: \",\")
+          }
+          let jsonEncoder = JSONEncoder()
+          let jsonData = try jsonEncoder.encode([\"value\": parsedCSV])
+          let json = String(data: jsonData, encoding: String.Encoding.utf8)
+          let outURL = URL(fileURLWithPath:\"<<fne>>.json\")
+          try json!.write(to: outURL, atomically: true, encoding: String.Encoding.utf8)
+          print(\"wrote \\(outURL)\")"
+     :shell-pipe "swift -"))
+#+end_src
 * Build a rich toolbox (or use mine)
 
 While you may want to build your own command toolbox over time, I've also [[#my-toolbox][shared my toolbox]] (close to 100 commands).
