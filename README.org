@@ -89,12 +89,12 @@ This makes wrapping one-liners a breeze, so let's do some more...
     (dwim-shell-command-on-marked-files
      "Convert csv file to json (via Python)."
      "
-      import csv
-      import json
-      text = json.dumps({ \"values\": list(csv.reader(open('<<f>>')))})
-      fpath = '<<fne>>.json'
-      with open(fpath , 'w') as f:
-        f.write(text)"
+  import csv
+  import json
+  text = json.dumps({ \"values\": list(csv.reader(open('<<f>>')))})
+  fpath = '<<fne>>.json'
+  with open(fpath , 'w') as f:
+    f.write(text)"
      :shell-util "python"
      :shell-args "-c"))
 
@@ -103,21 +103,20 @@ This makes wrapping one-liners a breeze, so let's do some more...
     (interactive)
     (dwim-shell-command-on-marked-files
      "Convert csv file to json (via Swift)."
-     "
-          import Foundation
-          import TabularData
-          let filePath = \"<<f>>\"
-          print(\"reading \\(filePath)\")
-          let content = try String(contentsOfFile: filePath).trimmingCharacters(in: .whitespacesAndNewlines)
-          let parsedCSV = content.components(separatedBy: CSVWritingOptions().newline).map{
-            $0.components(separatedBy: \",\")
-          }
-          let jsonEncoder = JSONEncoder()
-          let jsonData = try jsonEncoder.encode([\"value\": parsedCSV])
-          let json = String(data: jsonData, encoding: String.Encoding.utf8)
-          let outURL = URL(fileURLWithPath:\"<<fne>>.json\")
-          try json!.write(to: outURL, atomically: true, encoding: String.Encoding.utf8)
-          print(\"wrote \\(outURL)\")"
+     "import Foundation
+      import TabularData
+      let filePath = \"<<f>>\"
+      print(\"reading \\(filePath)\")
+      let content = try String(contentsOfFile: filePath).trimmingCharacters(in: .whitespacesAndNewlines)
+      let parsedCSV = content.components(separatedBy: CSVWritingOptions().newline).map{
+        $0.components(separatedBy: \",\")
+      }
+      let jsonEncoder = JSONEncoder()
+      let jsonData = try jsonEncoder.encode([\"value\": parsedCSV])
+      let json = String(data: jsonData, encoding: String.Encoding.utf8)
+      let outURL = URL(fileURLWithPath:\"<<fne>>.json\")
+      try json!.write(to: outURL, atomically: true, encoding: String.Encoding.utf8)
+      print(\"wrote \\(outURL)\")"
      :shell-pipe "swift -"))
 #+end_src
 * Build a rich toolbox (or use mine)
