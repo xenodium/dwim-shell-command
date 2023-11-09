@@ -611,6 +611,15 @@ EOF"
    :silent-success t
    :utils "ffmpeg"))
 
+(defun dwim-shell-commands-video-to-thumbnail ()
+  "Generate a thumbnail for marked video(s)."
+  (interactive)
+  (let ((temp-dir (make-temp-file "thumbnails-" t)))
+    (dwim-shell-command-on-marked-files
+     "Thumbnail with ffmpeg"
+     "ffmpeg -i '<<f>>' -ss 00:00:01.000 -vframes 1 '<<fne>>.png'"
+     :utils "ffmpeg")))
+
 (defun dwim-shell-commands-drop-video-audio ()
   "Drop audio from all marked videos."
   (interactive)
