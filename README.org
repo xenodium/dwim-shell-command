@@ -309,6 +309,7 @@ Here are all the commands I've added so far...
 | dwim-shell-commands-video-to-hevc-mkv                        | Convert all marked videos to hevc mkv.                    |
 | dwim-shell-commands-video-to-mp3                             | Drop audio from all marked videos.                        |
 | dwim-shell-commands-video-to-optimized-gif                   | Convert all marked videos to optimized gif(s).            |
+| dwim-shell-commands-video-to-thumbnail                       | Generate a thumbnail for marked video(s).                 |
 | dwim-shell-commands-video-to-webp                            | Convert all marked videos to webp(s).                     |
 | dwim-shell-commands-video-trim-beginning                     | Drop audio from all marked videos.                        |
 | dwim-shell-commands-video-trim-end                           | Drop audio from all marked videos.                        |
