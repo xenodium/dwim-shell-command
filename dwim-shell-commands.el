@@ -617,7 +617,7 @@ EOF"
   (let ((temp-dir (make-temp-file "thumbnails-" t)))
     (dwim-shell-command-on-marked-files
      "Thumbnail with ffmpeg"
-     "ffmpeg -i '<<f>>' -ss 00:00:01.000 -vframes 1 '<<fne>>.png'"
+     "ffmpeg -i '<<f>>' -ss 00:00:01.000 -vframes 1 '<<fne>>.jpg'"
      :utils "ffmpeg")))
 
 (defun dwim-shell-commands-drop-video-audio ()
