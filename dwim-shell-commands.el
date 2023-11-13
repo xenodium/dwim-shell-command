@@ -1057,6 +1057,14 @@ ffmpeg -n -i '<<f>>' -vf \"scale=$width:-2\" '<<fne>>_x<<Scaling factor:0.5>>.<<
    :utils '("sips" "iconutil")
    :extensions "png"))
 
+(defun dwim-shell-commands-image-add-drop-shadow ()
+  "Add a drop shadow."
+  (interactive)
+  (dwim-shell-command-on-marked-files
+   "Add a drop shadow."
+   "convert <<f>> -bordercolor white -border 13 \\( +clone -background black -shadow 80x3+2+2 \\) +swap -background white -layers merge +repage <<fne>>-shadow.<<e>>"
+   :utils "convert"))
+
 (defun dwim-shell-commands-image-trim-borders ()
   "Trim image(s) border (useful for video screenshots)."
   (interactive)
