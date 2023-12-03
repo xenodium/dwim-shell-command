@@ -249,7 +249,7 @@ Optional argument ARGS as per `browse-url-default-browser'"
                           (or (seq-first (dwim-shell-command--file-extensions)) "png"))))
     (dwim-shell-command-on-marked-files
      "Join images horizontally"
-     (format "convert -verbose '<<*>>' +append '<<%s(u)>>'"
+     (format "convert -verbose '<<*>>' -gravity center -append '<<%s(u)>>'"
              (dwim-shell-command-read-file-name
               (format "Join as image named (default \"%s\"): " filename)
               :default filename))
@@ -262,7 +262,7 @@ Optional argument ARGS as per `browse-url-default-browser'"
                           (or (seq-first (dwim-shell-command--file-extensions)) "png"))))
     (dwim-shell-command-on-marked-files
      "Join images vertically"
-     (format "convert -verbose '<<*>>' -append '<<%s(u)>>'"
+     (format "convert -verbose '<<*>>' -gravity center -append '<<%s(u)>>'"
              (dwim-shell-command-read-file-name
               (format "Join as image named (default \"%s\"): " filename)
               :default filename))
