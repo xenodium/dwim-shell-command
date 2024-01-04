@@ -707,7 +707,8 @@ ffmpeg -n -i '<<f>>' -vf \"scale=$width:-2\" '<<fne>>_x<<Scaling factor:0.5>>.<<
            (format "xed --line %d '<<f>>'"
                    (line-number-at-pos (point)))
          "open '<<f>>'")
-     "setsid -w xdg-open '<<f>>'")
+     "xdg-open '<<f>>'")
+   :shell-util "zsh"
    :shell-args '("-x" "-c")
    :silent-success t
    :utils (if (eq system-type 'darwin)
