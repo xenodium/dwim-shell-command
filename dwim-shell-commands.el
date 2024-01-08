@@ -293,7 +293,7 @@ Optional argument ARGS as per `browse-url-default-browser'"
    :utils "ffmpeg"))
 
 (defun dwim-shell-commands-macos-ocr ()
-  "Add a password to pdf(s)."
+  "Select a macOS desktop area to OCR and copy to kill ring."
   (interactive)
   (dwim-shell-command-on-marked-files
    "OCR area"
@@ -302,13 +302,13 @@ Optional argument ARGS as per `browse-url-default-browser'"
    :utils "ocr"
    :on-completion
    (lambda (buffer process)
-     (if-let ((success (= (process-exit-status process) 0))
-              (text (with-current-buffer buffer
-                      (string-trim (buffer-string)))))
-         (progn
-           (kill-buffer buffer)
-           (kill-new text)
-           (message "OCR copied to clipboard"))))))
+     (when-let ((success (= (process-exit-status process) 0))
+                (text (with-current-buffer buffer
+                        (string-trim (buffer-string)))))
+       (progn
+         (kill-buffer buffer)
+         (kill-new text)
+         (message "OCR copied to clipboard"))))))
 
 (defun dwim-shell-commands-macos-convert-to-mp4 ()
   "Convert to mov to mp4"
