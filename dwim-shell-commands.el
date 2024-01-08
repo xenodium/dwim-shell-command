@@ -590,7 +590,6 @@ EOF"
    (format "qpdf --verbose --encrypt '%s' '%s' 256 -- '<<f>>' '<<fne>>_protected.<<e>>'"
            (read-passwd "user-password: ")
            (read-passwd "owner-password: "))
-   :extensions pdf
    :utils "qpdf"
    :extensions "pdf"))
 
