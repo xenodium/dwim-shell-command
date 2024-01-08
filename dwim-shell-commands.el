@@ -292,6 +292,24 @@ Optional argument ARGS as per `browse-url-default-browser'"
    "ffmpeg -i '<<f>>' -movflags faststart -pix_fmt yuv420p -vf 'scale=trunc(iw/2)*2:trunc(ih/2)*2' '<<fne>>.mp4'"
    :utils "ffmpeg"))
 
+(defun dwim-shell-commands-macos-ocr ()
+  "Add a password to pdf(s)."
+  (interactive)
+  (dwim-shell-command-on-marked-files
+   "OCR area"
+   "ocr"
+   ;; brew install schappim/ocr/ocr
+   :utils "ocr"
+   :on-completion
+   (lambda (buffer process)
+     (if-let ((success (= (process-exit-status process) 0))
+              (text (with-current-buffer buffer
+                      (string-trim (buffer-string)))))
+         (progn
+           (kill-buffer buffer)
+           (kill-new text)
+           (message "OCR copied to clipboard"))))))
+
 (defun dwim-shell-commands-macos-convert-to-mp4 ()
   "Convert to mov to mp4"
   (interactive)
