@@ -714,6 +714,38 @@ ffmpeg -n -i '<<f>>' -vf \"scale=$width:-2\" '<<fne>>_x<<Scaling factor:0.5>>.<<
                     (propertize hash 'face 'font-lock-string-face)))
        (switch-to-buffer buffer)))))
 
+(defun dwim-shell-commands-view-sqlite-schema-diagram ()
+  "View sqlite schema diagram."
+  (interactive)
+  (dwim-shell-command-on-marked-files
+   "View sqlite schema"
+   "set -e
+temp_dir=\"${TMPDIR:-/tmp/}\"
+file_name=\"sqlite-schema-diagram.sql\"
+file_path=\"${temp_dir}/${file_name}\"
+url=\"https://gitlab.com/Screwtapello/sqlite-schema-diagram/-/raw/main/sqlite-schema-diagram.sql\"
+
+if [[ ! -f \"$file_path\" ]]; then
+  curl -o \"$file_path\" \"$url\"
+fi
+
+sqlite3 -list \"<<f>>\" < $file_path > \"<<fne>>.dot\"
+dot -Tsvg \"<<fne>>.dot\" > \"<<fne>>.svg\"
+echo \"<<fne>>.svg\"
+"
+   :utils '("dot" "sqlite3")
+   :on-completion
+   (lambda (buffer process)
+     (if (= (process-exit-status process) 0)
+         (with-current-buffer buffer
+           (let ((svg-file (string-trim (buffer-string))))
+             (if (string-suffix-p "svg" svg-file)
+                 (progn
+                   (find-file svg-file)
+                   (kill-buffer buffer))
+               (switch-to-buffer buffer))))
+       (switch-to-buffer buffer)))))
+
 (defun dwim-shell-commands-open-externally ()
   "Open file(s) externally."
   (interactive)
