@@ -582,6 +582,15 @@ EOF"
              (* 100 factor) factor))
    :utils "convert"))
 
+(defun dwim-shell-commands-resize-image-in-pixels ()
+  "Resize marked image(s) in pixels."
+  (interactive)
+  (dwim-shell-command-on-marked-files
+   "Resize image"
+   (let ((width (read-number "Resize width (pixels): " 500)))
+     (format "convert -resize %dx '<<f>>' '<<fne>>_x%d.<<e>>'" width width))
+   :utils "convert"))
+
 (defun dwim-shell-commands-pdf-password-protect ()
   "Add a password to pdf(s)."
   (interactive)
