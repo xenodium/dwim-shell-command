@@ -572,8 +572,8 @@ EOF"
    "pdftotext -layout '<<f>>' '<<fne>>.txt'"
    :utils "pdftotext"))
 
-(defun dwim-shell-commands-resize-image ()
-  "Resize marked image(s)."
+(defun dwim-shell-commands-resize-image-by-factor ()
+  "Resize marked image(s) by factor."
   (interactive)
   (dwim-shell-command-on-marked-files
    "Resize image"
