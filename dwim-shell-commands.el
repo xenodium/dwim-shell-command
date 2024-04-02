@@ -664,6 +664,17 @@ EOF"
              (/ 1 (float factor)) factor))
    :utils "ffmpeg"))
 
+(defun dwim-shell-commands-speed-up-video-fragment ()
+  "Speed up fragment in video(s)."
+  (interactive)
+  (let ((start (read-number "Start (seconds): "))
+        (end (read-number "End (seconds): "))
+        (factor (read-number "Speed up factor: " 2)))
+    (dwim-shell-command-on-marked-files
+     "Speed up fragment in video"
+     (format "ffmpeg -i '<<f>>' -filter_complex '[0:v]trim=start=0:end=%d,setpts=PTS-STARTPTS[v0];[0:v]trim=start=%d:end=%d,setpts=(PTS-1)/%d[v1];[0:v]trim=start=%d,setpts=PTS-STARTPTS[v2];[v0][v1][v2]concat=n=3:v=1:a=0' -preset fast '<<fne>>_%d:%dx%d.<<e>>'" start start end factor end start end factor)
+     :utils "ffmpeg")))
+
 (defun dwim-shell-commands-resize-video ()
   "Resize marked images."
   (interactive)
