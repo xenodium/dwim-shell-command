@@ -407,6 +407,19 @@ Optional argument ARGS as per `browse-url-default-browser'"
      :post-process-template (lambda (script file)
                               (string-replace "<<frames>>" (dwim-shell-commands--gifsicle-frames-every factor file) script)))))
 
+(defun dwim-shell-commands-image-apply-ios-round-corners ()
+  "Apply iOS round corners to image(s)."
+  (interactive)
+  (dwim-shell-command-on-marked-files
+     "Speed up gif"
+     "set -o xtrace
+      width=$(ffprobe -v error -select_streams v:0 -show_entries stream=width -of default=noprint_wrappers=1:nokey=1 '<<f>>')
+      height=$(ffprobe -v error -select_streams v:0 -show_entries stream=height -of default=noprint_wrappers=1:nokey=1 '<<f>>')
+      corner=$((${width}/4))
+      echo ${corner}
+      convert -size ${width}x${height} xc:none -fill white -draw \"roundRectangle 0,0 ${width},${height} ${corner},${corner}\" '<<f>>' -compose SrcIn -composite '<<fne>>_ios_round.<<e>>'"
+     :utils '("ffprobe" "convert")))
+
 (defun dwim-shell-commands-clip-round-rect-gif ()
   "Clip gif(s) with round rectangle."
   (interactive)
