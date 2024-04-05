@@ -338,6 +338,25 @@ Optional argument ARGS as per `browse-url-default-browser'"
    "ffmpeg -i '<<f>>' -vcodec libwebp -filter:v fps=fps=10 -compression_level 3 -lossless 1 -loop 0 -preset default -an -vsync 0 '<<fne>>'.webp"
    :utils "ffmpeg"))
 
+(defun dwim-shell-commands-webp-to-video ()
+  "Convert all marked webp(s) to video(s)."
+  (interactive)
+  (dwim-shell-command-on-marked-files
+   "Convert webp to video"
+   "convert '<<f>>' '<<td>>/<<bne>>.gif'
+    ffmpeg -i '<<td>>/<<bne>>.gif' -movflags faststart -pix_fmt yuv420p -vf 'scale=trunc(iw/2)*2:trunc(ih/2)*2' '<<fne>>.mp4'"
+   :utils '("ffmpeg" "convert")
+   :extensions "webp"))
+
+(defun dwim-shell-commands-webp-to-gif ()
+  "Convert all marked webp(s) to gif(s)."
+  (interactive)
+  (dwim-shell-command-on-marked-files
+   "Convert webp to video"
+   "convert '<<f>>' '<<fne>>.gif''"
+   :utils '("convert")
+   :extensions "webp"))
+
 (defun dwim-shell-commands-video-to-hevc-mkv ()
   "Convert all marked videos to hevc mkv."
   (interactive)
