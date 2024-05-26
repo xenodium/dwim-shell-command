@@ -228,21 +228,21 @@ Optional argument ARGS as per `browse-url-default-browser'"
   (dwim-shell-command-on-marked-files
    "Create favicons"
    "echo '<link rel=\"icon\" type=\"image/svg+xml\" href=\"<<f>>\">'
-   convert -background none '<<f>>' -resize 16x16 '<<fne>>-16.png'
+   rsvg-convert -o '<<fne>>-16.png' -w 16 -h 16 '<<f>>'
    echo '<link rel=\"icon\" type=\"image/png\" href=\"<<fne>>-16.png\" sizes=\"16x16\">'
-   convert -background none '<<f>>' -resize 32x32 '<<fne>>-32.png'
+   rsvg-convert -o '<<fne>>-32.png' -w 32 -h 32 '<<f>>'
    echo '<link rel=\"icon\" type=\"image/png\" href=\"<<fne>>-32.png\" sizes=\"32x32\">'
-   convert -background none '<<f>>' -resize 48x48 '<<fne>>-48.png'
+   rsvg-convert -o '<<fne>>-48.png' -w 48 -h 48 '<<f>>'
    echo '<link rel=\"icon\" type=\"image/png\" href=\"<<fne>>-48.png\" sizes=\"48x48\">'
    convert '<<fne>>-16.png' '<<fne>>-32.png' '<<fne>>-48.png' '<<fne>>.ico'
    echo '<link rel=\"icon\" type=\"image/x-icon\" href=\"/'<<fne>>.ico'\">'
-   convert -background none '<<f>>' -resize 64x64 '<<fne>>-64.png'
+   rsvg-convert -o '<<fne>>-64.png' -w 64 -h 64 '<<f>>'
    echo '<link rel=\"icon\" type=\"image/png\" href=\"<<fne>>-64.png\" sizes=\"64x64\">'
-   convert -background none '<<f>>' -resize 180x180 '<<fne>>-180.png'
+   rsvg-convert -o '<<fne>>-180.png' -w 180 -h 180 '<<f>>'
    echo '<link rel=\"apple-touch-icon\" href=\"<<fne>>-180.png\" sizes=\"180x180\">'
    read -n 1 -s -r"
    :extensions "svg"
-   :utils "convert"
+   :utils '("convert" "rsvg-convert")
    :focus-now t))
 
 (defun dwim-shell-commands-make-transparent-png ()
