@@ -657,6 +657,16 @@ EOF"
    :utils "qpdf"
    :extensions "pdf"))
 
+(defun dwim-shell-commands-pdf-password-unprotect ()
+  "Remove a password from pdf(s)."
+  (interactive)
+  (dwim-shell-command-on-marked-files
+   "Remove protection from pdf"
+   (format "qpdf --verbose --decrypt --password='%s' -- '<<f>>' '<<fne>>_unprotected.<<e>>'"
+           (read-passwd "password: "))
+   :utils "qpdf"
+   :extensions "pdf"))
+
 (defun dwim-shell-commands--gifsicle-frames-every (skipping-every file)
   "Generate frames SKIPPING-EVERY count for video FILE."
   (string-join
