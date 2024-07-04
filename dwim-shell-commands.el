@@ -315,6 +315,16 @@ Optional argument ARGS as per `browse-url-default-browser'"
    "ffmpeg -i '<<f>>' -movflags faststart -pix_fmt yuv420p -vf 'scale=trunc(iw/2)*2:trunc(ih/2)*2' '<<fne>>.mp4'"
    :utils "ffmpeg"))
 
+(defun dwim-shell-commands-macos-empty-trash ()
+  "Empty macOS trash."
+  (interactive)
+  (when (y-or-n-p "Empty macOS trash? ")
+    (dwim-shell-command-on-marked-files
+     "Empty macOS trash"
+     "trash -e -y"
+     :silent-success t
+     :utils "trash")))
+
 (defun dwim-shell-commands-macos-ocr ()
   "Select a macOS desktop area to OCR and copy to kill ring."
   (interactive)
