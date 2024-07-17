@@ -118,7 +118,7 @@ Optional argument ARGS as per `browse-url-default-browser'"
    "exiftool '<<f>>'"
    :utils "exiftool"))
 
-(defun dwim-shell-commands-ocr-text-from-image ()
+(defun dwim-shell-commands-tesseract-ocr-text-from-image ()
   "Extract text from image via tesseract."
   (interactive)
   (dwim-shell-command-on-marked-files
@@ -325,7 +325,7 @@ Optional argument ARGS as per `browse-url-default-browser'"
      :silent-success t
      :utils "trash")))
 
-(defun dwim-shell-commands-macos-ocr-desktop-region ()
+(defun dwim-shell-commands-macos-ocr-text-from-desktop-region ()
   "Select a macOS desktop area to OCR and copy recognized text to kill ring."
   (interactive)
   (dwim-shell-command-on-marked-files
@@ -344,7 +344,7 @@ Optional argument ARGS as per `browse-url-default-browser'"
          (goto-char (point-min))
          (message "OCR copied to clipboard"))))))
 
-(defun dwim-shell-commands-macos-ocr-file ()
+(defun dwim-shell-commands-macos-ocr-text-from-image ()
   "OCR file and copy recognized text to kill ring."
   (interactive)
   (dwim-shell-command-on-marked-files
