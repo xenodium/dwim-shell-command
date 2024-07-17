@@ -325,22 +325,42 @@ Optional argument ARGS as per `browse-url-default-browser'"
      :silent-success t
      :utils "trash")))
 
-(defun dwim-shell-commands-macos-ocr ()
-  "Select a macOS desktop area to OCR and copy to kill ring."
+(defun dwim-shell-commands-macos-ocr-desktop-region ()
+  "Select a macOS desktop area to OCR and copy recognized text to kill ring."
   (interactive)
   (dwim-shell-command-on-marked-files
    "OCR area"
-   "ocr"
-   ;; brew install schappim/ocr/ocr
-   :utils "ocr"
+   "macosrec --ocr"
+   ;; brew install xenodium/macosrec/macosrec
+   :utils "macosrec"
    :on-completion
    (lambda (buffer process)
      (when-let ((success (= (process-exit-status process) 0))
                 (text (with-current-buffer buffer
                         (string-trim (buffer-string)))))
        (progn
-         (kill-buffer buffer)
          (kill-new text)
+         (switch-to-buffer buffer)
+         (goto-char (point-min))
+         (message "OCR copied to clipboard"))))))
+
+(defun dwim-shell-commands-macos-ocr-file ()
+  "OCR file and copy recognized text to kill ring."
+  (interactive)
+  (dwim-shell-command-on-marked-files
+   "OCR area"
+   "macosrec --ocr --clipboard --input '<<f>>'"
+   ;; brew install xenodium/macosrec/macosrec
+   :utils "macosrec"
+   :on-completion
+   (lambda (buffer process)
+     (when-let ((success (= (process-exit-status process) 0))
+                (text (with-current-buffer buffer
+                        (string-trim (buffer-string)))))
+       (progn
+         (kill-new text)
+         (switch-to-buffer buffer)
+         (goto-char (point-min))
          (message "OCR copied to clipboard"))))))
 
 (defun dwim-shell-commands-macos-convert-to-mp4 ()
