@@ -38,7 +38,6 @@
 (require 'dired-aux)
 (require 'map)
 (require 'seq)
-(require 'shell)
 (require 'simple)
 (require 'subr-x)
 (require 'view)
@@ -459,7 +458,7 @@ This is implied when <<td>> appears in the script.
     (with-current-buffer proc-buffer
       (let ((inhibit-message t))
       ;; Silence noise of entering shell-mode.
-        (shell-mode))
+        (comint-mode))
       (setq default-directory default-directory)
       (shell-command-save-pos-or-erase)
       (view-mode +1)
