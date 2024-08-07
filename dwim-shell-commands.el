@@ -406,7 +406,7 @@ Optional argument ARGS as per `browse-url-default-browser'"
   (interactive)
   (dwim-shell-command-on-marked-files
    "Convert webp to video"
-   "convert '<<f>>' '<<fne>>.gif''"
+   "convert '<<f>>' '<<fne>>.gif'"
    :utils '("convert")
    :extensions "webp"))
 
