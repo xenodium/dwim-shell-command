@@ -714,6 +714,26 @@ EOF"
    "ffmpeg -i '<<f>>' -vn -ab 128k -ar 44100 -y '<<fne>>.mp3'"
    :utils "ffmpeg"))
 
+(defun dwim-shell-commands-set-media-artwork-image-metadata ()
+  "Set image artwork metadata for media file(s)."
+  (interactive)
+  (let ((artwork-file (read-file-name "Select artwork image: "
+                                      nil nil t))
+        (should-backup (y-or-n-p "Create backup files? ")))
+    (unless (file-regular-p artwork-file)
+      (user-error "Not a file"))
+    (unless should-backup
+      (unless (y-or-n-p "Override files? ")
+        (user-error "Aborted")))
+    (dwim-shell-command-on-marked-files
+     "Set album artwork"
+     (format (if should-backup
+                 "cp '<<f>>' '<<f>>.bak'; AtomicParsley '<<f>>' --artwork '%s' --overWrite"
+               "AtomicParsley '<<f>>' --artwork '%s' --overWrite")
+             artwork-file)
+     :utils "AtomicParsley"
+     :silent-success t)))
+
 (defun dwim-shell-commands-video-trim-beginning ()
   "Drop audio from all marked videos."
   (interactive)
