@@ -717,19 +717,20 @@ EOF"
 (defun dwim-shell-commands-set-media-artwork-image-metadata ()
   "Set image artwork metadata for media file(s)."
   (interactive)
-  (let ((artwork-file (read-file-name "Select artwork image: "
-                                      nil nil t))
+  (let ((artwork-file (file-name-unquote
+                       (read-file-name "Select artwork image: "
+                                       nil nil t)))
         (should-backup (y-or-n-p "Create backup files? ")))
     (unless (file-regular-p artwork-file)
       (user-error "Not a file"))
     (unless should-backup
-      (unless (y-or-n-p "Override files? ")
+      (unless (y-or-n-p "Override file(s)? ")
         (user-error "Aborted")))
     (dwim-shell-command-on-marked-files
      "Set album artwork"
      (format (if should-backup
-                 "cp '<<f>>' '<<f>>.bak'; AtomicParsley '<<f>>' --artwork '%s' --overWrite"
-               "AtomicParsley '<<f>>' --artwork '%s' --overWrite")
+                 "ffmpeg -i '<<f>>' -i '%s' -map_metadata 0 -map 0:a -map 1 -c copy -disposition:v:0 attached_pic '<<f>>.tmp.<<e>>' && mv -f '<<f>>' '<<f>>.bak' && mv '<<f>>.tmp.<<e>>' '<<f>>'"
+               "ffmpeg -i '<<f>>' -i '%s' -map_metadata 0 -map 0:a -map 1 -c copy -disposition:v:0 attached_pic '<<f>>.tmp.<<e>>' && mv -f '<<f>>.tmp.<<e>>' '<<f>>'")
              artwork-file)
      :utils "AtomicParsley"
      :silent-success t)))
