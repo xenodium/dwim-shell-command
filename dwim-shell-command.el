@@ -5,7 +5,7 @@
 ;; Author: Alvaro Ramirez
 ;; Package-Requires: ((emacs "28.1"))
 ;; URL: https://github.com/xenodium/dwim-shell-command
-;; Version: 0.62.1
+;; Version: 0.62.2
 
 ;; This package is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -120,6 +120,7 @@ Use `identify' to remove formatting."
   error-autofocus
   monitor-directory)
 
+;;;###autoload
 (defun dwim-shell-command (prefix)
   "Execute DWIM shell command asynchronously using noweb templates.
 
