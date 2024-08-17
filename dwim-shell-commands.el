@@ -714,6 +714,53 @@ EOF"
    "ffmpeg -i '<<f>>' -vn -ab 128k -ar 44100 -y '<<fne>>.mp3'"
    :utils "ffmpeg"))
 
+(defun dwim-shell-commands-ndjson-to-org ()
+  "Convert ndjson file to org."
+  (interactive)
+  (unless (eq (length (dwim-shell-command--files)) 1)
+    (error "Only 1 file supported"))
+  (let* ((emacs-bin (file-truename (expand-file-name invocation-name
+                                                     invocation-directory)))
+         (source (nth 0 (dwim-shell-command--files)))
+         (destination (concat (file-name-sans-extension
+                               source) ".org"))
+         (fields (with-temp-buffer
+                   (insert-file-contents source)
+                   (buffer-substring-no-properties (point-min) (line-end-position))
+                   (read-string "Fields: " (mapconcat 'identity (mapcar (lambda (item)
+                                                                          (symbol-name (car item)))
+                                                                        (json-read-from-string
+                                                                         (buffer-substring-no-properties
+                                                                          (point-min) (line-end-position))))
+                                                      " ")))))
+    (dwim-shell-command-on-marked-files
+     "Convert ndjson to org"
+     (format "%s --quick --batch --eval \"%s\"" emacs-bin
+             (replace-regexp-in-string
+              "\"" "\\\\\""
+              (prin1-to-string
+               `(progn
+                  (require 'org)
+                  (require 'json)
+                  (defun convert-to-org-table (ndjson)
+                    (let ((rows (mapcar #'json-read-from-string
+                                        (split-string ndjson "\n" t))))
+                      (orgtbl-to-orgtbl
+                       (append
+                        (list (split-string ,fields))
+                        '(hline)
+                        (mapcar (lambda (obj)
+                                  (mapcar (lambda (key)
+                                            (alist-get (intern key) obj))
+                                          (split-string ,fields)))
+                                rows)) nil)))
+                  (with-temp-buffer
+                    (insert-file-contents ,source)
+                    (let ((org (convert-to-org-table (buffer-string))))
+                      (with-temp-file ,destination
+                        (insert org))))))))
+     :extensions "ndjson")))
+
 (defun dwim-shell-commands-set-media-artwork-image-metadata ()
   "Set image artwork metadata for media file(s)."
   (interactive)
