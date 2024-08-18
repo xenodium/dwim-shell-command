@@ -751,7 +751,7 @@ EOF"
                         '(hline)
                         (mapcar (lambda (obj)
                                   (mapcar (lambda (key)
-                                            (alist-get (intern key) obj))
+                                            (or (alist-get (intern key) obj) ""))
                                           (split-string ,fields)))
                                 rows)) nil)))
                   (with-temp-buffer
