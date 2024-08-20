@@ -707,11 +707,19 @@ EOF"
                              skipping-every)) " "))
 
 (defun dwim-shell-commands-video-to-mp3 ()
-  "Drop audio from all marked videos."
+  "Convert video(s) to mp3."
   (interactive)
   (dwim-shell-command-on-marked-files
    "Convert to mp3"
    "ffmpeg -i '<<f>>' -vn -ab 128k -ar 44100 -y '<<fne>>.mp3'"
+   :utils "ffmpeg"))
+
+(defun dwim-shell-commands-video-to-mp3-with-artwork ()
+  "Convert video(s) to mp3 (keep frame as artwork)."
+  (interactive)
+  (dwim-shell-command-on-marked-files
+   "Convert to mp3"
+   "ffmpeg -i '<<f>>' -vf 'select=eq(n\\,0)' -q:v 3 cover.jpg -i '<<f>>' -vn -ab 128k -ar 44100 -y -map_metadata 0 -id3v2_version 3 -write_id3v1 1 -metadata:s:v title='Album cover' -metadata:s:v comment='Cover (front)' '<<fne>>.mp3'"
    :utils "ffmpeg"))
 
 (defun dwim-shell-commands-ndjson-to-org ()
