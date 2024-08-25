@@ -41,6 +41,28 @@
    "ffmpeg -stats -n -i '<<f>>' -acodec libmp3lame '<<fne>>.mp3'"
    :utils "ffmpeg"))
 
+(defun dwim-shell-extract-har-content ()
+  "Extract all har content fields to files."
+  (interactive)
+  (dwim-shell-command-on-marked-files
+   "Extract har content"
+   "declare -A mime_map=( \
+  [\"audio/mpeg\"]=\"mp3\" \
+  [\"image/jpeg\"]=\"jpg\" \
+  [\"text/plain\"]=\"txt\" \
+  [\"application/json\"]=\"json\" \
+  # TODO: Add more mappings if needed.
+)
+
+jq -r '.log.entries[] | @base64' '<<f>>' | while read -r entry; do
+  fname=$(echo \"$entry\" | base64 --decode | jq -r '.request.url | capture(\"(?<=//)[^/]+/(?<path>.*)\") | .path | gsub(\"[^a-zA-Z0-9]\"; \"_\")')
+  mimeType=$(echo \"$entry\" | base64 --decode | jq -r '.response.content.mimeType')
+  extension=${mime_map[$mimeType]:-\"bin\"}
+  content=$(echo \"$entry\" | base64 --decode | jq -r '.response.content.text')
+  echo \"$content\" | base64 --decode > \"${fname:0:255}.${extension}\"
+done"
+   :utils "jq"))
+
 (defun dwim-shell-commands-open-clipboard-url ()
   "Open clipboard URL.  Offer to stream if possible."
   (interactive)
