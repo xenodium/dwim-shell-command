@@ -41,26 +41,63 @@
    "ffmpeg -stats -n -i '<<f>>' -acodec libmp3lame '<<fne>>.mp3'"
    :utils "ffmpeg"))
 
-(defun dwim-shell-extract-har-content ()
+(defun dwim-shell-extract-har-content (prefix)
   "Extract all har content fields to files."
-  (interactive)
+  (interactive "P")
+  (when prefix
+    (setq prefix (string-trim (read-string "Transcription locale: " "ja-JP")))
+    (when (string-empty-p prefix)
+      (errro "No locale given")))
   (dwim-shell-command-on-marked-files
-   "Extract har content"
-   "declare -A mime_map=( \
+   "Extract har response content"
+   (format "declare -A mime_map=( \
   [\"audio/mpeg\"]=\"mp3\" \
   [\"image/jpeg\"]=\"jpg\" \
   [\"text/plain\"]=\"txt\" \
   [\"application/json\"]=\"json\" \
   # TODO: Add more mappings if needed.
 )
-
+if %s; then
+  : > '<<fne>>.org'
+fi
 jq -r '.log.entries[] | @base64' '<<f>>' | while read -r entry; do
-  fname=$(echo \"$entry\" | base64 --decode | jq -r '.request.url | capture(\"(?<=//)[^/]+/(?<path>.*)\") | .path | gsub(\"[^a-zA-Z0-9]\"; \"_\")')
-  mimeType=$(echo \"$entry\" | base64 --decode | jq -r '.response.content.mimeType')
-  extension=${mime_map[$mimeType]:-\"bin\"}
+  basename=$(echo \"$entry\" | base64 --decode | jq -r '.request.url | capture(\"(?<=//)[^/]+/(?<path>.*)\") | .path | gsub(\"[^a-zA-Z0-9]\"; \"_\")')
+  mime=$(echo \"$entry\" | base64 --decode | jq -r '.response.content.mimeType')
+  extension=${mime_map[$mime]:-\"bin\"}
+  name=\"${basename:0:255}.${extension}\"
   content=$(echo \"$entry\" | base64 --decode | jq -r '.response.content.text')
-  echo \"$content\" | base64 --decode > \"${fname:0:255}.${extension}\"
+  echo \"$content\" | base64 --decode > \"${name}\"
+  transcription=$(macosrec --speech-to-text --locale %s --input \"${name}\" | xargs)
+  if %s; then
+    echo \"${name}\" >> '<<fne>>.org'
+    echo \"${transcription}\" >> '<<fne>>.org'
+  fi
 done"
+           (if prefix
+               "true"
+             "false")
+           prefix
+           (if prefix
+               "true"
+             "false"))
+   :utils "jq"
+   :extensions "har"))
+
+(defun dwim-shell-extract-har-urls ()
+  "Get all request URLs."
+  (interactive)
+  (dwim-shell-command-on-marked-files
+   "Extract har request URLs"
+   "jq -r '.log.entries[].request.url' '<<f>>'"
+   :utils "jq"))
+
+(defun dwim-shell-view-open-ports-per-app ()
+  "View open ports per app"
+  (interactive)
+  (dwim-shell-command-on-marked-files
+   "Ports per app"
+   ;; https://x.com/nurmiwilliam/status/1823228630664634695
+   "sudo lsof -iTCP -sTCP:LISTEN -n -P | awk 'NR>1 {print $9, $1, $2}' | sed 's/.*://' | sort -u | while read port process pid; do echo \"Port $port: $(ps -p $pid -o command= | sed 's/^-//') (PID: $pid)\"; done | sort -n"
    :utils "jq"))
 
 (defun dwim-shell-commands-open-clipboard-url ()
