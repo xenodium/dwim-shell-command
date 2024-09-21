@@ -324,6 +324,15 @@ Optional argument ARGS as per `browse-url-default-browser'"
             :default "joined.pdf"))
    :utils "convert"))
 
+(defun dwim-shell-commands-keep-pdf-page ()
+  "Keep a page from pdf."
+  (interactive)
+  (let ((page-num (read-number "Keep page number: " 1)))
+    (dwim-shell-command-on-marked-files
+     "Keep pdf page"
+     (format "qpdf '<<f>>' --pages . %d -- '<<fne>>_%d.<<e>>'" page-num page-num)
+     :utils "qpdf")))
+
 (defun dwim-shell-commands-join-images-horizontally ()
   "Join all marked images horizontally as a single image."
   (interactive)
