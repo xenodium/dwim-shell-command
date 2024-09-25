@@ -57,20 +57,26 @@
   [\"application/json\"]=\"json\" \
   # TODO: Add more mappings if needed.
 )
-if %s; then
-  : > '<<fne>>.org'
-fi
+outdir='<<fne>>'
+mkdir -p \"${outdir}\"
+  : > \"${outdir}/<<bne>>.org\"
 jq -r '.log.entries[] | @base64' '<<f>>' | while read -r entry; do
+  url=$(echo \"$entry\" | base64 --decode | jq -r '.request.url')
   basename=$(echo \"$entry\" | base64 --decode | jq -r '.request.url | capture(\"(?<=//)[^/]+/(?<path>.*)\") | .path | gsub(\"[^a-zA-Z0-9]\"; \"_\")')
   mime=$(echo \"$entry\" | base64 --decode | jq -r '.response.content.mimeType')
   extension=${mime_map[$mime]:-\"bin\"}
-  name=\"${basename:0:255}.${extension}\"
+  name=\"${outdir}/${basename:0:255}.${extension}\"
+  echo \"${name}\"
   content=$(echo \"$entry\" | base64 --decode | jq -r '.response.content.text')
   echo \"$content\" | base64 --decode > \"${name}\"
-  transcription=$(macosrec --speech-to-text --locale %s --input \"${name}\" | xargs)
-  if %s; then
-    echo \"${name}\" >> '<<fne>>.org'
-    echo \"${transcription}\" >> '<<fne>>.org'
+  if [ -f \"${name}\" ] && %s; then
+    transcription=$(macosrec --speech-to-text --locale %s --input \"${name}\")
+    if [ $? -eq 0 ]; then
+      transcribed_name=\"${outdir}/${transcription}.${extension}\"
+      mv \"${name}\" \"${transcribed_name}\"
+      basename=$(basename \"${transcribed_name}\")
+      echo \"[[file:${basename}][${transcription}]] [[${url}][remote]]\" >> \"${outdir}/<<bne>>.org\"
+    fi
   fi
 done"
            (if prefix
