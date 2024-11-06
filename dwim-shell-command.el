@@ -937,21 +937,26 @@ all needed to finalize processing."
     (setq dwim-shell-command--commands
           (map-delete dwim-shell-command--commands (process-name process)))))
 
-(cl-defun dwim-shell-command--unique-new-file-path (file-path &key expand)
-  "Return a unique FILE-PATH using :EXPAND to expand FILE-PATH.
+(defun dwim-shell-command--unique-new-file-path (file-path)
+  "Return a unique FILE-PATH.
+
+If FILE-PATH already contains a number in the format (n), set counter to n.
+
 \"/tmp/blah.txt\" -> \"/tmp/blah(1).txt\"
-\"/tmp/blah\" -> \"/tmp/blah(1)\""
-  (let ((counter 1)
-        (name (file-name-sans-extension file-path))
-        (extension (file-name-extension file-path)))
+\"/tmp/blah(2).txt\" -> \"/tmp/blah(3).txt\""
+  (let* ((name (file-name-sans-extension file-path))
+         (extension (file-name-extension file-path))
+         (counter (if (string-match "(\\([0-9]+\\))$" name)
+                      (string-to-number (match-string 1 name))
+                    1)))
+    (when (string-match "(\\([0-9]+\\))$" name)
+      (setq name(replace-match "" t t name)))
     (while (file-exists-p file-path)
-      (if extension
-          (setq file-path (format "%s(%d).%s" name counter extension))
-        (setq file-path (format "%s(%d)" name counter)))
-      (setq counter (1+ counter)))
-    (if expand
-        (expand-file-name file-path)
-      file-path)))
+      (setq counter (1+ counter))
+      (setq file-path (if extension
+                          (format "%s(%d).%s" base-name counter extension)
+                        (format "%s(%d)" base-name counter))))
+    file-path))
 
 (defun dwim-shell-command--sentinel (process _)
   "Handles PROCESS sentinel and STATE."
