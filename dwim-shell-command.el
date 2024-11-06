@@ -5,7 +5,7 @@
 ;; Author: Alvaro Ramirez
 ;; Package-Requires: ((emacs "28.1"))
 ;; URL: https://github.com/xenodium/dwim-shell-command
-;; Version: 0.63.1
+;; Version: 0.63.2
 
 ;; This package is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -948,14 +948,14 @@ If FILE-PATH already contains a number in the format (n), set counter to n.
          (extension (file-name-extension file-path))
          (counter (if (string-match "(\\([0-9]+\\))$" name)
                       (string-to-number (match-string 1 name))
-                    1)))
+                    0)))
     (when (string-match "(\\([0-9]+\\))$" name)
       (setq name(replace-match "" t t name)))
     (while (file-exists-p file-path)
       (setq counter (1+ counter))
       (setq file-path (if extension
-                          (format "%s(%d).%s" base-name counter extension)
-                        (format "%s(%d)" base-name counter))))
+                          (format "%s(%d).%s" name counter extension)
+                        (format "%s(%d)" name counter))))
     file-path))
 
 (defun dwim-shell-command--sentinel (process _)
