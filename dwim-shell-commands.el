@@ -490,6 +490,15 @@ Optional argument ARGS as per `browse-url-default-browser'"
    :utils "ffmpeg"))
 
 ;;;###autoload
+(defun dwim-shell-commands-video-to-mov ()
+  "Convert all marked videos to mov(s)."
+  (interactive)
+  (dwim-shell-command-on-marked-files
+   "Convert to mov"
+   "ffmpeg -i  '<<f>>' -c:v libx264 -c:a aac  '<<fne>>.mov'"
+   :utils "ffmpeg"))
+
+;;;###autoload
 (defun dwim-shell-commands-video-to-webp ()
   "Convert all marked videos to webp(s)."
   (interactive)
