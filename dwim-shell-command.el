@@ -90,7 +90,7 @@ Set to nil to use `shell-command-switch'."
 
 (defcustom dwim-shell-command-done-buffer-name
   (lambda (name)
-    (format "✅ %s %s" name (propertize "done" 'face 'success)))
+    (format "%s %s" name (propertize "done" 'face 'success)))
   "Function to format buffer name on success.
 Use `identify' to remove formatting."
   :type 'function
@@ -98,7 +98,7 @@ Use `identify' to remove formatting."
 
 (defcustom dwim-shell-command-error-buffer-name
   (lambda (name)
-    (format "⛔️ %s %s" name (propertize "error" 'face 'error)))
+    (format "%s %s" name (propertize "error" 'face 'error)))
   "Function to format buffer name on error.
 Use `identify' to remove formatting."
   :type 'function
