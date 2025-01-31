@@ -1025,6 +1025,16 @@ fi"
      (format "ffmpeg -i '<<f>>' -filter_complex '[0:v]trim=start=0:end=%d,setpts=PTS-STARTPTS[v0];[0:v]trim=start=%d:end=%d,setpts=(PTS-1)/%d[v1];[0:v]trim=start=%d,setpts=PTS-STARTPTS[v2];[v0][v1][v2]concat=n=3:v=1:a=0' -preset fast '<<fne>>_%d:%dx%d.<<e>>'" start start end factor end start end factor)
      :utils "ffmpeg")))
 
+(defun dwim-shell-commands-set-song-title ()
+  "Set song(s) title."
+  (interactive)
+  (let ((title (replace-regexp-in-string "'" "\'" (read-string "New title: "))))
+    (dwim-shell-command-on-marked-files
+     "Set song(s) title"
+     (format "ffmpeg -i '<<f>>' -metadata title='%s' -codec copy '<<td>>/<<bne>>_temp.<<e>>' && mv -f '<<td>>/<<bne>>_temp.<<e>>' '<<f>>'"
+             title)
+     :utils "ffmpeg")))
+
 ;;;###autoload
 (defun dwim-shell-commands-resize-video ()
   "Resize marked images."
