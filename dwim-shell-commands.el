@@ -1369,7 +1369,7 @@ echo \"<<fne>>.svg\"
   "Select and start recording a macOS window."
   (interactive)
   (let* ((window (dwim-shell-commands--macos-select-window))
-         (path (dwim-shell-commands--generate-path "~/Desktop" (car window) ".gif"))
+         (path (dwim-shell-commands--generate-path "~/Screenshots" (car window) ".gif"))
          (buffer-file-name path) ;; override so <<f>> picks it up
          (inhibit-message t))
     ;; Silence echo to avoid unrelated messages making into animation.
@@ -1381,7 +1381,7 @@ echo \"<<fne>>.svg\"
         "macosrec --record '%s' --gif --output '<<f>>'"
         (cdr window))
        :silent-success t
-       :monitor-directory "~/Desktop"
+       :monitor-directory "~/Screenshots"
        :no-progress t
        :utils '("ffmpeg" "macosrec")
        :on-completion
@@ -1457,7 +1457,7 @@ echo \"<<fne>>.svg\"
      "Start recording a macOS window."
      (format "macosrec --screenshot %s" (cdr window))
      :silent-success t
-     :monitor-directory "~/Desktop"
+     :monitor-directory "~/Screenshots"
      :no-progress t
      :utils "macosrec")))
 
