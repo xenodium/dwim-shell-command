@@ -1642,13 +1642,29 @@ Needs ideviceinstaller and libmobiledevice installed."
    :monitor-directory "~/Downloads"))
 
 ;;;###autoload
-(defun dwim-shell-commands-duplicate ()
-  "Duplicate file."
-  (interactive)
-  (dwim-shell-command-on-marked-files
-   "Duplicate file(s)."
-   "cp -R '<<f>>' '<<f(u)>>'"
-   :utils "cp"))
+(defun dwim-shell-commands-duplicate (times)
+  "Duplicate file.
+
+With prefix, duplicate it n TIMES."
+  (interactive "p")
+  (dwim-shell-commands--duplicate (list times)))
+
+(defun dwim-shell-commands--duplicate (remaining)
+  "Helper using REMAINING as a list to share recursion state."
+  (let ((current-buffer (current-buffer)))
+    (dwim-shell-command-on-marked-files
+     "Duplicate file(s)."
+     "cp -R '<<f>>' '<<f(u)>>'"
+     :utils "cp"
+     :on-completion
+     (lambda (buffer _process)
+       (kill-buffer buffer)
+       (setcar remaining (1- (car remaining)))
+       (if (> (car remaining) 0)
+           (with-current-buffer current-buffer
+             (dwim-shell-commands--duplicate remaining))
+         (dired-jump nil (with-current-buffer current-buffer
+                           default-directory)))))))
 
 ;;;###autoload
 (defun dwim-shell-commands-rename-all ()
