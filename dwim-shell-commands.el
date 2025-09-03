@@ -1381,6 +1381,7 @@ echo \"<<fne>>.svg\"
         "macosrec --record '%s' --gif --output '<<f>>'"
         (cdr window))
        :silent-success t
+       :focus-now nil
        :monitor-directory "~/Screenshots"
        :no-progress t
        :utils '("ffmpeg" "macosrec")
