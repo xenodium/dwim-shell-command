@@ -426,6 +426,17 @@ Optional argument ARGS as per `browse-url-default-browser'"
    :utils "ffmpeg"))
 
 ;;;###autoload
+(defun dwim-shell-commands-set-video-framerate ()
+  "Set framerate for marked video(s)."
+  (interactive)
+  (dwim-shell-command-on-marked-files
+   "Set video framerate"
+   (let ((fps (read-number "Target framerate (fps): " 30)))
+     (format "ffmpeg -i '<<f>>' -r %d -c:a copy '<<fne>>_%dfps.<<e>>'"
+             fps fps))
+   :utils "ffmpeg"))
+
+;;;###autoload
 (defun dwim-shell-commands-macos-empty-trash ()
   "Empty macOS trash."
   (interactive)
