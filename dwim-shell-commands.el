@@ -1751,6 +1751,40 @@ gpg: decryption failed: No pinentry"
    :utils "gpgconf"
    :silent-success t))
 
+(defun dwim-shell-commands-upload-to-tmpfiles-org ()
+  "Upload the marked files to 0x0.st"
+  (interactive)
+  (dwim-shell-command-on-marked-files
+   "0x0 upload"
+   "curl -Ffile=@<<f>> -Fsecret= https://tmpfiles.org/api/v1/upload"
+   :utils "curl"
+   :post-process-template
+   ;; The placement of required single quotes confuse the escaping
+   ;; mechanisms of dwim-shell-command, as it considers @ as the
+   ;; opening 'quote' because it appears in front of <<f>>.
+   ;;
+   ;; What we want is:
+   ;;
+   ;; curl -F'file=@yourfile.png' -Fsecret= https://tmpfiles.org/api/v1/upload
+   (lambda (template path)
+     (string-replace "-Ffile" "-F'file"
+                     (string-replace path (concat path "'") template)))
+   :on-completion
+   (lambda (buffer process)
+     (if (= (process-exit-status process) 0)
+         (with-current-buffer buffer
+           (if-let* ((json (condition-case nil
+                               (json-read-from-string (buffer-string))
+                             (error nil)))
+                     (success (equal (map-elt json 'status) "success")))
+               (progn
+                 (eww (map-nested-elt json '(data url)))
+                 (kill-new (map-nested-elt json '(data url)))
+                 (message "Copied: %s" (current-kill 0))
+                 (kill-buffer buffer))
+             (switch-to-buffer buffer)))
+       (switch-to-buffer buffer)))))
+
 ;; Based on
 ;; https://apps.bram85.nl/git/bram/gists/src/commit/31ac3363da925daafa2420b7f96c67612ca28241/gists/dwim-0x0-upload.el
 ;;;###autoload
