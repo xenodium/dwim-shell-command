@@ -1541,28 +1541,6 @@ echo \"<<fne>>.svg\"
    :utils "magick"))
 
 ;;;###autoload
-(defun dwim-shell-commands-git-clone-clipboard-url-to-downloads ()
-  "Clone git URL in clipboard to \"~/Downloads/\"."
-  (interactive)
-  (cl-assert (or (string-match-p "^\\(http\\|https\\|ssh\\)://" (current-kill 0))
-                 (string-match-p "^git@" (current-kill 0))) nil "No URL in clipboard")
-  (let* ((url (current-kill 0))
-         (download-dir (expand-file-name "~/Downloads/"))
-         (project-dir (concat download-dir (file-name-base url)))
-         (default-directory download-dir))
-    (when (or (not (file-exists-p project-dir))
-              (when (y-or-n-p (format "%s exists.  delete?" (file-name-base url)))
-                (delete-directory project-dir t)
-                t))
-      (dwim-shell-command-on-marked-files
-       (format "Clone %s" (file-name-base url))
-       (format "git clone %s" url)
-       :utils "git"
-       :on-completion (lambda (buffer _process)
-                        (kill-buffer buffer)
-                        (dired project-dir))))))
-
-;;;###autoload
 (defun dwim-shell-commands-http-serve-dir ()
   "HTTP serve current directory."
   (interactive)
@@ -1590,14 +1568,63 @@ echo \"<<fne>>.svg\"
         (t
          (error "No python found"))))
 
+(defcustom dwim-shell-commands-git-clone-dirs
+  '("~/Downloads" "~/Desktop")
+  "List of directories where git repositories can be cloned.
+The first directory is used as the default."
+  :type '(repeat directory)
+  :group 'dwim-shell-commands)
+
 ;;;###autoload
-(defun dwim-shell-commands-git-clone-clipboard-url ()
-  "Clone git URL in clipboard to `default-directory'."
-  (interactive)
-  (dwim-shell-command-on-marked-files
-   (format "Clone %s" (file-name-base (current-kill 0)))
-   "git clone <<cb>>"
-   :utils "git"))
+(defun dwim-shell-commands-git-clone-clipboard-url (&optional arg)
+  "Clone git URL in clipboard to a directory.
+With C-u ARG, prompt for directory from `dwim-shell-commands-git-clone-dirs'.
+With C-u C-u ARG, prompt for any directory.
+Without prefix, use the first directory in the `dwim-shell-commands-git-clone-dirs'."
+  (interactive "P")
+  (unless (or (string-match-p "^\\(?:http\\|https\\|ssh\\|git\\)://" (string-trim (current-kill 0)))
+              (string-match-p "^git@" (string-trim (current-kill 0))))
+    (user-error "No URL in clipboard"))
+  (let* ((url (current-kill 0))
+         (current-dir (abbreviate-file-name
+                       (directory-file-name default-directory)))
+         (fallback-dir (car dwim-shell-commands-git-clone-dirs))
+         (candidates (append (list (cons fallback-dir fallback-dir))
+                             (list (cons (concat current-dir " (current)") current-dir))
+                             (mapcar (lambda (dir)
+                                       (cons dir dir))
+                                     (cdr dwim-shell-commands-git-clone-dirs))))
+         (target-dir (cond
+                      ;; C-u prefix - Choose from `dwim-shell-commands-git-clone-dirs'
+                      ((equal arg '(4))
+                       (expand-file-name
+                        (map-elt candidates
+                                 (completing-read "Clone repo to: " candidates
+                                                  nil t))))
+                      ;; C-u C-u prefix - Choose any directory
+                      ((equal arg '(16))
+                       (expand-file-name
+                        (read-directory-name "Clone repo to: " nil nil t)))
+                      ;; Default to using first in `dwim-shell-commands-git-clone-dirs'
+                      (t
+                       (expand-file-name fallback-dir))))
+         (base-name (file-name-base url))
+         (project-dir (dwim-shell-command--unique-new-file-path
+                       (concat (file-name-as-directory target-dir) base-name)))
+         (default-directory target-dir))
+    (dwim-shell-command-on-marked-files
+     (format "Clone %s" (file-name-base url))
+     (format "git clone %s %s"
+             (shell-quote-argument url)
+             (shell-quote-argument (file-name-nondirectory project-dir)))
+     :monitor-directory target-dir
+     :utils "git"
+     :on-completion (lambda (buffer _)
+                      (kill-buffer buffer)
+                      (dired project-dir)
+                      (goto-char (point-min))
+                      (when (re-search-forward "README" nil t)
+                        (beginning-of-line))))))
 
 ;;;###autoload
 (defun dwim-shell-commands-pass-git-pull ()
