@@ -84,10 +84,7 @@ done"
            (if prefix
                "true"
              "false")
-           prefix
-           (if prefix
-               "true"
-             "false"))
+           prefix)
    :utils "jq"
    :extensions "har"))
 
@@ -916,7 +913,6 @@ fi"
                                source) ".org"))
          (fields (with-temp-buffer
                    (insert-file-contents source)
-                   (buffer-substring-no-properties (point-min) (line-end-position))
                    (read-string "Fields: " (mapconcat 'identity (mapcar (lambda (item)
                                                                           (symbol-name (car item)))
                                                                         (json-read-from-string
@@ -997,11 +993,10 @@ fi"
 (defun dwim-shell-commands-video-to-thumbnail ()
   "Generate a thumbnail for marked video(s)."
   (interactive)
-  (let ((temp-dir (make-temp-file "thumbnails-" t)))
-    (dwim-shell-command-on-marked-files
-     "Thumbnail with ffmpeg"
-     "ffmpeg -i '<<f>>' -ss 00:00:01.000 -vframes 1 '<<fne>>.jpg'"
-     :utils "ffmpeg")))
+  (dwim-shell-command-on-marked-files
+   "Thumbnail with ffmpeg"
+   "ffmpeg -i '<<f>>' -ss 00:00:01.000 -vframes 1 '<<fne>>.jpg'"
+   :utils "ffmpeg"))
 
 ;;;###autoload
 (defun dwim-shell-commands-drop-video-audio ()
@@ -1394,7 +1389,7 @@ echo \"<<fne>>.svg\"
          (inhibit-message t))
     ;; Silence echo to avoid unrelated messages making into animation.
     (cl-letf (((symbol-function 'dwim-shell-command--message)
-               (lambda (fmt &rest args) nil)))
+               (lambda (_fmt &rest _args) nil)))
       (dwim-shell-command-on-marked-files
        "Start recording a macOS window."
        (format
@@ -1444,7 +1439,7 @@ echo \"<<fne>>.svg\"
   (interactive)
   (let ((inhibit-message t))
     (cl-letf (((symbol-function 'dwim-shell-command--message)
-               (lambda (fmt &rest args) nil)))
+               (lambda (_fmt &rest _args) nil)))
       (dwim-shell-command-on-marked-files
        "End recording macOS window."
        "macosrec --save"
@@ -1459,7 +1454,7 @@ echo \"<<fne>>.svg\"
   (interactive)
   (let ((inhibit-message t))
     (cl-letf (((symbol-function 'dwim-shell-command--message)
-               (lambda (fmt &rest args) nil)))
+               (lambda (_fmt &rest _args) nil)))
       (dwim-shell-command-on-marked-files
        "Abort recording macOS window."
        "macosrec --abort"
@@ -1578,9 +1573,13 @@ The first directory is used as the default."
 ;;;###autoload
 (defun dwim-shell-commands-git-clone-clipboard-url (&optional arg)
   "Clone git URL in clipboard to a directory.
-With C-u ARG, prompt for directory from `dwim-shell-commands-git-clone-dirs'.
+With C-u ARG, prompt for directory from
+`dwim-shell-commands-git-clone-dirs'.
+
 With C-u C-u ARG, prompt for any directory.
-Without prefix, use the first directory in the `dwim-shell-commands-git-clone-dirs'."
+
+Without prefix, use the first directory in
+`dwim-shell-commands-git-clone-dirs'."
   (interactive "P")
   (unless (or (string-match-p "^\\(?:http\\|https\\|ssh\\|git\\)://" (string-trim (current-kill 0)))
               (string-match-p "^git@" (string-trim (current-kill 0))))
