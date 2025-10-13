@@ -1585,7 +1585,7 @@ Without prefix, use the first directory in the `dwim-shell-commands-git-clone-di
   (unless (or (string-match-p "^\\(?:http\\|https\\|ssh\\|git\\)://" (string-trim (current-kill 0)))
               (string-match-p "^git@" (string-trim (current-kill 0))))
     (user-error "No URL in clipboard"))
-  (let* ((url (current-kill 0))
+  (let* ((url (string-trim (current-kill 0)))
          (current-dir (abbreviate-file-name
                        (directory-file-name default-directory)))
          (fallback-dir (car dwim-shell-commands-git-clone-dirs))
