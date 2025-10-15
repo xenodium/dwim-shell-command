@@ -301,9 +301,10 @@ Here are all the commands I've added so far...
 | dwim-shell-commands-duplicate                                | Duplicate file.                                                           |
 | dwim-shell-commands-epub-to-org                              | Convert epub(s) to org.                                                   |
 | dwim-shell-commands-external-ip                              | Copy external IP to kill ring.                                            |
+| dwim-shell-commands-extract-first-video-frame                | Extract first frame from video(s).                                        |
 | dwim-shell-commands-files-combined-size                      | Get files combined file size.                                             |
 | dwim-shell-commands-gif-to-video                             | Convert all marked gif(s) to video(s).                                    |
-| dwim-shell-commands-git-clone-clipboard-url                  | Clone git URL in clipboard to `default-directory'.                        |
+| dwim-shell-commands-git-clone-clipboard-url                  | Clone git URL in clipboard to a directory.                                |
 | dwim-shell-commands-git-clone-clipboard-url-to-downloads     | Clone git URL in clipboard to "~/Downloads/".                             |
 | dwim-shell-commands-git-delete-untracked-files               | Delete untracked git files in `default-directory'.                        |
 | dwim-shell-commands-git-list-untracked-files                 | List untracked git files in `default-directory'.                          |
@@ -350,6 +351,7 @@ Here are all the commands I've added so far...
 | dwim-shell-commands-macos-toggle-bluetooth-device-connection | Toggle Bluetooth device connection.                                       |
 | dwim-shell-commands-macos-toggle-dark-mode                   | Toggle macOS dark mode.                                                   |
 | dwim-shell-commands-macos-toggle-display-rotation            | Rotate display.                                                           |
+| dwim-shell-commands-macos-toggle-menu-bar-autohide           | Toggle macOS dark mode.                                                   |
 | dwim-shell-commands-macos-version-and-hardware-overview-info | View macOS version and hardware overview info.                            |
 | dwim-shell-commands-make-swift-package-executable            | Create a swift package executable                                         |
 | dwim-shell-commands-make-swift-package-library               | Create a swift package library                                            |
@@ -372,6 +374,8 @@ Here are all the commands I've added so far...
 | dwim-shell-commands-resize-image-in-pixels                   | Resize marked image(s) in pixels.                                         |
 | dwim-shell-commands-resize-video                             | Resize marked images.                                                     |
 | dwim-shell-commands-set-media-artwork-image-metadata         | Set image artwork metadata for media file(s).                             |
+| dwim-shell-commands-set-song-title                           | Set song(s) title.                                                        |
+| dwim-shell-commands-set-video-framerate                      | Set framerate for marked video(s).                                        |
 | dwim-shell-commands-sha-256-hash-file-at-clipboard-url       | Download file at clipboard URL and generate SHA-256 hash.                 |
 | dwim-shell-commands-speed-up-gif                             | Speeds up gif(s).                                                         |
 | dwim-shell-commands-speed-up-video                           | Speed up video(s).                                                        |
@@ -382,8 +386,10 @@ Here are all the commands I've added so far...
 | dwim-shell-commands-tesseract-ocr-text-from-image            | Extract text from image via tesseract.                                    |
 | dwim-shell-commands-unzip                                    | Unzip all marked archives (of any kind) using `atool'.                    |
 | dwim-shell-commands-upload-to-0x0                            | Upload the marked files to 0x0.st                                         |
+| dwim-shell-commands-upload-to-tmpfiles-org                   | Upload the marked files to 0x0.st                                         |
 | dwim-shell-commands-video-to-gif                             | Convert all marked videos to gif(s).                                      |
 | dwim-shell-commands-video-to-hevc-mkv                        | Convert all marked videos to hevc mkv.                                    |
+| dwim-shell-commands-video-to-mov                             | Convert all marked videos to mov(s).                                      |
 | dwim-shell-commands-video-to-mp3                             | Convert video(s) to mp3.                                                  |
 | dwim-shell-commands-video-to-mp3-with-artwork                | Convert video(s) to mp3 (keep frame as artwork).                          |
 | dwim-shell-commands-video-to-optimized-gif                   | Convert all marked videos to optimized gif(s).                            |
