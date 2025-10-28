@@ -294,6 +294,15 @@ Optional argument ARGS as per `browse-url-default-browser'"
    :utils "convert"))
 
 ;;;###autoload
+(defun dwim-shell-commands-image-to-webp ()
+  "Convert all marked images to webp(s)."
+  (interactive)
+  (dwim-shell-command-on-marked-files
+   "Convert to png"
+   "convert -verbose '<<f>>' '<<fne>>.webp'"
+   :utils "convert"))
+
+;;;###autoload
 (defun dwim-shell-commands-svg-to-png ()
   "Convert all marked svg(s) to png(s)."
   (interactive)
