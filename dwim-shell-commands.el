@@ -1255,10 +1255,10 @@ echo \"<<fne>>.svg\"
   "Share selected files from macOS."
   (interactive)
   (let* ((services (dwim-shell-commands--macos-sharing-services))
-         (service-name (completing-read "Share via: " services))
+         (service-name (completing-read "macOS share via: " services))
          (selection (seq-position services service-name #'string-equal)))
     (dwim-shell-command-on-marked-files
-     "Share"
+     "macOS Share"
      (format
       "import AppKit
 
