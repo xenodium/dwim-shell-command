@@ -1365,6 +1365,21 @@ echo \"<<fne>>.svg\"
      :utils "duti")))
 
 ;;;###autoload
+(defun dwim-shell-commands-macos-open-app ()
+  "Open a macOS app."
+  (interactive)
+  (let* ((apps (dwim-shell-commands--macos-apps))
+         (selection (progn
+                      (cl-assert apps nil "No apps found")
+                      (completing-read "Open with: " apps nil t))))
+    (dwim-shell-command-on-marked-files
+     "Open with"
+     (format "open '%s'" (map-elt apps selection))
+     :silent-success t
+     :no-progress t
+     :utils "open")))
+
+;;;###autoload
 (defun dwim-shell-commands-macos-open-with ()
   "Open file(s) with specific external app."
   (interactive)
