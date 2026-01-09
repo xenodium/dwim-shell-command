@@ -1220,12 +1220,10 @@ echo \"<<fne>>.svg\"
   (interactive)
   (dwim-shell-command-on-marked-files
    "Reveal in Finder"
-   "import AppKit
-    NSWorkspace.shared.activateFileViewerSelecting([\"<<*>>\"].map{URL(fileURLWithPath:$0)})"
+   "open -R '<<*>>'"
    :silent-success t
-   :shell-pipe "swift -"
-   :join-separator ", "
-   :utils "swift"))
+   :no-progress t
+   :utils "open"))
 
 (defun dwim-shell-commands--macos-sharing-services ()
   "Return a list of sharing services."
