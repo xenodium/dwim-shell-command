@@ -22,6 +22,10 @@ Can be applied as:
 
 This makes wrapping one-liners a breeze, so let's do some more...
 
+Watch on [[https://www.youtube.com/watch?v=77NtPfgr4x0][YouTube]]
+
+[[https://www.youtube.com/watch?v=77NtPfgr4x0][file:yt.png]]
+
 ** One-liners
 
 #+begin_src emacs-lisp :lexical no
