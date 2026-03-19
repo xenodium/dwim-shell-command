@@ -330,7 +330,7 @@ Here are all the commands I've added so far...
 | dwim-shell-commands-join-as-pdf                              | Join all marked images as a single pdf.                                   |
 | dwim-shell-commands-join-images-horizontally                 | Join all marked images horizontally as a single image.                    |
 | dwim-shell-commands-join-images-vertically                   | Join all marked images vertically as a single image.                      |
-| dwim-shell-commands-kdeconnect-share                         | Send file(s) to DEVICE through KDE Connect.                               |
+| dwim-shell-commands-kdeconnect-share                         | Send file(s) to a device through KDE Connect.                             |
 | dwim-shell-commands-keep-pdf-page                            | Keep a page from pdf.                                                     |
 | dwim-shell-commands-kill-gpg-agent                           | Kill (thus restart) gpg agent.                                            |
 | dwim-shell-commands-kill-process                             | Select and kill process.                                                  |
