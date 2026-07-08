@@ -1218,14 +1218,19 @@ echo \"<<fne>>.svg\"
 (defun dwim-shell-commands-macos-reveal-in-finder ()
   "Reveal selected files in macOS Finder."
   (interactive)
-  (dwim-shell-command-on-marked-files
-   "Reveal in Finder"
-   "import AppKit
-    NSWorkspace.shared.activateFileViewerSelecting([\"<<*>>\"].map{URL(fileURLWithPath:$0)})"
-   :silent-success t
-   :shell-pipe "swift -"
-   :join-separator ", "
-   :utils "swift"))
+  ;; AppleScript's \"POSIX file\" does not resolve relative paths
+  ;; (unlike Swift's URL(fileURLWithPath:)), so force absolute ones.
+  (let ((dwim-shell-command-use-absolute-paths t))
+    (dwim-shell-command-on-marked-files
+     "Reveal in Finder"
+     "tell application \"Finder\"
+      activate
+      select {POSIX file \"<<*>>\"}
+    end tell"
+     :silent-success t
+     :shell-pipe "osascript -"
+     :join-separator ", POSIX file "
+     :utils "osascript")))
 
 (defun dwim-shell-commands--macos-sharing-services ()
   "Return a list of sharing services."
