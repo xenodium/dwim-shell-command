@@ -362,9 +362,9 @@ Optional argument ARGS as per `browse-url-default-browser'"
   "Send file(s) to a device through KDE Connect."
   (interactive)
   (let* ((devices (process-lines "kdeconnect-cli" "--list-available" "--name-only"))
-         (device (completing-read "Device: " devices nil t)))
+         (device (if (string= (car devices) "0 devices found") (user-error "0 devices found") (completing-read "Device: " devices nil t))))
     (dwim-shell-command-on-marked-files
-     "Send file(s) to DEVICE through KDE Connect."
+     "Send file(s) to a device through KDE Connect."
      (format "kdeconnect-cli -n '%s' --share '<<f>>'" device)
      :utils "kdeconnect-cli")))
 
