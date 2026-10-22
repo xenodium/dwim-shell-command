@@ -1074,20 +1074,12 @@ fi"
 
 ;;;###autoload
 (defun dwim-shell-commands-resize-video ()
-  "Resize marked images."
+  "Resize marked videos."
   (interactive)
   (dwim-shell-command-on-marked-files
    "Resize video"
-   "
-eval $(ffprobe -v quiet -show_format -of flat=s=_ -show_entries stream=width '<<f>>');
-width=${streams_stream_0_width};
-zmodload zsh/mathfunc
-width=$((rint($width * <<Scaling factor:0.5>>)));
-# Make it even or face 'not divisible by 2' errors.
-if [[ $((width%2)) -ne 0 ]] then
-  width=$(($width - 1))
-fi
-ffmpeg -n -i '<<f>>' -vf \"scale=$width:-2\" '<<fne>>_x<<Scaling factor:0.5>>.<<e>>'"
+   ;; Round width down to even or face 'not divisible by 2' errors.
+   "ffmpeg -n -i '<<f>>' -vf \"scale=trunc(iw*<<Scaling factor:0.5>>/2)*2:-2\" '<<fne>>_x<<Scaling factor:0.5>>.<<e>>'"
    :utils "ffmpeg"))
 
 ;;;###autoload
