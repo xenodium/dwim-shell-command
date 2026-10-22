@@ -1599,7 +1599,7 @@ echo \"<<fne>>.svg\"
   (cond ((executable-find "python3")
          (dwim-shell-command-on-marked-files
           "HTTP serve current dir"
-          "python3 -m http.server"
+          "echo \"Serving at http://$(ipconfig getifaddr en0 2>/dev/null || hostname -I 2>/dev/null | awk '{print $1}'):8000\" && python3 -m http.server"
           :utils "python3"
           :focus-now t
           :no-progress t))
