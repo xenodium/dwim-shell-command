@@ -1577,6 +1577,21 @@ echo \"<<fne>>.svg\"
    "magick convert -fuzz 3% -define trim:percent-background=0% -trim +repage '<<f>>' '<<fne>>_trimmed.<<e>>'"
    :utils "magick"))
 
+(defun dwim-shell-command-round-corners-and-shadow ()
+  "Add rounded corners and shadow to image."
+  (interactive)
+  (dwim-shell-command-on-marked-files
+   "Round corners and shadow"
+   "f=<<f>>; fne=<<fne>>; e=<<e>>; \
+    width=$(magick identify -format %w \"$f\"); \
+    height=$(magick identify -format %h \"$f\"); \
+    magick \"$f\" -background white -flatten tmp_flat.png; \
+    magick -size ${width}x${height} xc:none -fill white -draw \"roundRectangle 0,0 $((width-1)),$((height-1)) 24,24\" tmp_mask.png; \
+    magick tmp_flat.png tmp_mask.png -compose DstIn -composite tmp_round.png; \
+    magick tmp_round.png -bordercolor none -border 30 \\( +clone -background black -shadow 50x10+0+8 \\) +swap -background none -layers merge +repage \"${fne}_styled.${e}\"; \
+    rm tmp_flat.png tmp_mask.png tmp_round.png"
+   :utils "magick"))
+
 ;;;###autoload
 (defun dwim-shell-commands-http-serve-dir ()
   "HTTP serve current directory."
